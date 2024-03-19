@@ -91,21 +91,22 @@ decompose_sets <- function(x, overlap = 1L)
   # Set decomposition ----
   n <- 2L # only pairs of sets are currently supported
 
+  # Coefficients used to convert each disjoint component from binary to int.
+  coefs <- matrix(2L ^ ((n - 1):0), nrow = 1L)
+  # e.g., n = 5 --> (16, 8, 4, 2, 1)
+
   outcomes <- rep(list(0:1), n) # 1 = in set; 0 = not in set
   outcomes <- expand.grid(outcomes)
   outcomes <- as.matrix(outcomes)[-1, ] # convert to matrix, remove null set
 
-  # Coefficients used to convert each disjoint component from binary to int.
-  coefs <- matrix(2L ^ (seq_len(n) - 1L), nrow = 1L)
-  # e.g., n = 5 --> (1, 2, 4, 8, 16)
+  outcome_vec <- as.vector(tcrossprod(coefs, outcomes))
 
   elements <- colnames(incidence)
 
   # The following works for n-tuples, but the entire incidence matrix would need
   # to be supplied instead, and combs would require as many columns as rows in
   # the incidence matrix.
-  x_decomp <- apply(set_pairs, 1, function(sets_i)
-  {
+  x_decomp <- apply(set_pairs, 1, function(sets_i) {
     ## For a pair of sets A and B, define names of disjoint components:
     # "A NOT B" = elements in A and not in B,
     # "B NOT A" = elements in B and not in A,
@@ -118,7 +119,6 @@ decompose_sets <- function(x, overlap = 1L)
 
     # Convert incidence matrix columns from binary to integer
     i_vec <- as.vector(coefs %*% incidence[sets_i, ])
-    outcome_vec <- as.vector(tcrossprod(coefs, outcomes))
 
     idx <- match(i_vec, outcome_vec)
     # Reorder indices to preserve order of decomp_labels

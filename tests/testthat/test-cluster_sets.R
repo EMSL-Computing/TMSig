@@ -1,5 +1,5 @@
 test_that("cutoff must be between 0 and 1", {
-  x <- list("A" = 1:2, "B" = 1:2)
+  x <- list("A" = c("a", "b"), "B" = c("a", "b"))
 
   expect_error(
     cluster_sets(x, cutoff = -0.01),
@@ -14,7 +14,7 @@ test_that("cutoff must be between 0 and 1", {
 
 
 test_that("x must contain 2 or more sets", {
-  x <- list("A" = 1:2)
+  x <- list("A" = c("a", "b"))
 
   expect_error(
     cluster_sets(x),
@@ -24,7 +24,7 @@ test_that("x must contain 2 or more sets", {
 
 
 test_that("a message is produced when no pairs of sets pass threshold", {
-  x <- list("A" = 1:2, "B" = 3:4)
+  x <- list("A" = c("a", "b"), "B" = c("c", "d"))
 
   expect_message(
     object <- cluster_sets(x),
