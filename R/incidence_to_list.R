@@ -21,10 +21,6 @@
 #' incidence_to_list(mat)
 
 incidence_to_list <- function(incidence) {
-
-  if (!all(incidence %in% 0:1))
-    stop("`incidence` must be a matrix with values 0 and 1.")
-
   # The incidence matrix is assumed to be in the correct form with sets as rows
   # and elements as columns.
   idx <- which(incidence == 1, arr.ind = TRUE, useNames = FALSE)

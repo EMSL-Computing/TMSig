@@ -7,14 +7,6 @@ x <- list("A" = 1:3,
 incidence <- incidence(x)
 
 
-test_that("incidence must be a matrix with values 0 and 1", {
-  expect_error(
-    incidence_to_list(matrix(c(0, 1, 2))),
-    "`incidence` must be a matrix with values 0 and 1."
-  )
-})
-
-
 test_that("set order does not change", {
   expect_no_error(
     out <- incidence_to_list(incidence)
