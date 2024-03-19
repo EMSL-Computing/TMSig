@@ -8,7 +8,7 @@ x <- list("A" = letters[1:4],
 test_that("an error is thrown if all sets are empty", {
   expect_error(
     filter_sets(list("A" = c())),
-    "`x` only contains empty sets."
+    "All sets in `x` are empty."
   )
 })
 
@@ -23,7 +23,7 @@ test_that("an error is thrown when min_size is greater than max_size", {
 
 test_that("an error is thrown when all sets are smaller than min_size", {
   expect_error(
-    filter_sets(x),
+    filter_sets(x, min_size = 5L),
     "No sets contain at least `min_size` elements"
   )
 })
@@ -51,18 +51,19 @@ test_that("an error is thrown when no sets satisfy both size requirements", {
 })
 
 
-test_that("smallest allowable set size is 2", {
+test_that("smallest allowable set size is 1", {
   x <- list("A" = c("a", "b"),
             "B" = c("a"),
-            "C" = c("a", "b", "c"))
+            "C" = c("a", "b", "c"),
+            "D" = c())
 
   expect_no_error(
     out <- filter_sets(x, min_size = 1L, max_size = 1L)
   )
 
-  expect_identical(names(out), "A")
+  expect_identical(names(out), "B")
 
-  expect_true(all(range(lengths(out)) >= 2L))
+  expect_true(all(range(lengths(out)) >= 1L))
 })
 
 
@@ -76,17 +77,17 @@ test_that("duplicates and NA values are removed from the sets", {
 })
 
 
-test_that("background must be a character, numeric, or integer vector", {
+test_that("background must be a character vector", {
   expect_error(
     filter_sets(x, background = list()),
-    "`background` must be a character vector containing 2 or more elements."
+    "`background` must be a character vector."
   )
 })
 
 
 test_that("background must contain at least 2 elements", {
   expect_error(
-    filter_sets(x, background = "a"),
+    filter_sets(x, background = c("a", "a", NA)),
     "`background` must contain at least 2 unique, nonmissing elements."
   )
 })
@@ -110,10 +111,8 @@ test_that("at least some elements of sets must be present in background", {
   x <- list("A" = letters[1:3],
             "B" = letters[4:8])
 
-  background <- letters[20:24]
-
   expect_error(
-    filter_sets(x, background = background, min_size = 2L),
+    filter_sets(x, background = letters[20:24], min_size = 2L),
     "No elements of `x` are present in `background`."
   )
 })
@@ -121,15 +120,12 @@ test_that("at least some elements of sets must be present in background", {
 
 test_that("duplicate set names will have their elements combined", {
   x <- list("A" = c("a", "b"),
-            "A" = c("c"))
+            "A" = c("b", "c"))
 
   expect_no_error(
     out <- filter_sets(x, min_size = 3L)
   )
 
-  expect_identical(
-    out,
-    list("A" = c("a", "b", "c"))
-  )
+  expect_identical(out, list("A" = c("a", "b", "c")))
 })
 

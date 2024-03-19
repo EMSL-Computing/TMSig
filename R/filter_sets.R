@@ -21,8 +21,6 @@
 #'
 #' @return A named list of sets at most the same size as \code{x}.
 #'
-#' @seealso \code{\link{find_aliases}}
-#'
 #' @export filter_sets
 #'
 #' @examples
@@ -43,29 +41,36 @@ filter_sets <- function(x,
 {
   # Validate input
   if (!is.list(x) | is.null(names(x)))
-    stop("`x` must be a named list.")
+    stop("`x` must be a named list of character vectors.")
 
   # Relax the type of min_size and max_size to allow doubles
-  if (!(typeof(min_size) %in% c("double", "integer")) | length(min_size) != 1L)
+  if (!is.numeric(min_size) | length(min_size) != 1L)
     stop("`min_size` must be a single integer.")
 
-  if (!(typeof(max_size) %in% c("double", "integer")) | length(max_size) != 1L)
+  if (!is.numeric(max_size) | length(max_size) != 1L)
     stop("`min_size` must be a single integer or Inf.")
 
   if (min_size > max_size)
     stop("`min_size` cannot be greater than `max_size`.")
 
-  # Sets must contain at least 2 elements
-  min_size <- max(2L, min_size)
-  max_size <- max(2L, max_size)
+  # Sets must contain at least 1 element
+  min_size <- max(1L, min_size)
+  max_size <- max(1L, max_size)
 
   # Convert list of sets to a data.frame
   sets <- rep(names(x), lengths(x))
 
-  if (length(sets) == 0L)
-    stop("`x` only contains empty sets.")
+  elements <- unlist(x, use.names = FALSE)
 
-  elements <- as.character(unlist(x, use.names = FALSE))
+  if (length(elements) == 0L)
+    stop("All sets in `x` are empty.")
+
+  if (!is.character(elements)) {
+    if (all(is.na(elements)))
+      stop("`x` only contains missing values.")
+
+    stop("Sets in `x` must consist of character vectors.")
+  }
 
   df <- data.frame(sets = sets,
                    elements = elements,
@@ -74,13 +79,13 @@ filter_sets <- function(x,
   df <- unique(df)
   df <- df[!is.na(df$elements), ]
 
+  # Validate background
   if (!missing(background)) {
-    # Validate background
-    if (!typeof(background) %in% c("character", "double", "integer"))
-      stop("`background` must be a character vector containing ",
-           "2 or more elements.")
 
-    background <- as.character(unique(background))
+    if (!is.character(background))
+      stop("`background` must be a character vector.")
+
+    background <- unique(background)
     background <- background[!is.na(background)]
 
     if (length(background) < 2L)
@@ -97,15 +102,15 @@ filter_sets <- function(x,
 
   o <- order(unique(df$sets)) # prevent ordering by set name
   x <- split(x = df$elements, f = df$sets)[o]
-  s <- lengths(x)
+  ss <- lengths(x) # set size
 
-  if (all(s < min_size))
+  if (all(ss < min_size))
     stop("No sets contain at least `min_size` elements.")
 
-  if (all(s > max_size))
+  if (all(ss > max_size))
     stop("All sets contain more than `max.size` elements.")
 
-  keep_set <- (s >= min_size) & (s <= max_size)
+  keep_set <- (ss >= min_size) & (ss <= max_size)
 
   if (!any(keep_set))
     stop("No sets satisfy both `min_size` and `max_size` thresholds.")

@@ -1,5 +1,5 @@
 test_that("x must contain at least 2 sets", {
-  x <- list("A" = 1:2)
+  x <- list("A" = c("a", "b"))
 
   expect_error(
     decompose_sets(x, overlap = 2L),
@@ -24,7 +24,7 @@ test_that("overlap must be a length 1 integer", {
 
 
 test_that("at least one pair must have overlap elements in common", {
-  x <- list("A" = 1:2, "B" = 2:3)
+  x <- list("A" = c("a", "b"), "B" = c("b", "c"))
 
   expect_error(
     decompose_sets(x, overlap = 2L),
@@ -35,21 +35,21 @@ test_that("at least one pair must have overlap elements in common", {
 
 
 test_that("sets are properly decomposed", {
-  x <- list("A" = 1:3,
-            "B" = 2:5, # overlaps with A
-            "C" = 2:3, # subset of A, not B
-            "D" = c(1, 5)) # insufficient overlap with other sets
+  x <- list("A" = c("a", "b", "c"),
+            "B" = c("b", "c", "d", "e"), # overlaps with A
+            "C" = c("b", "c", "d"), # subset of A, not B
+            "D" = c("a", "e")) # insufficient overlap with other sets
 
   object <- decompose_sets(x, overlap = 2L)
 
-  expected <- list("A NOT B" = 1,
-                   "B NOT A" = 4:5,
-                   "A AND B" = 2:3,
-                   "A NOT C" = 1,
-                   "A AND C" = 2:3,
-                   "B NOT C" = 4:5,
-                   "B AND C" = 2:3)
-  expected <- lapply(expected, as.character)
+  expected <- list("A NOT B" = "a",
+                   "B NOT A" = c("d", "e"),
+                   "A AND B" = c("b", "c"),
+                   "A NOT C" = "a",
+                   "C NOT A" = "d",
+                   "A AND C" = c("b", "c"),
+                   "B NOT C" = "e",
+                   "B AND C" = c("b", "c", "d"))
 
   expect_identical(object, expected)
 })

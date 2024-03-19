@@ -29,8 +29,7 @@
 #'   original results. (The same logic can be applied for set 2.)}
 #' }
 #'
-#' @returns A list of disjoint parts of sets. May contain aliases. Elements of
-#'   each set will be of type \code{"character"}.
+#' @returns A list of disjoint parts of sets. May contain aliases.
 #'
 #' @seealso \code{\link{filter_sets}}
 #'
@@ -51,15 +50,16 @@
 #'           "D" = letters[6:12])
 #'
 #' decompose_sets(x)
+#'
+#' decompose_sets(x, overlap = 5L)
 
-decompose_sets <- function(x, overlap = 5L)
+decompose_sets <- function(x, overlap = 1L)
 {
-  if (!(typeof(overlap) %in% c("double", "integer")) |
-      length(overlap) != 1L)
+  if (!(typeof(overlap) %in% c("double", "integer")) | length(overlap) != 1L)
     stop("`overlap` must be a single integer specifying the minimum ",
          "intersection size required to decompose pairs of sets.")
 
-  overlap <- max(2L, overlap)
+  overlap <- max(1L, overlap)
 
   # This also validates x. Since the size of the intersection between a set and
   # any other set is at most the size of that set, we can pre-filter to sets of
@@ -93,9 +93,9 @@ decompose_sets <- function(x, overlap = 5L)
 
   outcomes <- rep(list(0:1), n) # 1 = in set; 0 = not in set
   outcomes <- expand.grid(outcomes)
-  outcomes <- as.matrix(outcomes)[-1, ] # remove null set, convert to matrix
+  outcomes <- as.matrix(outcomes)[-1, ] # convert to matrix, remove null set
 
-  # Coefficients used to assign a unique value to each disjoint component
+  # Coefficients used to convert each disjoint component from binary to int.
   coefs <- matrix(2L ^ (seq_len(n) - 1L), nrow = 1L)
   # e.g., n = 5 --> (1, 2, 4, 8, 16)
 
@@ -116,11 +116,7 @@ decompose_sets <- function(x, overlap = 5L)
       sub("^AND ", "", label_i)
     })
 
-    # Linear combination of each set in outcomes to produce a unique value for
-    # each disjoint component. For the n = 2 case:
-    # 1, 0 --> 1 * 1 + 2 * 0 = 1
-    # 0, 1 --> 1 * 0 + 2 * 1 = 2
-    # 1, 1 --> 1 * 1 + 2 * 1 = 3
+    # Convert incidence matrix columns from binary to integer
     i_vec <- as.vector(coefs %*% incidence[sets_i, ])
     outcome_vec <- as.vector(tcrossprod(coefs, outcomes))
 

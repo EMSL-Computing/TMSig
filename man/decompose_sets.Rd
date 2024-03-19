@@ -20,7 +20,7 @@ Decomposition of sets is described by Jiang and Gentleman (2007) in
 }
 }
 \usage{
-decompose_sets(x, overlap = 5L)
+decompose_sets(x, overlap = 1L)
 }
 \arguments{
 \item{x}{a named list of sets.}
@@ -29,8 +29,7 @@ decompose_sets(x, overlap = 5L)
 \code{overlap} elements in common will be decomposed.}
 }
 \value{
-A list of disjoint parts of sets. May contain aliases. Elements of
-  each set will be of type \code{"character"}.
+A list of disjoint parts of sets. May contain aliases.
 }
 \description{
 Decompose all pairs of sufficiently overlapping sets into 3
@@ -52,6 +51,8 @@ x <- list("A" = letters[1:10],
           "D" = letters[6:12])
 
 decompose_sets(x)
+
+decompose_sets(x, overlap = 5L)
 }
 \references{
 Jiang, Z., & Gentleman, R. (2007). Extensions to gene set enrichment.
