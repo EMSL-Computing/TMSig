@@ -128,6 +128,5 @@ set collection. \emph{Cell systems, 1}(6), 417–425.
 \url{https://doi.org/10.1016/j.cels.2015.12.004}
 }
 \seealso{
-\code{\link{filter_sets}}, \code{\link{similarity}},
-  \code{\link{find_aliases}}
+\code{\link{filter_sets}}, \code{\link{similarity}}
 }

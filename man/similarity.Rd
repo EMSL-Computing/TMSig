@@ -88,7 +88,5 @@ Jaccard, P. (1912). The distribution of the flora in the alpine
   1029–1034. \url{http://www.jstor.org/stable/1304126}
 }
 \seealso{
-\code{\link{incidence}}, \code{\link{filter_sets}},
-  \code{\link{find_aliases}}, \code{\link{cluster_sets}},
-  \code{\link[Matrix]{sparseMatrix}}
+\code{\link{incidence}}, \code{\link{cluster_sets}}
 }

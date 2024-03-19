@@ -80,8 +80,7 @@
 #' set collection. \emph{Cell systems, 1}(6), 417–425.
 #' \url{https://doi.org/10.1016/j.cels.2015.12.004}
 #'
-#' @seealso \code{\link{filter_sets}}, \code{\link{similarity}},
-#'   \code{\link{find_aliases}}
+#' @seealso \code{\link{filter_sets}}, \code{\link{similarity}}
 #'
 #' @examples
 #' x <- list("A" = letters[1:5],
@@ -128,7 +127,7 @@ cluster_sets <- function(x,
   x <- filter_sets(x, min_size = 2L)
 
   if (length(x) < 2L)
-    stop("`x` must contain 2 or more sets.", call. = FALSE)
+    stop("`x` must contain 2 or more sets.")
 
   # Similarity matrix
   s <- similarity(x, method = method)

@@ -29,9 +29,8 @@ decompose_sets(x, overlap = 5L)
 \code{overlap} elements in common will be decomposed.}
 }
 \value{
-A list of disjoint parts of sets. May contain aliases, which can be
-  identified with \code{\link{find_aliases}} and removed. Elements of each
-  set will be of type \code{"character"}.
+A list of disjoint parts of sets. May contain aliases. Elements of
+  each set will be of type \code{"character"}.
 }
 \description{
 Decompose all pairs of sufficiently overlapping sets into 3
@@ -60,5 +59,5 @@ Jiang, Z., & Gentleman, R. (2007). Extensions to gene set enrichment.
 \url{https://doi.org/10.1093/bioinformatics/btl599}
 }
 \seealso{
-\code{\link{filter_sets}}, \code{\link{find_aliases}}
+\code{\link{filter_sets}}
 }

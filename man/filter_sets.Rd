@@ -43,6 +43,3 @@ filter_sets(x, min_size = 2L)
 # Limit scope of sets before filtering
 filter_sets(x, min_size = 2L, background = c("a", "c", "e", "z"))
 }
-\seealso{
-\code{\link{find_aliases}}
-}

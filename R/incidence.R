@@ -34,12 +34,12 @@
 
 incidence <- function(x) {
   if (!is.list(x) | is.null(names(x)))
-    stop("`x` must be a named list.", call. = FALSE)
+    stop("`x` must be a named list.")
 
   sets <- rep(names(x), lengths(x))
 
   if (length(sets) == 0L)
-    stop("`x` only contains empty sets.", call. = FALSE)
+    stop("`x` only contains empty sets.")
 
   # All genes (may include duplicates from the same set)
   elements <- unlist(x, use.names = FALSE)

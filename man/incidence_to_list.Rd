@@ -14,7 +14,7 @@ columns. Usually, the output of \code{\link{incidence}}.}
 a named list of sets with the same length as \code{nrow(incidence)}.
 }
 \description{
-Converts an incidence matrix to a named list. The reverse of
+Converts an incidence matrix to a named list. The inverse of
   \code{\link{incidence}}.
 }
 \examples{

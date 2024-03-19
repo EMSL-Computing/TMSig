@@ -29,11 +29,10 @@
 #'   original results. (The same logic can be applied for set 2.)}
 #' }
 #'
-#' @returns A list of disjoint parts of sets. May contain aliases, which can be
-#'   identified with \code{\link{find_aliases}} and removed. Elements of each
-#'   set will be of type \code{"character"}.
+#' @returns A list of disjoint parts of sets. May contain aliases. Elements of
+#'   each set will be of type \code{"character"}.
 #'
-#' @seealso \code{\link{filter_sets}}, \code{\link{find_aliases}}
+#' @seealso \code{\link{filter_sets}}
 #'
 #' @references
 #'
@@ -130,10 +129,9 @@ decompose_sets <- function(x, overlap = 5L)
     o <- order(idx)
     idx <- idx[o]
     not_null <- which(!is.na(idx)) # NA = null set
-    elements <- elements[o]
 
     decomp_i <- data.frame(set = decomp_labels[idx],
-                           element = elements,
+                           element = elements[o],
                            stringsAsFactors = FALSE)[not_null, ]
   })
 

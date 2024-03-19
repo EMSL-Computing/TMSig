@@ -1,6 +1,6 @@
 #' @title Convert incidence matrix to a named list of sets
 #'
-#' @description Converts an incidence matrix to a named list. The reverse of
+#' @description Converts an incidence matrix to a named list. The inverse of
 #'   \code{\link{incidence}}.
 #'
 #' @param incidence incidence matrix with set names as rows and elements as

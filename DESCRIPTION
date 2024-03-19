@@ -1,8 +1,8 @@
 Package: ostRich
 Type: Package
-Title: Prepare -Omics Sets for Enrichment Analysis
-Version: 0.1.0
-Date: 2024-02-08
+Title: Prepare -Omics Sets for Enrichment Analysis/Gene Set Testing
+Version: 1.0.0
+Date: 2024-03-19
 Authors@R: 
     person(given = "Tyler", family = "Sagendorf", 
            email = "tyler.sagendorf@pnnl.gov",
@@ -17,9 +17,8 @@ Depends:
     R (>= 3.6.0),
     Matrix (>= 1.6.4)
 Imports:
-    data.table (>= 1.9.6),
     stats
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1
