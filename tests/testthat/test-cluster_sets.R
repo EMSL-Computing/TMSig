@@ -32,7 +32,7 @@ test_that("a message is produced when no pairs of sets pass threshold", {
   )
 
   expected <- data.frame(set = c("A", "B"),
-                         cluster = as.factor(1:2),
+                         cluster = 1:2,
                          set_size = rep(2L, 2),
                          row.names = NULL,
                          stringsAsFactors = FALSE)
@@ -52,11 +52,10 @@ test_that("results are correct", {
 
   df <- cluster_sets(x, cutoff = 0.5)
   expected <- data.frame(set = c("A", "B", "C", "G", "D", "F"),
-                         cluster = c(rep(1, 5), 2),
+                         cluster = c(rep(1L, 5), 2L),
                          set_size = c(5L, 4L, 4L, 4L, 3L, 3L),
                          row.names = NULL,
                          stringsAsFactors = FALSE)
-  expected$cluster <- as.factor(expected$cluster)
 
   expect_identical(df, expected)
 })

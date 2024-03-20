@@ -142,7 +142,7 @@ cluster_sets <- function(x,
     message("No pair of sets passes the similarity cutoff.")
 
     df <- data.frame(set = names(x),
-                     cluster = as.factor(seq_along(x)),
+                     cluster = seq_along(x),
                      set_size = lengths(x),
                      row.names = NULL,
                      stringsAsFactors = FALSE)
@@ -179,7 +179,6 @@ cluster_sets <- function(x,
 
   df <- rbind(df, other_sets)
 
-  df$cluster <- as.factor(df$cluster)
   df$set_size <- lengths(x)[df$set]
 
   o <- with(df, order(cluster, set_size, set, method = "radix",
