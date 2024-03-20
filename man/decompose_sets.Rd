@@ -5,18 +5,18 @@
 \title{Decompose pairs of overlapping sets into 3 disjoint parts}
 \source{
 Decomposition of sets is described by Jiang and Gentleman (2007) in
-  section 2.3.1 "Overlap among gene sets". It is a method to reduce the
-  redundancy of significant gene set testing results whereby the decomposed
-  sets are reanalyzed and the following selections can be made:
+section 2.3.1 "Overlap among gene sets". It is a method to reduce the
+redundancy of significant gene set testing results whereby the decomposed
+sets are reanalyzed and the following selections can be made:
 
 \itemize{
-  \item{If the elements unique to set 1 and set 2, elements common to both
-  sets, or all 3 parts are statistically significant, keep both set 1 and set
-  2 in the original results. We can not separate their effects.}
+\item{If the elements unique to set 1 and set 2, elements common to both
+sets, or all 3 parts are statistically significant, keep both set 1 and set
+2 in the original results. We can not separate their effects.}
 
-  \item{If the elements unique to set 1 or the elements unique to set 1 and
-  common to both sets are statistically significant, only keep set 1 in the
-  original results. (The same logic can be applied for set 2.)}
+\item{If the elements unique to set 1 or the elements unique to set 1 and
+common to both sets are statistically significant, only keep set 1 in the
+original results. (The same logic can be applied for set 2.)}
 }
 }
 \usage{
@@ -32,16 +32,18 @@ decompose_sets(x, overlap = 1L)
 A list of disjoint parts of sets. May contain aliases.
 }
 \description{
-Decompose all pairs of sufficiently overlapping sets into 3
-  disjoint parts: the elements unique to the first set, the elements unique
-  to the second set, and the elements found in both sets.
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
+
+Decompose all pairs of sufficiently overlapping sets into 3 disjoint parts:
+the elements unique to the first set, the elements unique to the second
+set, and the elements found in both sets.
 }
 \section{Optimization}{
 
 
-  Since the size of the intersection between two sets is at most the size of
-  the smaller set, any sets with fewer than \code{overlap} elements can be
-  immediately discarded.
+Since the size of the intersection between two sets is at most the size of
+the smaller set, any sets with fewer than \code{overlap} elements can be
+immediately discarded.
 }
 
 \examples{

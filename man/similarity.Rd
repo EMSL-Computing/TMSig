@@ -14,41 +14,41 @@ similarity(x, method = c("jaccard", "overlap"))
 }
 \value{
 An object of class \code{\link[Matrix:dgCMatrix-class]{dgCMatrix}}
-  containing all pairwise similarity coefficients.
+containing all pairwise similarity coefficients.
 }
 \description{
 Construct a sparse matrix of Jaccard or overlap coefficients for
-  each pair of sets in a list.
+each pair of sets in a list.
 }
 \section{Set Similarity}{
 
 
-  If \eqn{A} and \eqn{B} are sets, we define the Jaccard similarity
-  coefficient \eqn{J} as the size of their intersection divided by the size
-  of their union (Jaccard, 1912):
+If \eqn{A} and \eqn{B} are sets, we define the Jaccard similarity
+coefficient \eqn{J} as the size of their intersection divided by the size
+of their union (Jaccard, 1912):
 
-  \deqn{J(A, B) = \frac{|A \cap B|}{|A \cup B}}
+\deqn{J(A, B) = \frac{|A \cap B|}{|A \cup B}}
 
-  The overlap coefficient (also known as the Szymkiewicz–Simpson coefficient)
-  is defined as the size of the intersection divided by the size of the
-  smaller set (Szymkiewicz 1934; Simpson, 1943, 1947, 1960; Fallaw 1979):
+The overlap coefficient (also known as the Szymkiewicz–Simpson coefficient)
+is defined as the size of the intersection divided by the size of the
+smaller set (Szymkiewicz 1934; Simpson, 1943, 1947, 1960; Fallaw 1979):
 
-  \deqn{Overlap(A, B) = \frac{|A \cap B|}{min(|A|, |B|)}}
+\deqn{Overlap(A, B) = \frac{|A \cap B|}{min(|A|, |B|)}}
 
-  The Jaccard coefficient can identify aliased sets (sets which contain the
-  same elements, but have different names), while the overlap coefficient can
-  identify both aliased sets and subsets, though the two are not easily
-  distinguished without also having the matrix of Jaccard coefficients.
+The Jaccard coefficient can identify aliased sets (sets which contain the
+same elements, but have different names), while the overlap coefficient can
+identify both aliased sets and subsets, though the two are not easily
+distinguished without also having the matrix of Jaccard coefficients.
 }
 
 \section{Optimization}{
 
 
-  Since the similarity matrix of Jaccard or Overlap coefficients is always
-  symmetric, calculations are only performed for the lower triangular part of
-  the matrix and only for pairs of sets with nonzero intersections. As such,
-  \code{similarity} is efficient even for large similarity matrices, and it
-  is especially efficient for sparse similarity matrices.
+Since the similarity matrix of Jaccard or Overlap coefficients is always
+symmetric, calculations are only performed for the lower triangular part of
+the matrix and only for pairs of sets with nonzero intersections. As such,
+\code{similarity} is efficient even for large similarity matrices, and it
+is especially efficient for sparse similarity matrices.
 }
 
 \examples{
@@ -67,25 +67,25 @@ ss
 }
 \references{
 Jaccard, P. (1912). The distribution of the flora in the alpine
-  zone. \emph{New Phytologist, 11}, 37–50.
-  \url{https://doi.org/10.1111/j.1469-8137.1912.tb05611.x}
+zone. \emph{New Phytologist, 11}, 37–50.
+\url{https://doi.org/10.1111/j.1469-8137.1912.tb05611.x}
 
-  Szymkiewicz, D. (1934). Une contribution statistique à la géographie
-  floristique. \emph{Acta Societatis Botanicorum Poloniae, 11}(3), 249–265.
+Szymkiewicz, D. (1934). Une contribution statistique à la géographie
+floristique. \emph{Acta Societatis Botanicorum Poloniae, 11}(3), 249–265.
 
-  Simpson, G. G. (1943). Mammals and the nature of continents. \emph{American
-  Journal of Science, 241}(1), 1–31.
+Simpson, G. G. (1943). Mammals and the nature of continents. \emph{American
+Journal of Science, 241}(1), 1–31.
 
-  Simpson, G. G. (1947). Holarctic mammalian faunas and continental
-  relationships during the Cenozoic. \emph{Bulletin of the Geological Society
-  of America, 58}(7), 613–688.
+Simpson, G. G. (1947). Holarctic mammalian faunas and continental
+relationships during the Cenozoic. \emph{Bulletin of the Geological Society
+of America, 58}(7), 613–688.
 
-  Simpson, G. G. (1960). Notes on the measurement of faunal resemblance.
-  \emph{American Journal of Science, 258-A}, 300–311.
+Simpson, G. G. (1960). Notes on the measurement of faunal resemblance.
+\emph{American Journal of Science, 258-A}, 300–311.
 
-  Fallaw, W. C. (1979). A Test of the Simpson Coefficient and Other Binary
-  Coefficients of Faunal Similarity. \emph{Journal of Paleontology, 53}(4),
-  1029–1034. \url{http://www.jstor.org/stable/1304126}
+Fallaw, W. C. (1979). A Test of the Simpson Coefficient and Other Binary
+Coefficients of Faunal Similarity. \emph{Journal of Paleontology, 53}(4),
+1029–1034. \url{http://www.jstor.org/stable/1304126}
 }
 \seealso{
 \code{\link{incidence}}, \code{\link{cluster_sets}}

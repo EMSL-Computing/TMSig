@@ -21,9 +21,9 @@ A named list of sets at most the same size as \code{x}.
 }
 \description{
 Given a named list of sets, filter to those that contain at
-  least \code{min_size} and no more than \code{min_size} elements. The sets
-  are optionally filtered to elements of \code{background} before filtering
-  by size.
+least \code{min_size} and no more than \code{min_size} elements. The sets
+are optionally filtered to elements of \code{background} before filtering
+by size.
 }
 \details{
 Elements of \code{x} and \code{background} will be coerced to type

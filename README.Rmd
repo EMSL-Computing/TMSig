@@ -1,0 +1,79 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# ostRich
+
+<!-- badges: start -->
+![R package version](https://img.shields.io/github/r-package/v/EMSL-Computing/ostRich?label=R%20package) 
+[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+<!-- badges: end -->
+
+ostRich contains tools to operate on sets, and it was originally intended for the preparation of biomolecular/-omics sets for enrichment analysis/gene set testing/biomolecular set testing. Examples of biomolecular sets: Reactome pathways, Gene Ontology gene sets, phosphorylation sites grouped by their known kinases, and metabolites/lipids grouped by chemical subclasses (e.g., acyl carnitines, fatty acids). **In general, the functions in this package work with any named list of character vectors.**
+
+Below is a growing list of what can be accomplished with this package:
+
+- `incidence`: Compute a sparse incidence matrix with unique sets as rows and unique elements as columns. A value of 1 indicates that a particular element is a member of that set, while a value of 0 indicates that it is not. This serves as the cornerstone of several other functions. The cross-product of the incidence matrix with its transpose will yield the sizes of the pairwise intersections of each set on the off-diagonals and the sizes of the sets on the diagonal.
+
+- `similarity`: Compute all pairwise Jaccard or overlap similarity coefficients. The Jaccard coefficient, $J$, is defined as the cardinality of the intersection of two sets divided by the cardinality of their union. The overlap coefficient is defined as the cardinality of the intersection divided by the cardinality of the smallest set.
+
+- `filter_sets`: optionally restrict sets to only those elements in a pre-determined `background` and only keep those sets passing minimum and maximum size thresholds. In practice, biomolecular sets are restricted to the biomolecules measured in a particular experiment (the background).
+
+- `cluster_sets`: hierarchical clustering of highly similar sets. In practice, a single biomolecular set from each cluster would be selected to serve as that cluster's representative for enrichment analysis. Redundant sets would be discarded or reported separately (preferred).
+
+- `decompose_sets`: `r lifecycle::badge("experimental")` decompose all pairs of sets into 3 disjoint components: the elements unique to set 1, the elements unique to set 2, and the elements shared by both sets. Not currently used, in practice.
+
+
+## Installation
+
+You can install the development version of ostRich like so:
+
+``` r
+if (!require("devtools", quietly = TRUE))
+  install.packages("devtools")
+
+devtools::install_github("EMSL-Computing/ostRich")
+```
+
+## Examples
+
+```{r}
+library(ostRich)
+
+# Named list of sets
+x <- list("Set1" = letters[1:5],
+          "Set2" = letters[1:4], # subset of Set1
+          "Set3" = letters[1:4], # aliased with Set2
+          "Set4" = letters[1:3], # subset of Set1-Set3
+          "Set5" = c("a", "a", NA), # duplicates and NA
+          "Set6" = c("x", "y", "z"), # distinct elements
+          "Set7" = letters[3:6]) # overlaps with Set1-Set5
+x
+```
+
+```{r}
+incidence(x) # incidence matrix
+```
+
+```{r}
+similarity(x) # pairwise Jaccard similarity
+
+similarity(x, method = "overlap") # pairwise overlap similarity
+```
+
+```{r}
+cluster_sets(x, cutoff = 1) # cluster aliased sets
+
+cluster_sets(x, cutoff = 1, method = "overlap") # cluster subsets
+```

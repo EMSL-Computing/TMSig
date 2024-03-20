@@ -1,12 +1,16 @@
 #' @title Convert incidence matrix to a named list of sets
 #'
-#' @description Converts an incidence matrix to a named list. The inverse of
-#'   \code{\link{incidence}}.
+#' @description `r lifecycle::badge("experimental")`
+#'
+#'   Converts an incidence matrix to a named list of character vectors. The
+#'   inverse of \code{\link{incidence}}.
 #'
 #' @param incidence incidence matrix with set names as rows and elements as
 #'   columns. Usually, the output of \code{\link{incidence}}.
 #'
 #' @returns a named list of sets with the same length as \code{nrow(incidence)}.
+#'
+#' @note This function does not currently check that the input is valid.
 #'
 #' @export incidence_to_list
 #'

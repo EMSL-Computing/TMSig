@@ -14,8 +14,13 @@ columns. Usually, the output of \code{\link{incidence}}.}
 a named list of sets with the same length as \code{nrow(incidence)}.
 }
 \description{
-Converts an incidence matrix to a named list. The inverse of
-  \code{\link{incidence}}.
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
+
+Converts an incidence matrix to a named list of character vectors. The
+inverse of \code{\link{incidence}}.
+}
+\note{
+This function does not currently check that the input is valid.
 }
 \examples{
 x <- list("A" = c("a", "b", "c"),

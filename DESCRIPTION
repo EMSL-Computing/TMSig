@@ -2,7 +2,7 @@ Package: ostRich
 Type: Package
 Title: Prepare -Omics Sets for Enrichment Analysis/Gene Set Testing
 Version: 1.0.0
-Date: 2024-03-19
+Date: 2024-03-20
 Authors@R: 
     person(given = "Tyler", family = "Sagendorf", 
            email = "tyler.sagendorf@pnnl.gov",
@@ -13,12 +13,15 @@ Description: Tools to prepare lists of a priori biomolecular sets generated from
     set testing.
 License: GPL (>= 3)
 Encoding: UTF-8
+Bugreports: https://github.com/EMSL-Computing/ostRich/issues
 Depends:
     R (>= 3.6.0),
     Matrix (>= 1.6.4)
 Imports:
+    lifecycle,
     stats
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 RoxygenNote: 7.3.1
+Roxygen: list(markdown = TRUE)

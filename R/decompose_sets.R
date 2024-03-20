@@ -1,8 +1,10 @@
 #' @title Decompose pairs of overlapping sets into 3 disjoint parts
 #'
-#' @description Decompose all pairs of sufficiently overlapping sets into 3
-#'   disjoint parts: the elements unique to the first set, the elements unique
-#'   to the second set, and the elements found in both sets.
+#' @description `r lifecycle::badge("experimental")`
+#'
+#'   Decompose all pairs of sufficiently overlapping sets into 3 disjoint parts:
+#'   the elements unique to the first set, the elements unique to the second
+#'   set, and the elements found in both sets.
 #'
 #' @inheritParams incidence
 #' @param overlap integer \eqn{\geq 2}; only pairs of sets with at least
@@ -55,6 +57,8 @@
 
 decompose_sets <- function(x, overlap = 1L)
 {
+  lifecycle::signal_stage("experimental", "decompose_sets()")
+
   if (!(typeof(overlap) %in% c("double", "integer")) | length(overlap) != 1L)
     stop("`overlap` must be a single integer specifying the minimum ",
          "intersection size required to decompose pairs of sets.")

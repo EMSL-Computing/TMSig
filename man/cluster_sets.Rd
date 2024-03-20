@@ -32,58 +32,58 @@ well.}
 }
 \value{
 A \code{data.frame} with columns \code{"set"}, \code{"cluster"}, and
-  \code{"set_size"}.
+\code{"set_size"}.
 }
 \description{
 Determine clusters of highly similar sets. Useful to reduce the
-  redundancy of sets prior to statistical analysis.
+redundancy of sets prior to statistical analysis.
 }
 \section{Function Details}{
 
 
-  Given a named list of sets, \code{cluster_sets} calculates all pairwise
-  Jaccard or overlap similarity coefficients (see \code{\link{similarity}}
-  for details). Any coefficients below \code{cutoff} are set to 0 and
-  average-linkage hierarchical clustering is performed on the dissimilarity
-  matrix (calculated as 1 - coefficients). Lastly,
-  \code{\link[stats]{cutree}} is used with cut height \code{h} to define
-  clusters, and the results are stored in a \code{data.frame}.
+Given a named list of sets, \code{cluster_sets} calculates all pairwise
+Jaccard or overlap similarity coefficients (see \code{\link{similarity}}
+for details). Any coefficients below \code{cutoff} are set to 0 and
+average-linkage hierarchical clustering is performed on the dissimilarity
+matrix (calculated as 1 - coefficients). Lastly,
+\code{\link[stats]{cutree}} is used with cut height \code{h} to define
+clusters, and the results are stored in a \code{data.frame}.
 
-  Results are arranged in ascending order by cluster, descending order by set
-  size, and then alphanumerically by set name.
+Results are arranged in ascending order by cluster, descending order by set
+size, and then alphanumerically by set name.
 }
 
 \section{Set Size}{
 
 
-  Sets are pre-filtered to have at least 2 elements with
-  \code{\link{filter_sets}}.
+Sets are pre-filtered to have at least 2 elements with
+\code{\link{filter_sets}}.
 
-  For two non-aliased sets to have \eqn{Jaccard \geq x}, where \eqn{x} is
-  some threshold, sets must have minimum sizes \eqn{n1 = \lceil \frac{x}{1 -
+For two non-aliased sets to have \eqn{Jaccard \geq x}, where \eqn{x} is
+some threshold, sets must have minimum sizes \eqn{n1 = \lceil \frac{x}{1 -
   x} \rceil} and \eqn{n2 = n1 + 1} with the size of the overlap equal to
-  \eqn{n1}. For example, if sets have \eqn{J \geq 0.85}, their minimum sizes
-  are 6 and 7 with an overlap size of 6. That is, each set with fewer than 6
-  elements will always appear as a singleton cluster.
+\eqn{n1}. For example, if sets have \eqn{J \geq 0.85}, their minimum sizes
+are 6 and 7 with an overlap size of 6. That is, each set with fewer than 6
+elements will always appear as a singleton cluster.
 
-  For two sets to have \eqn{Overlap \geq x}, where one set is not a subset of
-  the other and \eqn{x} is some threshold, the sets must both be of minimum
-  size \eqn{n = 1 + \lceil \frac{x}{1 - x} \rceil} with the size of the
-  overlap equal to \eqn{n - 1}. For example, if sets have \eqn{Overlap \geq
+For two sets to have \eqn{Overlap \geq x}, where one set is not a subset of
+the other and \eqn{x} is some threshold, the sets must both be of minimum
+size \eqn{n = 1 + \lceil \frac{x}{1 - x} \rceil} with the size of the
+overlap equal to \eqn{n - 1}. For example, if sets have \eqn{Overlap \geq
   0.85}, their minimum sizes are both 7 with an overlap size of 6. That is,
-  each set with fewer than 7 elements will always appear as a singleton
-  cluster.
+each set with fewer than 7 elements will always appear as a singleton
+cluster.
 }
 
 \section{Optimization}{
 
 
-  Clustering does not need to be performed on those sets that are not
-  sufficiently similar (value of \code{similarity} below \code{cutoff}) to
-  any other set, as they will always be placed in their own cluster. By
-  excluding these sets during the hierarchical clustering step, the speed of
-  \code{cluster_sets} will increase as the value of \code{cutoff} approaches
-  1 (as the size of the dissimilarity matrix decreases).
+Clustering does not need to be performed on those sets that are not
+sufficiently similar (value of \code{similarity} below \code{cutoff}) to
+any other set, as they will always be placed in their own cluster. By
+excluding these sets during the hierarchical clustering step, the speed of
+\code{cluster_sets} will increase as the value of \code{cutoff} approaches
+1 (as the size of the dissimilarity matrix decreases).
 }
 
 \examples{

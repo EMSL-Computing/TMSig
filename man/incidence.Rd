@@ -11,8 +11,8 @@ incidence(x)
 }
 \value{
 An object of class \code{\link[Matrix:dgCMatrix-class]{dgCMatrix}}
-  with unique set names as rows and unique elements as columns. A value of 1
-  indicates the element is a member of the set.
+with unique set names as rows and unique elements as columns. A value of 1
+indicates the element is a member of the set.
 }
 \description{
 Given a named list of sets, construct a sparse incidence matrix.
@@ -36,5 +36,5 @@ apply(mat[, keep], 1, sum)
 }
 \seealso{
 \code{\link{incidence_to_list}}, \code{\link{similarity}},
-  \code{\link[Matrix]{sparseMatrix}}
+\code{\link[Matrix]{sparseMatrix}}
 }
