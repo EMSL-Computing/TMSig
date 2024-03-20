@@ -3,5 +3,6 @@
 ^LICENSE\.md$
 ^sandbox$
 ^README\.Rmd$
-^codecov\.yml$
 ^\.github$
+^doc$
+^Meta$
