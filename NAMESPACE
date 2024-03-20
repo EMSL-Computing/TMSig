@@ -3,6 +3,7 @@
 export(cluster_sets)
 export(decompose_sets)
 export(filter_sets)
+export(gmt_to_list)
 export(incidence)
 export(incidence_to_list)
 export(similarity)
