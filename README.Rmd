@@ -24,6 +24,8 @@ ostRich contains tools to operate on sets, and it was originally intended for th
 
 Below is a growing list of what can be accomplished with this package:
 
+- `gmt_to_list`: Create a named list of gene sets from a GMT file.
+
 - `incidence`: Compute a sparse incidence matrix with unique sets as rows and unique elements as columns. A value of 1 indicates that a particular element is a member of that set, while a value of 0 indicates that it is not. This serves as the cornerstone of several other functions. The cross-product of the incidence matrix with its transpose will yield the sizes of the pairwise intersections of each set on the off-diagonals and the sizes of the sets on the diagonal.
 
 - `similarity`: Compute all pairwise Jaccard or overlap similarity coefficients. The Jaccard coefficient, $J$, is defined as the cardinality of the intersection of two sets divided by the cardinality of their union. The overlap coefficient is defined as the cardinality of the intersection divided by the cardinality of the smallest set.

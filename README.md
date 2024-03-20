@@ -22,6 +22,8 @@ work with any named list of character vectors.**
 
 Below is a growing list of what can be accomplished with this package:
 
+- `gmt_to_list`: Create a named list of gene sets from a GMT file.
+
 - `incidence`: Compute a sparse incidence matrix with unique sets as
   rows and unique elements as columns. A value of 1 indicates that a
   particular element is a member of that set, while a value of 0
