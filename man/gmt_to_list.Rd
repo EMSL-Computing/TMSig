@@ -19,7 +19,7 @@ Create a named list of sets from a GMT file.
 Equivalent to \code{fgsea::gmtPathways}.
 }
 \examples{
-path <- system.file("extdata", "c5.go.v2023.2.Hs.symbols.gmt",
+path <- system.file("extdata", "c5.go.v2023.2.Hs.symbols.gmt.gz",
                     package = "ostRich")
 
 x <- gmt_to_list(path)
