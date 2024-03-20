@@ -48,7 +48,7 @@ filter_sets <- function(x,
     stop("`min_size` must be a single integer.")
 
   if (!is.numeric(max_size) | length(max_size) != 1L)
-    stop("`min_size` must be a single integer or Inf.")
+    stop("`max_size` must be a single integer or Inf.")
 
   if (min_size > max_size)
     stop("`min_size` cannot be greater than `max_size`.")
@@ -65,12 +65,11 @@ filter_sets <- function(x,
   if (length(elements) == 0L)
     stop("All sets in `x` are empty.")
 
-  if (!is.character(elements)) {
-    if (all(is.na(elements)))
-      stop("`x` only contains missing values.")
-
+  if (!is.character(elements))
     stop("Sets in `x` must consist of character vectors.")
-  }
+
+  if (all(is.na(elements)))
+    stop("`x` only contains missing values.")
 
   df <- data.frame(sets = sets,
                    elements = elements,

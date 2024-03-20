@@ -5,11 +5,55 @@ x <- list("A" = letters[1:4],
           "E" = c(rep("a", 10), NA)) # duplicates and NA
 
 
+test_that("sets must be a named list", {
+
+  expect_error(
+    filter_sets(list(c("a", "b"),
+                     c("b", "c"))),
+    "`x` must be a named list of character vectors."
+  )
+
+  expect_error(
+    filter_sets(c("a", "b", "c")),
+    "`x` must be a named list of character vectors."
+  )
+})
+
+
 test_that("an error is thrown if all sets are empty", {
   expect_error(
     filter_sets(list("A" = c())),
     "All sets in `x` are empty."
   )
+})
+
+
+test_that("min_size and max_size must each be a single integer", {
+
+  expect_error(
+    filter_sets(x, min_size = c(1, 2)),
+    "`min_size` must be a single integer."
+  )
+
+  expect_error(
+    filter_sets(x, min_size = 1, max_size = c(1, 2)),
+    "`max_size` must be a single integer or Inf."
+  )
+})
+
+
+test_that("sets must be non-NA character vectors", {
+
+  expect_error(
+    filter_sets(list("A" = NA_character_)),
+    "`x` only contains missing values."
+  )
+
+  expect_error(
+    filter_sets(list("A" = c(1, 2))),
+    "Sets in `x` must consist of character vectors."
+  )
+
 })
 
 
