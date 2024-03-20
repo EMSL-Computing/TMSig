@@ -3,6 +3,7 @@ x <- list("A" = 1:3,
           "B" = 2:4,
           "C" = 8:10,
           "A" = 4)
+x <- lapply(x, as.character)
 
 incidence <- incidence(x)
 

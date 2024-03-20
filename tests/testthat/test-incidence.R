@@ -1,5 +1,5 @@
-test_that("x must be a named list", {
-  err <- "`x` must be a named list."
+test_that("x must be a named list of character vectors", {
+  err <- "`x` must be a named list of character vectors."
 
   expect_error(
     incidence(list(c("a", "b"))), # no names
@@ -8,6 +8,11 @@ test_that("x must be a named list", {
 
   expect_error(
     incidence(1), # not a list
+    err
+  )
+
+  expect_error(
+    incidence(list("A" = 1)), # elements are not strings
     err
   )
 })
@@ -45,6 +50,16 @@ test_that("missing values are discarded", {
   out <- incidence(x)
 
   expect_identical(colnames(out), c("a", "b"))
+})
+
+
+test_that("all values cannot be missing", {
+  x <- list("A" = c(NA, NA))
+
+  expect_error(
+    incidence(x),
+    "All sets in `x` are empty or only contain missing values."
+  )
 })
 
 

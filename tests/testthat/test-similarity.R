@@ -1,6 +1,6 @@
 test_that("similarity works with only 2 sets", {
-  x <- list("A" = 1:2,
-            "B" = 1:2)
+  x <- list("A" = c("a", "b"),
+            "B" = c("a", "b"))
 
   expect_identical(
     similarity(x),

@@ -34,19 +34,23 @@
 
 incidence <- function(x) {
   if (!is.list(x) | is.null(names(x)))
-    stop("`x` must be a named list.")
+    stop("`x` must be a named list of character vectors.")
 
   sets <- rep(names(x), lengths(x))
-
-  if (length(sets) == 0L)
-    stop("`x` only contains empty sets.")
 
   # All genes (may include duplicates from the same set)
   elements <- unlist(x, use.names = FALSE)
 
   # Remove missing elements and convert type to character
   keep <- !is.na(elements)
-  elements <- as.character(elements[keep])
+  elements <- elements[keep]
+
+  if (length(elements) == 0L)
+    stop("All sets in `x` are empty or only contain missing values.")
+
+  if (!is.character(elements))
+    stop("`x` must be a named list of character vectors.")
+
   sets <- sets[keep]
 
   # Unique genes and sets
