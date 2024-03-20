@@ -32,7 +32,7 @@ Below is a growing list of what can be accomplished with this package:
 
 - `cluster_sets`: hierarchical clustering of highly similar sets. In practice, a single biomolecular set from each cluster would be selected to serve as that cluster's representative for enrichment analysis. Redundant sets would be discarded or reported separately (preferred).
 
-- `decompose_sets`: `r lifecycle::badge("experimental")` decompose all pairs of sets into 3 disjoint components: the elements unique to set 1, the elements unique to set 2, and the elements shared by both sets. Not currently used, in practice.
+- `decompose_sets`: decompose all pairs of sets into 3 disjoint components: the elements unique to set 1, the elements unique to set 2, and the elements shared by both sets. Not currently used in practice.
 
 
 ## Installation
@@ -63,7 +63,11 @@ x
 ```
 
 ```{r}
-incidence(x) # incidence matrix
+(imat <- incidence(x)) # incidence matrix
+
+tcrossprod(imat) # pairwise intersection and set sizes
+
+crossprod(imat) # occurrence of each element and pair of elements
 ```
 
 ```{r}

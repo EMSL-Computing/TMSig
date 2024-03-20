@@ -50,7 +50,7 @@ Below is a growing list of what can be accomplished with this package:
 
 - `decompose_sets`: decompose all pairs of sets into 3 disjoint
   components: the elements unique to set 1, the elements unique to set
-  2, and the elements shared by both sets. Not currently used, in
+  2, and the elements shared by both sets. Not currently used in
   practice.
 
 ## Installation
@@ -102,7 +102,7 @@ x
 ```
 
 ``` r
-incidence(x) # incidence matrix
+(imat <- incidence(x)) # incidence matrix
 #> 7 x 9 sparse Matrix of class "dgCMatrix"
 #>      a b c d e x y z f
 #> Set1 1 1 1 1 1 . . . .
@@ -112,6 +112,30 @@ incidence(x) # incidence matrix
 #> Set5 1 . . . . . . . .
 #> Set6 . . . . . 1 1 1 .
 #> Set7 . . 1 1 1 . . . 1
+
+tcrossprod(imat) # pairwise intersection and set sizes
+#> 7 x 7 sparse Matrix of class "dsCMatrix"
+#>      Set1 Set2 Set3 Set4 Set5 Set6 Set7
+#> Set1    5    4    4    3    1    .    3
+#> Set2    4    4    4    3    1    .    2
+#> Set3    4    4    4    3    1    .    2
+#> Set4    3    3    3    3    1    .    1
+#> Set5    1    1    1    1    1    .    .
+#> Set6    .    .    .    .    .    3    .
+#> Set7    3    2    2    1    .    .    4
+
+crossprod(imat) # occurrence of each element and pair of elements
+#> 9 x 9 sparse Matrix of class "dsCMatrix"
+#>   a b c d e x y z f
+#> a 5 4 4 3 1 . . . .
+#> b 4 4 4 3 1 . . . .
+#> c 4 4 5 4 2 . . . 1
+#> d 3 3 4 4 2 . . . 1
+#> e 1 1 2 2 2 . . . 1
+#> x . . . . . 1 1 1 .
+#> y . . . . . 1 1 1 .
+#> z . . . . . 1 1 1 .
+#> f . . 1 1 1 . . . 1
 ```
 
 ``` r
