@@ -25,7 +25,7 @@ decompose_sets(x, overlap = 1L)
 \arguments{
 \item{x}{a named list of sets.}
 
-\item{overlap}{integer \eqn{\geq 2}; only pairs of sets with at least
+\item{overlap}{integer; only pairs of sets with at least
 \code{overlap} elements in common will be decomposed.}
 }
 \value{

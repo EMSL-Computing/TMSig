@@ -7,7 +7,7 @@
 #'   set, and the elements found in both sets.
 #'
 #' @inheritParams incidence
-#' @param overlap integer \eqn{\geq 2}; only pairs of sets with at least
+#' @param overlap integer; only pairs of sets with at least
 #'   \code{overlap} elements in common will be decomposed.
 #'
 #' @section Optimization:
