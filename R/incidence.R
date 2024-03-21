@@ -11,13 +11,11 @@
 #' @seealso \code{\link{incidence_to_list}}, \code{\link{similarity}},
 #'   \code{\link[Matrix]{sparseMatrix}}
 #'
-#' @importFrom Matrix Matrix sparseMatrix
+#' @import Matrix
 #'
 #' @export incidence
 #'
 #' @examples
-#' require(Matrix)
-#'
 #' x <- list("A" = c("a", "b", "c"),
 #'           "B" = c("c", "d"),
 #'           "C" = c("x", "y", "z", "z"), # duplicates

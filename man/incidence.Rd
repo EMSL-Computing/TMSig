@@ -18,8 +18,6 @@ indicates the element is a member of the set.
 Given a named list of sets, construct a sparse incidence matrix.
 }
 \examples{
-require(Matrix)
-
 x <- list("A" = c("a", "b", "c"),
           "B" = c("c", "d"),
           "C" = c("x", "y", "z", "z"), # duplicates
