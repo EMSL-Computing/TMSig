@@ -56,7 +56,7 @@ size, and then alphanumerically by set name.
 \section{Set Size}{
 
 
-Sets are pre-filtered to have at least 2 elements with
+Sets are pre-filtered to have at least 1 element with
 \code{\link{filter_sets}}.
 
 For two non-aliased sets to have \eqn{Jaccard \geq x}, where \eqn{x} is

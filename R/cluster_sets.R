@@ -27,7 +27,7 @@
 #'
 #' @section Set Size:
 #'
-#'   Sets are pre-filtered to have at least 2 elements with
+#'   Sets are pre-filtered to have at least 1 element with
 #'   \code{\link{filter_sets}}.
 #'
 #'   For two non-aliased sets to have \eqn{Jaccard \geq x}, where \eqn{x} is
@@ -124,7 +124,7 @@ cluster_sets <- function(x,
     stop("`cutoff` must be between 0 and 1.")
 
   # Pre-filter sets (also validates x)
-  x <- filter_sets(x, min_size = 2L)
+  x <- filter_sets(x, min_size = 1L)
 
   if (length(x) < 2L)
     stop("`x` must contain 2 or more sets.")
