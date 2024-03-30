@@ -4,10 +4,12 @@
 \alias{gmt_to_list}
 \title{Convert GMT file to named list}
 \usage{
-gmt_to_list(path)
+gmt_to_list(path, check = TRUE)
 }
 \arguments{
 \item{path}{character; path to a GMT file.}
+
+\item{check}{logical; check that \code{path} points to a valid GMT file.}
 }
 \value{
 A named list of character vectors.
@@ -16,7 +18,7 @@ A named list of character vectors.
 Create a named list of sets from a GMT file.
 }
 \note{
-Equivalent to \code{fgsea::gmtPathways}.
+Similar to \code{fgsea::gmtPathways}.
 }
 \examples{
 path <- system.file("extdata", "c5.go.v2023.2.Hs.symbols.gmt.gz",

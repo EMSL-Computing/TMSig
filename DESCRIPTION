@@ -2,7 +2,7 @@ Package: ostRich
 Type: Package
 Title: Prepare -Omics Sets for Enrichment Analysis/Gene Set Testing
 Version: 0.1.0
-Date: 2024-03-21
+Date: 2024-03-30
 Authors@R: 
     person(given = "Tyler", family = "Sagendorf", 
            email = "tyler.sagendorf@pnnl.gov",
