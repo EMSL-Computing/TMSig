@@ -26,44 +26,29 @@
 #' # Sizes of sets and their intersections
 #' tcrossprod(mat)
 #'
-#' # Number of unique elements in each set
+#' # Number of elements unique to each set
 #' keep <- apply(mat, 2, sum) == 1
 #' apply(mat[, keep], 1, sum)
 
 incidence <- function(x) {
-  if (!is.list(x) | is.null(names(x)))
-    stop("`x` must be a named list of character vectors.")
+  # Validate x, remove missing values, remove duplicate set-element pairs
+  dt <- .prepare_sets(x)
+  sets <- dt[["sets"]]
+  elements <- dt[["elements"]]
 
-  sets <- rep(names(x), lengths(x))
-
-  # All genes (may include duplicates from the same set)
-  elements <- unlist(x, use.names = FALSE)
-
-  # Remove missing elements and convert type to character
-  keep <- !is.na(elements)
-  elements <- elements[keep]
-
-  if (length(elements) == 0L)
-    stop("All sets in `x` are empty or only contain missing values.")
-
-  if (!is.character(elements))
-    stop("`x` must be a named list of character vectors.")
-
-  sets <- sets[keep]
-
-  # Unique genes and sets
-  elements_unique <- unique(elements)
+  # Unique sets and elements
   sets_unique <- unique(sets)
+  elements_unique <- unique(elements)
 
-  # Convert identifiers to positions of nonzero values
+  # Convert identifiers to positions of 1's
   i <- match(sets, sets_unique)         # row idx
   j <- match(elements, elements_unique) # column idx
 
-  mat.dimnames <- list(sets_unique, elements_unique)
+  mat_dimnames <- list(sets_unique, elements_unique)
 
+  # Note: sparseMatrix converts integers to numeric
   mat <- sparseMatrix(i = i, j = j, x = 1,
-                      dimnames = mat.dimnames,
-                      use.last.ij = TRUE) # remove duplicates
+                      dimnames = mat_dimnames)
 
   return(mat)
 }
