@@ -5,6 +5,9 @@ date: "Last compiled `r format(Sys.time(), '%d %B, %Y')`"
 output: 
   rmarkdown::html_vignette:
     toc: true
+bibliography: references.bib
+csl: apa-numeric-superscript-brackets.csl
+link-citations: true
 vignette: >
   %\VignetteIndexEntry{Prepare Gene Sets for Enrichment Analysis}
   %\VignetteEngine{knitr::rmarkdown}
@@ -23,10 +26,13 @@ knitr::opts_chunk$set(
 ```{r setup}
 # Required packages
 library(ostRich)
+library(data.table)
 ```
 
 
 # Create List of Gene Sets from GMT File
+
+We will use Gene Ontology gene sets[@ashburner_gene_2000; @the_gene_ontology_consortium_gene_2023] from the C5 collection of the Molecular Signatures Database (v2023.2.Hs)[@liberzon_molecular_2011; @liberzon_molecular_2015].
 
 ```{r read-gmt}
 # Path to GMT file - MSigDB Gene Ontology sets
@@ -35,20 +41,19 @@ gmt_file <- system.file("extdata", "c5.go.v2023.2.Hs.symbols.gmt.gz",
 
 gene_sets <- gmt_to_list(gmt_file)
 
-class(gene_sets)
-
 length(gene_sets) # 10461 gene sets
 
-head(names(gene_sets))
+head(names(gene_sets)) # first 6 gene set names
 
 gene_sets[1] # genes in first set
 ```
 
+
 # Filter Gene Sets
 
-We will restrict gene sets to only those genes in `background` (usually the genes from a particular experiment). Only those sets with at least 10 genes that do not contain all background genes will be retained.
+We will restrict gene sets to only those genes in `background` (usually the genes from a particular experiment). Only those sets with at least 10 genes will be retained. We also set the upper limit on set size to be one less than the background size, which is a requirement for competitive analyses like GSEA[@subramanian_gene_2005] or CAMERA[@wu_camera_2012].
 
-Normally, the background would be the vector of unique genes that were detected in a particular -omics experiment. For example purposes, we will set the background to the top 4000 most common genes. This ensures that at least some gene sets will have a high degree of overlap, which is necessary for clustering later.
+Normally, the background would be the vector of unique genes that were detected in a particular omics experiment. For the purposes of this example, we will set the background to the top 4000 most common genes. This ensures that at least some gene sets will have a high degree of overlap, which is necessary for clustering later.
 
 ```{r}
 # Top 4000 most common genes
@@ -57,6 +62,7 @@ top_genes <- sort(top_genes, decreasing = TRUE)[1:4000]
 head(top_genes)
 
 background <- names(top_genes)
+length(background) # 4000
 ```
 
 ```{r filter-sets}
@@ -68,7 +74,7 @@ gene_sets_filt <- filter_sets(gene_sets,
 length(gene_sets_filt) # 5701 (down from 10461)
 ```
 
-We can plot the ratio of the new set sizes to their original sizes. This ratio serves as a measure of confidence that what genes remain for testing is correctly described by the gene set name.
+We can plot the ratio of the new set sizes to their original sizes. This ratio serves as a measure of confidence that what genes remain for testing is correctly described by the gene set name. The ratio for each set should always be calculated as the proportion of genes from the original database that are in the data.
 
 ```{r}
 sizes_new <- lengths(gene_sets_filt)
@@ -77,6 +83,17 @@ r <- sizes_new / sizes_old
 
 hist(r, breaks = seq(0, 1, 0.05))
 ```
+
+
+We will make a plot of the log$_2$ set size versus the ratio.
+
+```{r}
+plot(sizes_new, r, log = "x", frame.plot = FALSE)
+abline(h = 1, col = "red", lty = 2)
+```
+
+
+Notice that as sets get larger they retain a smaller proportion of their original genes.
 
 We can determine what minimum proportion of genes are retained by the top 90% of sets.
 
@@ -89,61 +106,136 @@ The top 90% of gene sets retain at least `r round(quantile(r, 1 - 0.9) * 100, 1)
 
 # Cluster Gene Sets
 
-Now, we will cluster highly similar sets. This helps to reduce redundancy of enrichment analysis/gene set testing results. At the very least, this should be used to remove aliased sets by setting `cutoff` to 1. Two or more sets are aliased if they contain the same genes, but they have different descriptions.
+Restricting gene sets to a background tends to always increase the similarity of the gene sets that remain, especially when using the Gene Ontology database. To partly address this, we can cluster highly similar sets and only retain one set from each cluster for the analysis. This helps to reduce redundancy of enrichment analysis/gene set testing results. **At the very least, this should be used to remove aliased sets by setting `cutoff` to 1.** Two or more sets are aliased if they contain the same genes, but they have different descriptions.
 
-The `cutoff` is the minimum Jaccard similarity coefficient (default `method`) used to classify two sets as sufficiently similar. A larger `h` (cut height) will increase the maximum size of clusters. In practice, we use the default 0.9.
+The `cutoff` is the minimum similarity coefficient used to classify two sets as sufficiently similar. A larger `h` (cut height) will increase the maximum size of clusters.
 
 ```{r cluster-sets}
 # Cluster sets with default parameters. Same as cluster_sets(gene_sets_filt)
-cluster_df <- cluster_sets(gene_sets_filt, 
-                           method = "jaccard", 
+cluster_dt <- cluster_sets(gene_sets_filt, 
+                           type = "jaccard", 
                            cutoff = 0.85,
+                           method = "complete",
                            h = 0.9)
 ```
 
 ```{r}
-# Include size_ratio and n_char columns
-cluster_df$size_ratio <- r[cluster_df$set]
-cluster_df$n_char <- nchar(cluster_df$set)
+# Create size_ratio and n_char columns
+cluster_dt[, `:=`(size_ratio = r[set],
+                  n_char = nchar(set))]
 
 # Reorder rows
-o <- with(cluster_df, order(cluster, -set_size, -size_ratio, n_char, set))
-cluster_df <- cluster_df[o, ]
+setorderv(cluster_dt, 
+          cols = c("cluster", "set_size", "size_ratio", "n_char", "set"),
+          order = c(1, -1, -1, 1, 1))
 ```
 
 Due to how `cluster_sets` works, clusters with at least 2 gene sets will always appear first. Therefore, if we select the data for the first 5 clusters, this should show groups of highly similar sets (unless no pairs of sets were sufficiently similar, according to the choice of `cutoff`).
 
 ```{r}
 # Show data for first 5 clusters
-cluster_df[cluster_df$cluster <= 5, ]
+subset(cluster_dt, cluster <= 5)
 ```
 
 ```{r}
 # Total number of clusters
-max(cluster_df$cluster) # 5478
+max(cluster_dt$cluster) # 5491
 
 # Number of clusters with n sets
-barplot(table(table(cluster_df$cluster)),
+barplot(table(table(cluster_dt$cluster)),
         xlab = "Number of Sets per Cluster",
         ylab = "Number of Clusters")
 ```
 
 From the bar plot, most clusters consist of singleton sets. The largest cluster(s) contain 4 sets.
 
-Now, we will keep the first set from each cluster. To do this, we can remove any sets where the cluster is duplicated.
+It is useful to record the cluster information in a separate table, like so:
+
+```{r}
+dt <- copy(cluster_dt)
+
+# Number of sets per cluster
+dt[, n_sets := .N, by = "cluster"]
+
+# Keep clusters of >= 2 sets
+keep_sets <- subset(dt, subset = n_sets > 1L)[["set"]]
+
+# Jaccard similarity matrix
+jaccard <- similarity(gene_sets_filt[keep_sets])
+jaccard <- as.matrix(jaccard)
+
+# Overlap similarity matrix
+overlap <- similarity(gene_sets_filt[keep_sets], type = "overlap")
+overlap <- as.matrix(overlap)
+
+# Mark sets as the primary set that is kept for the analysis ("set") or the
+# highly similar sets that will be discarded ("similar_sets").
+dt[, type := ifelse(duplicated(cluster), "similar_sets", "set")]
+
+# Convert from long to wide format. Columns: cluster, set, and similar_sets.
+dt <- dcast(dt, 
+            formula = cluster ~ type,
+            value.var = "set",
+            fun.aggregate = list)[, set := unlist(set)]
+
+# Unnest similar_sets column (also remove cluster column)
+dt <- dt[, .(similar_sets = unlist(similar_sets)),
+         by = "set"]
+
+# Add columns for Jaccard and overlap coefficients
+dt[, `:=`(
+  jaccard_coef = vapply(seq_len(.N), function(i) {
+    jaccard[set[i], similar_sets[i]]
+  }, numeric(1L)),
+  overlap_coef = vapply(seq_len(.N), function(i) {
+    overlap[set[i], similar_sets[i]]
+  }, numeric(1L))
+)]
+
+# Round similarity coefficient columns to 3 digits
+coef_cols <- c("jaccard_coef", "overlap_coef")
+dt[ , (coef_cols) := lapply(.SD, round, digits = 3L), 
+    .SDcols = coef_cols]
+
+# Reorder rows
+setorderv(dt, 
+          cols = c("set", "jaccard_coef", "overlap_coef", "similar_sets"),
+          order = c(1, -1, -1, 1))
+
+head(dt, 10L)
+```
+
+Note that most of the sets in the `similar_sets` column are subsets or aliases of the set in the `set` column:
+
+```{r}
+# If overlap == 1, Jaccard == 1
+table(dt$overlap_coef == 1)
+```
+
+Now, we will keep the first set from each cluster. Since we have already sorted the rows so that the set to keep appears in the first row of each cluster, we can remove any sets where the cluster is duplicated.
 
 ```{r}
 # Select first set from each cluster
-keep_sets <- cluster_df$set[!duplicated(cluster_df$cluster)]
+keep_sets <- subset(cluster_dt, !duplicated(cluster))[["set"]]
 head(keep_sets)
 
 # Filter sets once more
 gene_sets_filt <- gene_sets_filt[keep_sets]
-length(gene_sets_filt) # 5478 (down from 5701)
+length(gene_sets_filt) # 5491 (down from 5701)
 ```
 
+The reduction in the number of sets with clustering is marginal (-3.7%), in this case, but it can vary depending on the choice parameters and the data. Again, at the very least, **clustering should be performed to remove aliases**.
 
-Now, `gene_sets_filt` can be used with any enrichment analysis/gene set testing procedure of your choice. We recommend `camera` or `cameraPR` from the limma package. CAMERA is an extension of the t-test that accounts for inter-gene correlation to correctly control the type I error rate.
+We will check the proportion of the background genes that are present in these filtered sets. We will refer to this as the "coverage".
+
+```{r}
+length(unique(unlist(gene_sets_filt))) / 
+  length(background)
+```
+
+Despite removing terms, the coverage is still 100%. This is because we mostly removed subsets.
+
+Now, `gene_sets_filt` can be used with any enrichment analysis/gene set testing procedure of your choice. We recommend `camera` or `cameraPR` from the limma package.
 
 
 # Session Info
@@ -152,4 +244,7 @@ Now, `gene_sets_filt` can be used with any enrichment analysis/gene set testing 
 sI <- sessionInfo()
 print(sI, locale = FALSE)
 ```
+
+
+# References
 
