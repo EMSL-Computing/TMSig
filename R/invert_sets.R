@@ -7,7 +7,7 @@
 #'
 #' @inheritParams incidence
 #'
-#' @note This function is essentially a simplified version of
+#' @note This function is essentially a more limited version of
 #'   \code{purrr::transpose_list}.
 #'
 #' @returns A named list of sets.
@@ -30,36 +30,15 @@
 #' (x_dc <- invert_sets(x_dc))
 
 invert_sets <- function(x) {
-  ## Parsimonious approach
+  ## Parsimonious approach:
   # imat <- incidence(x)
   # imat <- t(imat)
   #
   # y <- incidence_to_list(imat)
 
-  if (!is.list(x) | is.null(names(x)))
-    stop("`x` must be a named list of character vectors.")
+  dt <- .prepare_sets(x)
 
-  sets <- rep(names(x), lengths(x))
-
-  # All genes (may include duplicates from the same set)
-  elements <- unlist(x, use.names = FALSE)
-
-  # Remove missing elements and convert type to character
-  keep <- !is.na(elements)
-  elements <- elements[keep]
-
-  if (length(elements) == 0L)
-    stop("All sets in `x` are empty or only contain missing values.")
-
-  if (!is.character(elements))
-    stop("`x` must be a named list of character vectors.")
-
-  sets <- sets[keep]
-
-  # The code above is from incidence()
-  # TODO wrap reused code like this into an unexported function.
-
-  y <- split(x = sets, f = elements)
+  y <- split(x = dt[["sets"]], f = dt[["elements"]])
 
   return(y)
 }

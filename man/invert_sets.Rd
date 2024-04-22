@@ -19,7 +19,7 @@ Invert a list of sets so that elements become set names and set names
 become elements.
 }
 \note{
-This function is essentially a simplified version of
+This function is essentially a more limited version of
 \code{purrr::transpose_list}.
 }
 \examples{
