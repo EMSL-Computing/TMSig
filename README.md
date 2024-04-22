@@ -11,49 +11,35 @@ version](https://img.shields.io/github/r-package/v/EMSL-Computing/ostRich?label=
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 <!-- badges: end -->
 
-ostRich contains tools to operate on sets, and it was originally
-intended for the preparation of biomolecular/-omics sets for enrichment
-analysis/gene set testing/biomolecular set testing. Examples of
-biomolecular sets: Reactome pathways, Gene Ontology gene sets,
-phosphorylation sites grouped by their known kinases, and
+ostRich contains tools to operate on sets and is intended for preparing
+*a priori* biomolecular/omics sets for enrichment analysis/gene set
+testing. Examples of biomolecular sets: Reactome pathways, Gene Ontology
+gene sets, phosphorylation sites grouped by their known kinases, and
 metabolites/lipids grouped by chemical subclasses (e.g., acyl
 carnitines, fatty acids). **In general, the functions in this package
 work with any named list of character vectors.**
 
-Below is a growing list of what can be accomplished with this package:
+Below is a overview of some core functions:
 
-- `gmt_to_list`: Create a named list of gene sets from a GMT file.
+- `gmt_to_list`: Create a named list of sets from a GMT file.
 
 - `incidence`: Compute a sparse incidence matrix with unique sets as
   rows and unique elements as columns. A value of 1 indicates that a
   particular element is a member of that set, while a value of 0
-  indicates that it is not. This serves as the cornerstone of several
-  other functions. The cross-product of the incidence matrix with its
-  transpose will yield the sizes of the pairwise intersections of each
-  set on the off-diagonals and the sizes of the sets on the diagonal.
+  indicates that it is not.
 
-- `similarity`: Compute all pairwise Jaccard or overlap similarity
-  coefficients. The Jaccard coefficient, $J$, is defined as the
-  cardinality of the intersection of two sets divided by the cardinality
-  of their union. The overlap coefficient is defined as the cardinality
-  of the intersection divided by the cardinality of the smallest set.
+- `similarity`: Compute the matrix of pairwise Jaccard or overlap
+  similarity coefficients for all pairs of sets $A$ and $B$, where
 
-- `filter_sets`: optionally restrict sets to only those elements in a
-  pre-determined `background` and only keep those sets passing minimum
-  and maximum size thresholds. In practice, biomolecular sets are
-  restricted to the biomolecules measured in a particular experiment
-  (the background).
+  - $Jaccard(A, B) = \frac{|A \cap B|}{|A \cup B|}$
+  - $Overlap(A, B) = \frac{|A \cap B|}{\min(|A|, |B|)}$
 
-- `cluster_sets`: hierarchical clustering of highly similar sets. In
-  practice, a single biomolecular set from each cluster would be
-  selected to serve as that cluster’s representative for enrichment
-  analysis. Redundant sets would be discarded or reported separately
-  (preferred).
+- `filter_sets`: Restrict sets to only those elements in a
+  pre-determined `background`, if provided, and only keep those that
+  pass minimum and maximum size thresholds.
 
-- `decompose_sets`: decompose all pairs of sets into 3 disjoint
-  components: the elements unique to set 1, the elements unique to set
-  2, and the elements shared by both sets. Not currently used in
-  practice.
+- `cluster_sets`: hierarchical clustering of highly similar sets. Used
+  to reduce redundancy prior to analysis.
 
 ## Installation
 
@@ -152,7 +138,7 @@ similarity(x) # pairwise Jaccard similarity
 #> Set6  .   .         .         .         .            1 .        
 #> Set7  0.5 0.3333333 0.3333333 0.1666667 .            . 1.0000000
 
-similarity(x, method = "overlap") # pairwise overlap similarity
+similarity(x, type = "overlap") # pairwise overlap similarity
 #> 7 x 7 sparse Matrix of class "dgCMatrix"
 #>      Set1 Set2 Set3      Set4 Set5 Set6      Set7
 #> Set1 1.00  1.0  1.0 1.0000000    1    . 0.7500000
@@ -165,21 +151,27 @@ similarity(x, method = "overlap") # pairwise overlap similarity
 ```
 
 ``` r
-cluster_sets(x, cutoff = 1) # cluster aliased sets
-#>    set cluster set_size
-#> 1 Set2       1        4
-#> 2 Set3       1        4
-#> 3 Set1       2        5
-#> 4 Set4       3        3
-#> 5 Set6       4        3
-#> 6 Set7       5        4
+# Cluster aliased sets (the empty brackets are required to display the table)
+cluster_sets(x, cutoff = 1)[]
+#>       set cluster set_size
+#>    <char>   <int>    <int>
+#> 1:   Set2       1        4
+#> 2:   Set3       1        4
+#> 3:   Set1       2        5
+#> 4:   Set4       3        3
+#> 5:   Set5       4        1
+#> 6:   Set6       5        3
+#> 7:   Set7       6        4
 
-cluster_sets(x, cutoff = 1, method = "overlap") # cluster subsets
-#>    set cluster set_size
-#> 1 Set1       1        5
-#> 2 Set2       1        4
-#> 3 Set3       1        4
-#> 4 Set4       1        3
-#> 5 Set6       2        3
-#> 6 Set7       3        4
+# Cluster subsets
+cluster_sets(x, cutoff = 1, type = "overlap")[]
+#>       set cluster set_size
+#>    <char>   <int>    <int>
+#> 1:   Set1       1        5
+#> 2:   Set2       1        4
+#> 3:   Set3       1        4
+#> 4:   Set4       1        3
+#> 5:   Set5       1        1
+#> 6:   Set6       2        3
+#> 7:   Set7       3        4
 ```

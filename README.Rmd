@@ -20,21 +20,21 @@ knitr::opts_chunk$set(
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 <!-- badges: end -->
 
-ostRich contains tools to operate on sets, and it was originally intended for the preparation of biomolecular/-omics sets for enrichment analysis/gene set testing/biomolecular set testing. Examples of biomolecular sets: Reactome pathways, Gene Ontology gene sets, phosphorylation sites grouped by their known kinases, and metabolites/lipids grouped by chemical subclasses (e.g., acyl carnitines, fatty acids). **In general, the functions in this package work with any named list of character vectors.**
+ostRich contains tools to operate on sets and is intended for preparing _a priori_ biomolecular/omics sets for enrichment analysis/gene set testing. Examples of biomolecular sets: Reactome pathways, Gene Ontology gene sets, phosphorylation sites grouped by their known kinases, and metabolites/lipids grouped by chemical subclasses (e.g., acyl carnitines, fatty acids). **In general, the functions in this package work with any named list of character vectors.**
 
-Below is a growing list of what can be accomplished with this package:
+Below is a overview of some core functions:
 
-- `gmt_to_list`: Create a named list of gene sets from a GMT file.
+- `gmt_to_list`: Create a named list of sets from a GMT file.
 
-- `incidence`: Compute a sparse incidence matrix with unique sets as rows and unique elements as columns. A value of 1 indicates that a particular element is a member of that set, while a value of 0 indicates that it is not. This serves as the cornerstone of several other functions. The cross-product of the incidence matrix with its transpose will yield the sizes of the pairwise intersections of each set on the off-diagonals and the sizes of the sets on the diagonal.
+- `incidence`: Compute a sparse incidence matrix with unique sets as rows and unique elements as columns. A value of 1 indicates that a particular element is a member of that set, while a value of 0 indicates that it is not.
 
-- `similarity`: Compute all pairwise Jaccard or overlap similarity coefficients. The Jaccard coefficient, $J$, is defined as the cardinality of the intersection of two sets divided by the cardinality of their union. The overlap coefficient is defined as the cardinality of the intersection divided by the cardinality of the smallest set.
+- `similarity`: Compute the matrix of pairwise Jaccard or overlap similarity coefficients for all pairs of sets $A$ and $B$, where
+  - $Jaccard(A, B) = \frac{|A \cap B|}{|A \cup B|}$
+  - $Overlap(A, B) = \frac{|A \cap B|}{\min(|A|, |B|)}$
 
-- `filter_sets`: optionally restrict sets to only those elements in a pre-determined `background` and only keep those sets passing minimum and maximum size thresholds. In practice, biomolecular sets are restricted to the biomolecules measured in a particular experiment (the background).
+- `filter_sets`: Restrict sets to only those elements in a pre-determined `background`, if provided, and only keep those that pass minimum and maximum size thresholds.
 
-- `cluster_sets`: hierarchical clustering of highly similar sets. In practice, a single biomolecular set from each cluster would be selected to serve as that cluster's representative for enrichment analysis. Redundant sets would be discarded or reported separately (preferred).
-
-- `decompose_sets`: decompose all pairs of sets into 3 disjoint components: the elements unique to set 1, the elements unique to set 2, and the elements shared by both sets. Not currently used in practice.
+- `cluster_sets`: hierarchical clustering of highly similar sets. Used to reduce redundancy prior to analysis.
 
 
 ## Installation
@@ -75,11 +75,13 @@ crossprod(imat) # occurrence of each element and pair of elements
 ```{r}
 similarity(x) # pairwise Jaccard similarity
 
-similarity(x, method = "overlap") # pairwise overlap similarity
+similarity(x, type = "overlap") # pairwise overlap similarity
 ```
 
 ```{r}
-cluster_sets(x, cutoff = 1) # cluster aliased sets
+# Cluster aliased sets (the empty brackets are required to display the table)
+cluster_sets(x, cutoff = 1)[]
 
-cluster_sets(x, cutoff = 1, method = "overlap") # cluster subsets
+# Cluster subsets
+cluster_sets(x, cutoff = 1, type = "overlap")[]
 ```
