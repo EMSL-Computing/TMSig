@@ -28,7 +28,7 @@ x <- list("A" = c("a", "b", "c"),
 # Sizes of sets and their intersections
 tcrossprod(mat)
 
-# Number of unique elements in each set
+# Number of elements unique to each set
 keep <- apply(mat, 2, sum) == 1
 apply(mat[, keep], 1, sum)
 }
