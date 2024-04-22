@@ -1,5 +1,8 @@
+library(data.table)
+
 test_that("cutoff must be between 0 and 1", {
-  x <- list("A" = c("a", "b"), "B" = c("a", "b"))
+  x <- list("A" = c("a", "b"),
+            "B" = c("a", "b"))
 
   expect_error(
     cluster_sets(x, cutoff = -0.01),
@@ -31,10 +34,9 @@ test_that("a message is produced when no pairs of sets pass threshold", {
     "No pair of sets passes the similarity cutoff."
   )
 
-  expected <- data.frame(set = c("A", "B"),
+  expected <- data.table(set = c("A", "B"),
                          cluster = 1:2,
                          set_size = rep(2L, 2),
-                         row.names = NULL,
                          stringsAsFactors = FALSE)
 
   expect_identical(object, expected)
@@ -51,10 +53,9 @@ test_that("results are correct", {
             "G" = letters[3:6]) # overlaps with A-E
 
   df <- cluster_sets(x, cutoff = 0.5)
-  expected <- data.frame(set = c("A", "B", "C", "G", "D", "E", "F"),
-                         cluster = c(rep(1L, 5), 2L, 3L),
-                         set_size = c(5L, 4L, 4L, 4L, 3L, 1L, 3L),
-                         row.names = NULL,
+  expected <- data.table(set = c("A", "B", "C", "D", "G", "E", "F"),
+                         cluster = c(1L, 1L, 1L, 1L, 2L, 3L, 4L),
+                         set_size = c(5L, 4L, 4L, 3L, 4L, 1L, 3L),
                          stringsAsFactors = FALSE)
 
   expect_identical(df, expected)
