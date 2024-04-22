@@ -2,7 +2,7 @@
 % Please edit documentation in R/incidence_to_list.R
 \name{incidence_to_list}
 \alias{incidence_to_list}
-\title{Convert incidence matrix to a named list of sets}
+\title{Convert incidence matrix to a list of sets}
 \usage{
 incidence_to_list(incidence)
 }
@@ -16,8 +16,8 @@ a named list of sets with the same length as \code{nrow(incidence)}.
 \description{
 \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
 
-Converts an incidence matrix to a named list of character vectors. The
-inverse of \code{\link{incidence}}.
+Converts an incidence matrix to a named list of sets. The inverse of
+\code{\link{incidence}}.
 }
 \note{
 This function does not currently check that the input is valid.

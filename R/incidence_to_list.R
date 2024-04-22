@@ -1,9 +1,9 @@
-#' @title Convert incidence matrix to a named list of sets
+#' @title Convert incidence matrix to a list of sets
 #'
 #' @description `r lifecycle::badge("experimental")`
 #'
-#'   Converts an incidence matrix to a named list of character vectors. The
-#'   inverse of \code{\link{incidence}}.
+#'   Converts an incidence matrix to a named list of sets. The inverse of
+#'   \code{\link{incidence}}.
 #'
 #' @param incidence incidence matrix with set names as rows and elements as
 #'   columns. Usually, the output of \code{\link{incidence}}.
@@ -30,13 +30,14 @@ incidence_to_list <- function(incidence) {
   idx <- which(incidence == 1, arr.ind = TRUE, useNames = FALSE)
 
   # Convert indices to names of sets and elements
-  df <- data.frame(sets = rownames(incidence)[idx[, 1L]],
+  dt <- data.table(sets = rownames(incidence)[idx[, 1L]],
                    elements = colnames(incidence)[idx[, 2L]],
-                   row.names = NULL,
                    stringsAsFactors = FALSE)
 
-  o <- unique(df$sets) # prevent ordering by set name
-  x <- split(x = df$elements, f = df$sets)[o]
+  # Convert to factor to prevent ordering by set name when splitting
+  dt[, sets := factor(sets, levels = unique(sets))]
+
+  x <- split(x = dt[["elements"]], f = dt[["sets"]])
 
   return(x)
 }
