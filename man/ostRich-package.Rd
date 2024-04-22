@@ -4,9 +4,9 @@
 \name{ostRich-package}
 \alias{ostRich}
 \alias{ostRich-package}
-\title{ostRich: Prepare -Omics Sets for Enrichment Analysis/Gene Set Testing}
+\title{ostRich: Tools to Prepare Omics Sets for Enrichment Analysis/Gene Set Testing}
 \description{
-Tools to prepare lists of a priori biomolecular sets generated from high-throughput -omics data, such as gene sets, for enrichment analysis/gene set testing.
+Tools to prepare lists of a priori biomolecular sets generated from high-throughput omics data, such as gene sets, for enrichment analysis/gene set testing.
 }
 \author{
 \strong{Maintainer}: Tyler Sagendorf \email{tyler.sagendorf@pnnl.gov} (\href{https://orcid.org/0000-0003-1552-4870}{ORCID})
