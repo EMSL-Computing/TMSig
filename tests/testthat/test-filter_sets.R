@@ -46,12 +46,12 @@ test_that("sets must be non-NA character vectors", {
 
   expect_error(
     filter_sets(list("A" = NA_character_)),
-    "`x` only contains missing values."
+    "All sets in `x` are empty or only contain missing values."
   )
 
   expect_error(
     filter_sets(list("A" = c(1, 2))),
-    "Sets in `x` must consist of character vectors."
+    "`x` must be a named list of character vectors."
   )
 
 })

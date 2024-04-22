@@ -1,4 +1,4 @@
-#' @title Filter a list of sets by size
+#' @title Filter a list of sets
 #'
 #' @description Given a named list of sets, filter to those that contain at
 #'   least \code{min_size} and no more than \code{min_size} elements. The sets
@@ -39,10 +39,6 @@ filter_sets <- function(x,
                         min_size = 5L,
                         max_size = Inf)
 {
-  # Validate input
-  if (!is.list(x) | is.null(names(x)))
-    stop("`x` must be a named list of character vectors.")
-
   # Relax the type of min_size and max_size to allow doubles
   if (!is.numeric(min_size) | length(min_size) != 1L)
     stop("`min_size` must be a single integer.")
@@ -54,29 +50,11 @@ filter_sets <- function(x,
     stop("`min_size` cannot be greater than `max_size`.")
 
   # Sets must contain at least 1 element
-  min_size <- max(1L, min_size)
-  max_size <- max(1L, max_size)
+  min_size <- max(1L, round(min_size))
+  max_size <- max(1L, round(max_size))
 
-  # Convert list of sets to a data.frame
-  sets <- rep(names(x), lengths(x))
-
-  elements <- unlist(x, use.names = FALSE)
-
-  if (length(elements) == 0L)
-    stop("All sets in `x` are empty.")
-
-  if (!is.character(elements))
-    stop("Sets in `x` must consist of character vectors.")
-
-  if (all(is.na(elements)))
-    stop("`x` only contains missing values.")
-
-  df <- data.frame(sets = sets,
-                   elements = elements,
-                   row.names = NULL,
-                   stringsAsFactors = FALSE)
-  df <- unique(df)
-  df <- df[!is.na(df$elements), ]
+  # Convert list of sets to a data.table with columns "set" and "elements"
+  dt <- .prepare_sets(x)
 
   # Validate background
   if (!missing(background)) {
@@ -90,18 +68,18 @@ filter_sets <- function(x,
     if (length(background) < 2L)
       stop("`background` must contain at least 2 unique, nonmissing elements.")
 
-    # Subset df to elements of background
-    keep <- df$elements %in% background
+    # Subset dt to elements of background
+    dt <- subset(dt, subset = elements %in% background)
 
-    if (all(!keep))
+    if (nrow(dt) == 0L)
       stop("No elements of `x` are present in `background`.")
-
-    df <- df[keep, ]
   }
 
-  o <- order(unique(df$sets)) # prevent ordering by set name
-  x <- split(x = df$elements, f = df$sets)[o]
-  ss <- lengths(x) # set size
+  # Convert to factor to prevent ordering by set name
+  dt[, set := factor(sets, levels = unique(sets))]
+
+  x <- split(x = dt[["elements"]], f = dt[["sets"]])
+  ss <- lengths(x) # set sizes
 
   if (all(ss < min_size))
     stop("No sets contain at least `min_size` elements.")

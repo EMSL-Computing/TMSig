@@ -2,7 +2,7 @@
 % Please edit documentation in R/filter_sets.R
 \name{filter_sets}
 \alias{filter_sets}
-\title{Filter a list of sets by size}
+\title{Filter a list of sets}
 \usage{
 filter_sets(x, background, min_size = 5L, max_size = Inf)
 }
