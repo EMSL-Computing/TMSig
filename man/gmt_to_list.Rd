@@ -2,20 +2,23 @@
 % Please edit documentation in R/gmt_to_list.R
 \name{gmt_to_list}
 \alias{gmt_to_list}
-\title{Convert GMT file to named list}
+\title{Convert GMT file to named list of sets}
 \usage{
 gmt_to_list(path, check = TRUE)
 }
 \arguments{
 \item{path}{character; path to a GMT file.}
 
-\item{check}{logical; check that \code{path} points to a valid GMT file.}
+\item{check}{logical; check that \code{path} points to a valid GMT file. If
+\code{FALSE}, files with different extensions may be read, so long as they
+are in the expected format.}
 }
 \value{
 A named list of character vectors.
 }
 \description{
-Create a named list of sets from a GMT file.
+Create a named list of sets from a GMT file, or a file
+structured like a GMT.
 }
 \note{
 Similar to \code{fgsea::gmtPathways}.
