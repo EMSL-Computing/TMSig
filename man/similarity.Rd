@@ -2,14 +2,14 @@
 % Please edit documentation in R/similarity.R
 \name{similarity}
 \alias{similarity}
-\title{Construct set similarity matrix}
+\title{Construct matrix of pairwise set similarity coefficients}
 \usage{
-similarity(x, method = c("jaccard", "overlap"))
+similarity(x, type = c("jaccard", "overlap"))
 }
 \arguments{
 \item{x}{a named list of sets.}
 
-\item{method}{character; the type of similarity measure to use. Either
+\item{type}{character; the type of similarity measure to use. Either
 \code{"jaccard"} or \code{"overlap"}.}
 }
 \value{
@@ -17,8 +17,8 @@ An object of class \code{\link[Matrix:dgCMatrix-class]{dgCMatrix}}
 containing all pairwise similarity coefficients.
 }
 \description{
-Construct a sparse matrix of Jaccard or overlap coefficients for
-each pair of sets in a list.
+Construct a sparse matrix of Jaccard or overlap similarity
+coefficients for each pair of sets in a list.
 }
 \section{Set Similarity}{
 
@@ -38,15 +38,15 @@ smaller set (Szymkiewicz 1934; Simpson, 1943, 1947, 1960; Fallaw 1979):
 The Jaccard coefficient can identify aliased sets (sets which contain the
 same elements, but have different names), while the overlap coefficient can
 identify both aliased sets and subsets, though the two are not easily
-distinguished without also having the matrix of Jaccard coefficients.
+distinguished without also having the matrix of Jaccard coefficients or the
+set sizes.
 }
 
 \section{Optimization}{
 
 
-Since the similarity matrix of Jaccard or Overlap coefficients is always
-symmetric, calculations are only performed for the lower triangular part of
-the matrix and only for pairs of sets with nonzero intersections. As such,
+Calculations are only performed for pairs of sets with nonzero
+intersections in the lower triangular part of the matrix. As such,
 \code{similarity} is efficient even for large similarity matrices, and it
 is especially efficient for sparse similarity matrices.
 }
@@ -58,12 +58,7 @@ x <- list("A" = c("a", "b", "c", "d", "e"),
           "D" = c("a", "b", "c")) # subset of A
 
 (j <- similarity(x)) # Jaccard coefficients
-(o <- similarity(x, method = "overlap"))
-
-# Identify subsets (see help("cluster_sets") for a better approach)
-ss <- o
-ss[which(j == 1 | o != 1)] <- 0L
-ss
+(o <- similarity(x, type = "overlap"))
 }
 \references{
 Jaccard, P. (1912). The distribution of the flora in the alpine

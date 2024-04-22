@@ -26,9 +26,9 @@ test_that("similarity matrices are symmetric", {
             "C" = letters[4:8], # aliased with B
             "D" = letters[1:3]) # subset of A
 
-  expect_true(isSymmetric(similarity(x, method = "jaccard")))
+  expect_true(isSymmetric(similarity(x, type = "jaccard")))
 
-  expect_true(isSymmetric(similarity(x, method = "overlap")))
+  expect_true(isSymmetric(similarity(x, type = "overlap")))
 })
 
 
@@ -52,7 +52,7 @@ test_that("overlap coefficients are correct", {
             "C" = letters[4:8], # aliased with B
             "D" = letters[1:3]) # subset of A
 
-  overlap <- similarity(x, method = "overlap")
+  overlap <- similarity(x, type = "overlap")
 
   x <- c(1, 0.4, 0.4, 1, 0.4, 1, 1, 0.4, 1, 1, 1, 1)
 
