@@ -4,11 +4,12 @@
 #'
 #'   Decompose all pairs of sufficiently overlapping sets into 3 disjoint parts:
 #'   the elements unique to the first set, the elements unique to the second
-#'   set, and the elements found in both sets.
+#'   set, and the elements found in both sets. See the examples section in
+#'   \code{\link{invert_sets}} for a method to decompose an entire list of sets.
 #'
 #' @inheritParams incidence
-#' @param overlap integer; only pairs of sets with at least
-#'   \code{overlap} elements in common will be decomposed.
+#' @param overlap integer; only pairs of sets with at least \code{overlap}
+#'   elements in common will be decomposed.
 #'
 #' @section Optimization:
 #'
@@ -42,6 +43,7 @@
 #' \url{https://doi.org/10.1093/bioinformatics/btl599}
 #'
 #' @import Matrix
+#' @importFrom data.table data.table rbindlist `:=`
 #'
 #' @export decompose_sets
 #'
@@ -59,11 +61,14 @@ decompose_sets <- function(x, overlap = 1L)
 {
   lifecycle::signal_stage("experimental", "decompose_sets()")
 
-  if (!(typeof(overlap) %in% c("double", "integer")) | length(overlap) != 1L)
+  if (!is.numeric(overlap) |
+      isTRUE(is.infinite(overlap)) |
+      length(overlap) != 1L) {
     stop("`overlap` must be a single integer specifying the minimum ",
          "intersection size required to decompose pairs of sets.")
+  }
 
-  overlap <- max(1L, overlap)
+  overlap <- max(1L, round(overlap))
 
   # This also validates x. Since the size of the intersection between a set and
   # any other set is at most the size of that set, we can pre-filter to sets of
@@ -107,9 +112,6 @@ decompose_sets <- function(x, overlap = 1L)
 
   elements <- colnames(incidence)
 
-  # The following works for n-tuples, but the entire incidence matrix would need
-  # to be supplied instead, and combs would require as many columns as rows in
-  # the incidence matrix.
   x_decomp <- apply(set_pairs, 1, function(sets_i) {
     ## For a pair of sets A and B, define names of disjoint components:
     # "A NOT B" = elements in A and not in B,
@@ -130,17 +132,19 @@ decompose_sets <- function(x, overlap = 1L)
     idx <- idx[o]
     not_null <- which(!is.na(idx)) # NA = null set
 
-    decomp_i <- data.frame(set = decomp_labels[idx],
+    decomp_i <- data.table(set = decomp_labels[idx],
                            element = elements[o],
                            stringsAsFactors = FALSE)[not_null, ]
+
+    return(decomp_i)
   })
 
-  x_decomp <- Reduce(rbind, x_decomp)
+  x_decomp <- rbindlist(x_decomp)
+  x_decomp[, set := factor(set, levels = unique(set))]
 
-  # Convert data.frame to list. set is converted to a factor to maintain the
+  # Convert data.table to list. set was converted to a factor to maintain the
   # adjacency of disjoint components when using split().
-  x_decomp <- with(x_decomp,
-                   split(x = element, f = factor(set, levels = unique(set))))
+  x_decomp <- split(x = x_decomp[["element"]], f = x_decomp[["set"]])
 
   return(x_decomp)
 }

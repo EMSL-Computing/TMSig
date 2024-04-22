@@ -25,8 +25,8 @@ decompose_sets(x, overlap = 1L)
 \arguments{
 \item{x}{a named list of sets.}
 
-\item{overlap}{integer; only pairs of sets with at least
-\code{overlap} elements in common will be decomposed.}
+\item{overlap}{integer; only pairs of sets with at least \code{overlap}
+elements in common will be decomposed.}
 }
 \value{
 A list of disjoint parts of sets. May contain aliases.
@@ -36,7 +36,8 @@ A list of disjoint parts of sets. May contain aliases.
 
 Decompose all pairs of sufficiently overlapping sets into 3 disjoint parts:
 the elements unique to the first set, the elements unique to the second
-set, and the elements found in both sets.
+set, and the elements found in both sets. See the examples section in
+\code{\link{invert_sets}} for a method to decompose an entire list of sets.
 }
 \section{Optimization}{
 
