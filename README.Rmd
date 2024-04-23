@@ -16,8 +16,7 @@ knitr::opts_chunk$set(
 # ostRich
 
 <!-- badges: start -->
-![R package version](https://img.shields.io/github/r-package/v/EMSL-Computing/ostRich?label=R%20package) 
-[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+![R package version](https://img.shields.io/github/r-package/v/EMSL-Computing/ostRich?label=R%20package)
 <!-- badges: end -->
 
 ostRich contains tools to operate on sets and is intended for preparing _a priori_ biomolecular/omics sets for enrichment analysis/gene set testing. Examples of biomolecular sets: Reactome pathways, Gene Ontology gene sets, phosphorylation sites grouped by their known kinases, and metabolites/lipids grouped by chemical subclasses (e.g., acyl carnitines, fatty acids). **In general, the functions in this package work with any named list of character vectors.**
@@ -32,7 +31,7 @@ Below is a overview of some core functions:
   - $Jaccard(A, B) = \frac{|A \cap B|}{|A \cup B|}$
   - $Overlap(A, B) = \frac{|A \cap B|}{\min(|A|, |B|)}$
 
-- `filter_sets`: Restrict sets to only those elements in a pre-determined `background`, if provided, and only keep those that pass minimum and maximum size thresholds.
+- `filter_sets`: Restrict sets to only those elements in a pre-determined background, if provided, and only keep those that pass minimum and maximum size thresholds.
 
 - `cluster_sets`: hierarchical clustering of highly similar sets. Used to reduce redundancy prior to analysis.
 
@@ -72,13 +71,17 @@ tcrossprod(imat) # pairwise intersection and set sizes
 crossprod(imat) # occurrence of each element and pair of elements
 ```
 
-```{r}
-similarity(x) # pairwise Jaccard similarity
 
-similarity(x, type = "overlap") # pairwise overlap similarity
+```{r}
+## Calculate matrices of pairwise Jaccard and overlap similarity coefficients
+similarity(x) # Jaccard (default)
+
+similarity(x, type = "overlap") # overlap
 ```
 
 ```{r}
+## Cluster sets based on their similarity
+
 # Cluster aliased sets (the empty brackets are required to display the table)
 cluster_sets(x, cutoff = 1)[]
 

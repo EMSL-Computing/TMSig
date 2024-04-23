@@ -7,8 +7,6 @@
 
 ![R package
 version](https://img.shields.io/github/r-package/v/EMSL-Computing/ostRich?label=R%20package)
-[![Lifecycle:
-experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 <!-- badges: end -->
 
 ostRich contains tools to operate on sets and is intended for preparing
@@ -35,8 +33,8 @@ Below is a overview of some core functions:
   - $Overlap(A, B) = \frac{|A \cap B|}{\min(|A|, |B|)}$
 
 - `filter_sets`: Restrict sets to only those elements in a
-  pre-determined `background`, if provided, and only keep those that
-  pass minimum and maximum size thresholds.
+  pre-determined background, if provided, and only keep those that pass
+  minimum and maximum size thresholds.
 
 - `cluster_sets`: hierarchical clustering of highly similar sets. Used
   to reduce redundancy prior to analysis.
@@ -127,7 +125,8 @@ crossprod(imat) # occurrence of each element and pair of elements
 ```
 
 ``` r
-similarity(x) # pairwise Jaccard similarity
+## Calculate matrices of pairwise Jaccard and overlap similarity coefficients
+similarity(x) # Jaccard (default)
 #> 7 x 7 sparse Matrix of class "dgCMatrix"
 #>      Set1      Set2      Set3      Set4      Set5 Set6      Set7
 #> Set1  1.0 0.8000000 0.8000000 0.6000000 0.2000000    . 0.5000000
@@ -138,7 +137,7 @@ similarity(x) # pairwise Jaccard similarity
 #> Set6  .   .         .         .         .            1 .        
 #> Set7  0.5 0.3333333 0.3333333 0.1666667 .            . 1.0000000
 
-similarity(x, type = "overlap") # pairwise overlap similarity
+similarity(x, type = "overlap") # overlap
 #> 7 x 7 sparse Matrix of class "dgCMatrix"
 #>      Set1 Set2 Set3      Set4 Set5 Set6      Set7
 #> Set1 1.00  1.0  1.0 1.0000000    1    . 0.7500000
@@ -151,6 +150,8 @@ similarity(x, type = "overlap") # pairwise overlap similarity
 ```
 
 ``` r
+## Cluster sets based on their similarity
+
 # Cluster aliased sets (the empty brackets are required to display the table)
 cluster_sets(x, cutoff = 1)[]
 #>       set cluster set_size
