@@ -1,7 +1,7 @@
 Package: ostRich
 Type: Package
 Title: Tools to Prepare Omics Sets for Enrichment Analysis/Gene Set Testing
-Version: 0.1.9001
+Version: 0.1.9002
 Date: 2024-04-24
 Authors@R: 
     person(given = "Tyler", family = "Sagendorf", 
