@@ -17,10 +17,10 @@
 #'
 #' @seealso \code{\link{range_extend}}
 #'
-#' @name heatmap_color_functions
+#' @name enrichmap_color_functions
 
 
-#' @rdname heatmap_color_functions
+#' @rdname enrichmap_color_functions
 #' @export gsea_color_fun
 gsea_color_fun <- function(statistics,
                            colors = c("#3366ff", "darkred"))
@@ -52,7 +52,7 @@ gsea_color_fun <- function(statistics,
 
 
 
-#' @rdname heatmap_color_functions
+#' @rdname enrichmap_color_functions
 #' @export camera_color_fun
 camera_color_fun <- function(statistics,
                              colors = c("#3366ff", "darkred"))
