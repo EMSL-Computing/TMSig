@@ -3,7 +3,8 @@
 #' @description Create a named list of sets from a GMT file, or a file
 #'   structured like a GMT.
 #'
-#' @param path character; path to a GMT file.
+#' @param path character; path to a GMT file. Files may include one additional
+#'   extension after ".gmt", such as ".gmt.gzip".
 #' @param check logical; check that \code{path} points to a valid GMT file. If
 #'   \code{FALSE}, files with different extensions may be read, so long as they
 #'   are in the expected format.
