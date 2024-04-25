@@ -7,7 +7,8 @@
 gmt_to_list(path, check = TRUE)
 }
 \arguments{
-\item{path}{character; path to a GMT file.}
+\item{path}{character; path to a GMT file. Files may include one additional
+extension after ".gmt", such as ".gmt.gzip".}
 
 \item{check}{logical; check that \code{path} points to a valid GMT file. If
 \code{FALSE}, files with different extensions may be read, so long as they

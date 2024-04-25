@@ -1,8 +1,8 @@
 Package: ostRich
 Type: Package
 Title: Tools to Prepare Omics Sets for Enrichment Analysis/Gene Set Testing
-Version: 0.1.0
-Date: 2024-04-22
+Version: 0.1.0.9005
+Date: 2024-04-25
 Authors@R: 
     person(given = "Tyler", family = "Sagendorf", 
            email = "tyler.sagendorf@pnnl.gov",
@@ -21,12 +21,16 @@ Depends:
     R (>= 3.6.0),
     Matrix
 Imports:
+    circlize,
+    ComplexHeatmap,
     data.table,
+    grDevices,
+    grid,
     lifecycle,
-    stats
+    stats,
+    utils
 Suggests: 
     knitr,
     rmarkdown,
-    testthat (>= 3.0.0),
-    utils
+    testthat (>= 3.0.0)
 Config/testthat/edition: 3
