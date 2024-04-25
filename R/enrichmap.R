@@ -39,7 +39,7 @@
 #'   \code{padj_cutoff}.
 #' @param padj_fill character; the background color used for values in
 #'   \code{padj_column} that are less than \code{padj_cutoff}. Default is
-#'   "grey45".
+#'   "grey".
 #' @param colors vector of length 2 specifying the colors for the largest
 #'   negative and largest positive values of \code{x[[statistic_column]]},
 #'   respectively. Default is "#3366ff" (blue) and "darkred".
@@ -96,7 +96,7 @@ enrichmap <- function(x,
                       },
                       padj_cutoff = 0.05,
                       plot_sig_only = TRUE,
-                      padj_fill = "grey45",
+                      padj_fill = "grey",
                       colors = c("#3366ff", "darkred"),
                       heatmap_color_fun = camera_color_fun,
                       scale_by = c("row", "column", "max"),
