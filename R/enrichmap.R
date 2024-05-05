@@ -14,9 +14,7 @@
 #'   Default is "GeneSet".
 #' @param statistic_column similar to \code{set_column}. The name of a column
 #'   containing the statistic for each pathway. Determines the heatmap body
-#'   colors. Normalized enrichment scores (NES) are assumed, by default, so
-#'   values between -1 and +1 (noise) will appear white. This can be modified
-#'   through the use of \code{heatmap_args}.
+#'   colors.
 #' @param contrast_column character; the name of a column in \code{x} containing
 #'   contrasts that will be used as columns for the heatmap. Entries of
 #'   \code{x[[rownames_colum]]} must be uniquely defined for each contrast
@@ -69,8 +67,8 @@
 #' @param draw_args list; additional arguments passed to
 #'   \code{\link[ComplexHeatmap]{draw-HeatmapList-method}}.
 #'
-#' @returns Nothing. Displays heatmap in Plots pane or saves the heatmap to a
-#'   file (if \code{filename} is provided).
+#' @returns Nothing. Displays heatmap or saves the heatmap to a file (if
+#'   \code{filename} is provided).
 #'
 #' @importFrom circlize colorRamp2
 #' @importFrom ComplexHeatmap max_text_width Heatmap Legend draw
@@ -87,9 +85,9 @@
 enrichmap <- function(x,
                       n_top = 15L,
                       set_column = "GeneSet",
-                      statistic_column = "ZScore",
+                      statistic_column = "TwoSidedT",
                       contrast_column = "Contrast",
-                      padj_column = "PAdj",
+                      padj_column = "FDR",
                       padj_legend_title = padj_column,
                       padj_aggregate_fun = function(padj) {
                         median(-log10(padj), na.rm = TRUE)

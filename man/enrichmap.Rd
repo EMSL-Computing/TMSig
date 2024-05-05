@@ -8,9 +8,9 @@ enrichmap(
   x,
   n_top = 15L,
   set_column = "GeneSet",
-  statistic_column = "ZScore",
+  statistic_column = "TwoSidedT",
   contrast_column = "Contrast",
-  padj_column = "PAdj",
+  padj_column = "FDR",
   padj_legend_title = padj_column,
   padj_aggregate_fun = function(padj) {
      median(-log10(padj), na.rm = TRUE)
@@ -47,9 +47,7 @@ Default is "GeneSet".}
 
 \item{statistic_column}{similar to \code{set_column}. The name of a column
 containing the statistic for each pathway. Determines the heatmap body
-colors. Normalized enrichment scores (NES) are assumed, by default, so
-values between -1 and +1 (noise) will appear white. This can be modified
-through the use of \code{heatmap_args}.}
+colors.}
 
 \item{contrast_column}{character; the name of a column in \code{x} containing
 contrasts that will be used as columns for the heatmap. Entries of
@@ -122,8 +120,8 @@ determined by the \code{filename} extension. See
 \code{\link[ComplexHeatmap]{draw-HeatmapList-method}}.}
 }
 \value{
-Nothing. Displays heatmap in Plots pane or saves the heatmap to a
-file (if \code{filename} is provided).
+Nothing. Displays heatmap or saves the heatmap to a file (if
+\code{filename} is provided).
 }
 \description{
 Create a bubble heatmap summarizing set enrichment analysis
