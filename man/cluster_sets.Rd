@@ -23,7 +23,7 @@ cluster_sets(
 )
 }
 \arguments{
-\item{x}{a named list of sets.}
+\item{x}{a named list of sets. Elements must be of type \code{"character"}.}
 
 \item{type}{character; the type of similarity measure to use. Either
 \code{"jaccard"} or \code{"overlap"}.}

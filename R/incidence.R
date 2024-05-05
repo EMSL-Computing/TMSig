@@ -2,7 +2,7 @@
 #'
 #' @description Given a named list of sets, construct a sparse incidence matrix.
 #'
-#' @param x a named list of sets.
+#' @param x a named list of sets. Elements must be of type \code{"character"}.
 #'
 #' @returns An object of class \code{\link[Matrix:dgCMatrix-class]{dgCMatrix}}
 #'   with unique set names as rows and unique elements as columns. A value of 1

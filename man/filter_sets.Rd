@@ -7,7 +7,7 @@
 filter_sets(x, background, min_size = 5L, max_size = Inf)
 }
 \arguments{
-\item{x}{a named list of sets.}
+\item{x}{a named list of sets. Elements must be of type \code{"character"}.}
 
 \item{background}{character; optional vector of at least 2 elements. \code{x}
 will be filtered to only those elements of \code{background}.}

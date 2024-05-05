@@ -7,7 +7,7 @@
 incidence(x)
 }
 \arguments{
-\item{x}{a named list of sets.}
+\item{x}{a named list of sets. Elements must be of type \code{"character"}.}
 }
 \value{
 An object of class \code{\link[Matrix:dgCMatrix-class]{dgCMatrix}}

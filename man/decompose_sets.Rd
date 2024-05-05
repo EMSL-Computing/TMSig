@@ -23,7 +23,7 @@ original results. (The same logic can be applied for set 2.)}
 decompose_sets(x, overlap = 1L)
 }
 \arguments{
-\item{x}{a named list of sets.}
+\item{x}{a named list of sets. Elements must be of type \code{"character"}.}
 
 \item{overlap}{integer; only pairs of sets with at least \code{overlap}
 elements in common will be decomposed.}

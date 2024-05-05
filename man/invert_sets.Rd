@@ -7,7 +7,7 @@
 invert_sets(x)
 }
 \arguments{
-\item{x}{a named list of sets.}
+\item{x}{a named list of sets. Elements must be of type \code{"character"}.}
 }
 \value{
 A named list of sets.
