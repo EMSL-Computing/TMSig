@@ -49,11 +49,11 @@ A \code{data.frame} with the following columns:
 \item{GeneSet}{character; the gene set being tested.}
 \item{NGenes}{integer; number of genes in the set with values in the
 \code{statistic} matrix for a given contrast.}
-\item{Correlation}{numeric; inter-gene correlation
-(only included if \code{inter.gene.cor} was not a single value).}
+\item{Correlation}{numeric; inter-gene correlation (only included if
+\code{inter.gene.cor} was not a single value).}
 \item{Direction}{character; direction of change ("Up" or "Down").}
-\item{Statistic}{numeric; two-sample t-statistic (\code{use.ranks=FALSE})
-or z-statistic (\code{use.ranks=TRUE}).}
+\item{TwoSampleT}{numeric; two-sample t-statistic (only included if
+\code{use.ranks=FALSE}).}
 \item{df}{numeric; degrees of freedom (only included if
 \code{use.ranks=FALSE}). Two less than the number of non-missing values in
 each column of the \code{statistic} matrix.}
@@ -71,25 +71,48 @@ details.
 While the language is centered around gene sets, any \emph{a priori} groups
 of biomolecules may be tested.
 }
-\section{Test Assumptions}{
+\examples{
+require(limma)
+require(stats)
 
+# Simulate experimental data with control and treatment groups (3 samples
+# each)
+group <- rep(c("control", "treatment"), each = 3)
+design <- model.matrix(~ 0 + group)
+contrasts <- makeContrasts(contrasts = "grouptreatment - groupcontrol",
+                           levels = colnames(design))
 
-CAMERA and CAMERA-PR extend the two-sample t-test or Wilcoxon-Mann-Whitney
-test (if \code{use.ranks=TRUE}) to allow for correlation of genes within
-each set of interest, though genes not in a given set are assumed to be
-independent (Wu & Smyth, 2012).
+ngenes <- 1000L
+nsamples <- length(group)
 
-If \code{use.ranks=FALSE}, it is assumed that the statistics in each group
-are sampled from Normal distributions with equal variance, though the
-two-sample t-test is fairly robust to departures from normality when group
-sizes are large (i.e., when the gene sets are not too small or too large
-relative to the total number of non-missing values in each column of
-\code{statistic}).
+set.seed(0)
+y <- matrix(data = rnorm(ngenes * nsamples),
+            nrow = ngenes, ncol = nsamples,
+            dimnames = list(paste0("gene", seq_len(ngenes)),
+                            make.unique(group)))
 
-If \code{use.ranks=TRUE}, the ranks of the statistics will be used, so
-there are no distributional assumptions.
+# First set of 20 genes are genuinely differentially expressed (trt1 and trt2
+# are lower than control)
+index1 <- 1:20
+y[index1, 1:3] <- y[index1, 1:3] + 1
+
+# Second set of 20 genes are not DE
+index2 <- 21:40
+
+# Generate matrix of moderated t-statistics
+fit <- lmFit(y, design)
+fit.contr <- contrasts.fit(fit, contrasts = contrasts)
+fit.smooth <- eBayes(fit.contr)
+
+index <- list(set1 = rownames(y)[index1],
+              set2 = rownames(y)[index2])
+
+# Only set1 is DE
+cameraPR(statistic = fit.smooth$t, index = index)
+
+# Non-parametric version
+cameraPR(statistic = fit.smooth$t, index = index, use.ranks = TRUE)
 }
-
 \references{
 Wu, D., and Smyth, G. K. (2012). Camera: a competitive gene set
 test accounting for inter-gene correlation. \emph{Nucleic Acids Research}

@@ -36,34 +36,17 @@
 #'   \item{GeneSet}{character; the gene set being tested.}
 #'   \item{NGenes}{integer; number of genes in the set with values in the
 #'   \code{statistic} matrix for a given contrast.}
-#'   \item{Correlation}{numeric; inter-gene correlation
-#'   (only included if \code{inter.gene.cor} was not a single value).}
+#'   \item{Correlation}{numeric; inter-gene correlation (only included if
+#'   \code{inter.gene.cor} was not a single value).}
 #'   \item{Direction}{character; direction of change ("Up" or "Down").}
-#'   \item{Statistic}{numeric; two-sample t-statistic (\code{use.ranks=FALSE})
-#'   or z-statistic (\code{use.ranks=TRUE}).}
+#'   \item{TwoSampleT}{numeric; two-sample t-statistic (only included if
+#'   \code{use.ranks=FALSE}).}
 #'   \item{df}{numeric; degrees of freedom (only included if
 #'   \code{use.ranks=FALSE}). Two less than the number of non-missing values in
 #'   each column of the \code{statistic} matrix.}
 #'   \item{PValue}{numeric; two-tailed p-value.}
 #'   \item{FDR}{numeric; Benjamini and Hochberg FDR adjusted p-value (not
 #'   included when only one set and contrast was tested).}
-#'
-#' @section Test Assumptions:
-#'
-#'   CAMERA and CAMERA-PR extend the two-sample t-test or Wilcoxon-Mann-Whitney
-#'   test (if \code{use.ranks=TRUE}) to allow for correlation of genes within
-#'   each set of interest, though genes not in a given set are assumed to be
-#'   independent (Wu & Smyth, 2012).
-#'
-#'   If \code{use.ranks=FALSE}, it is assumed that the statistics in each group
-#'   are sampled from Normal distributions with equal variance, though the
-#'   two-sample t-test is fairly robust to departures from normality when group
-#'   sizes are large (i.e., when the gene sets are not too small or too large
-#'   relative to the total number of non-missing values in each column of
-#'   \code{statistic}).
-#'
-#'   If \code{use.ranks=TRUE}, the ranks of the statistics will be used, so
-#'   there are no distributional assumptions.
 #'
 #' @references Wu, D., and Smyth, G. K. (2012). Camera: a competitive gene set
 #'   test accounting for inter-gene correlation. \emph{Nucleic Acids Research}
@@ -88,6 +71,48 @@
 #'
 #' @export cameraPR.matrix
 #' @exportS3Method limma::cameraPR
+#'
+#' @examples
+#' require(limma)
+#' require(stats)
+#'
+#' # Simulate experimental data with control and treatment groups (3 samples
+#' # each)
+#' group <- rep(c("control", "treatment"), each = 3)
+#' design <- model.matrix(~ 0 + group)
+#' contrasts <- makeContrasts(contrasts = "grouptreatment - groupcontrol",
+#'                            levels = colnames(design))
+#'
+#' ngenes <- 1000L
+#' nsamples <- length(group)
+#'
+#' set.seed(0)
+#' y <- matrix(data = rnorm(ngenes * nsamples),
+#'             nrow = ngenes, ncol = nsamples,
+#'             dimnames = list(paste0("gene", seq_len(ngenes)),
+#'                             make.unique(group)))
+#'
+#' # First set of 20 genes are genuinely differentially expressed (trt1 and trt2
+#' # are lower than control)
+#' index1 <- 1:20
+#' y[index1, 1:3] <- y[index1, 1:3] + 1
+#'
+#' # Second set of 20 genes are not DE
+#' index2 <- 21:40
+#'
+#' # Generate matrix of moderated t-statistics
+#' fit <- lmFit(y, design)
+#' fit.contr <- contrasts.fit(fit, contrasts = contrasts)
+#' fit.smooth <- eBayes(fit.contr)
+#'
+#' index <- list(set1 = rownames(y)[index1],
+#'               set2 = rownames(y)[index2])
+#'
+#' # Only set1 is DE
+#' cameraPR(statistic = fit.smooth$t, index = index)
+#'
+#' # Non-parametric version
+#' cameraPR(statistic = fit.smooth$t, index = index, use.ranks = TRUE)
 
 cameraPR.matrix <- function(statistic,
                             index,
@@ -115,7 +140,7 @@ cameraPR.matrix <- function(statistic,
   G <- apply(!is.na(statistic), 2, sum)
 
   if (any(G < 3L))
-    stop("Each column of `statistic` must have at least 3 non-missing values.")
+    stop("Each column of `statistic` must have at least 3 nonmissing values.")
 
   # data.table with columns "sets" and "elements"
   dt <- .prepare_sets(index) # this also validates index
@@ -148,19 +173,21 @@ cameraPR.matrix <- function(statistic,
   nsets <- length(all_set_names)
 
   m <- as.matrix(imat %*% !is.na(statistic)) # number of genes in each set
+  storage.mode(m) <- "integer"
 
   # Identify sets that are too small or too large in at least one contrast
   extreme_sets <- which(apply(m, 1, function(mi) any(mi < 2L | mi == G)))
   if (length(extreme_sets)) {
       # If all sets will be dropped, throw an error
       if (length(extreme_sets) == nsets)
-        stop("No sets in `index` have at least 2 and fewer than ",
-             "nrow(statistic) genes in every contrast. Check that ",
-             "rownames(statistic) match genes in `index`.")
+        stop("No sets in `index` have at least 2 and fewer than",
+             "apply(!is.na(statistic), 2, sum) genes with nonmissing ",
+             "values in `statistic`.")
 
       # Drop sets that are too small or too large
-      warning("Sets in `index` with fewer than 2 and at most nrow(statistic) ",
-              "genes in at least one contrast will be dropped.")
+      warning("Sets in `index` with fewer than 2 and at most ",
+              "apply(!is.na(statistic), 2, sum) genes with nonmissing ",
+              "values in at least one contrast will be dropped.")
       m <- m[-extreme_sets, , drop = FALSE]
       imat <- imat[-extreme_sets, , drop = FALSE]
 
@@ -211,7 +238,7 @@ cameraPR.matrix <- function(statistic,
     # Different calculation for sigma2 if the correlation is zero
     zero.cor.idx <- which(inter.gene.cor == 0)
     if (length(zero.cor.idx)) {
-      sigma2.zero.cor <- t(t(m_prod) * (G + 1L)) / 12
+      sigma2.zero.cor <- t(t(m_prod) / 12 * (G + 1L))
       sigma2[zero.cor.idx] <- sigma2.zero.cor[zero.cor.idx]
     }
 
@@ -229,11 +256,6 @@ cameraPR.matrix <- function(statistic,
 
     Down <- pt(zuppertail, df = Inf, lower.tail = FALSE)
     Up <- pt(zlowertail, df = Inf)
-
-    D <- which(Down < Up)
-
-    set_stats <- zlowertail
-    set_stats[D] <- zuppertail[D]
   } else {
     # Global mean and variance of statistics in each contrast
     meanStat <- apply(statistic, 2, mean, na.rm = TRUE)
@@ -259,20 +281,20 @@ cameraPR.matrix <- function(statistic,
     )
 
     # Two-sample t-statistics
-    set_stats <- delta / sqrt(varStatPooled * (vif / m + 1 / m2))
+    two.sample.t <- delta / sqrt(varStatPooled * (vif / m + 1 / m2))
 
     # Convert to a matrix to have same size as set_stats
     df.camera <- matrix(rep(df.camera, times = nsets),
                         nrow = nsets,
                         ncol = ncontrasts,
                         byrow = TRUE,
-                        dimnames = dimnames(set_stats))
+                        dimnames = dimnames(two.sample.t))
 
-    Up <- pt(set_stats, df = df.camera, lower.tail = FALSE)
-    Down <- pt(set_stats, df = df.camera)
-
-    D <- which(Down < Up)
+    Up <- pt(two.sample.t, df = df.camera, lower.tail = FALSE)
+    Down <- pt(two.sample.t, df = df.camera)
   }
+
+  D <- which(Down < Up)
 
   # Direction of change
   Direction <- matrix(data = "Up",
@@ -290,14 +312,14 @@ cameraPR.matrix <- function(statistic,
       GeneSet = all_set_names,
       NGenes = m[, contrast_i],
       Direction = Direction[, contrast_i],
-      Statistic = set_stats[, contrast_i],
       PValue = TwoSided[, contrast_i],
       stringsAsFactors = FALSE
     )
 
     if (!use.ranks) {
-      tab_i[, df := df.camera[, contrast_i]]
-      setcolorder(tab_i, neworder = "df", before = "PValue")
+      tab_i[, `:=`(df = df.camera[, contrast_i],
+                   TwoSampleT = two.sample.t[, contrast_i])]
+      setcolorder(tab_i, neworder = c("TwoSampleT", "df"), before = "PValue")
     }
 
     return(tab_i)
