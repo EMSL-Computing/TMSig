@@ -10,7 +10,8 @@
   use.ranks = FALSE,
   inter.gene.cor = 0.01,
   sort = TRUE,
-  adjust.globally = FALSE
+  adjust.globally = FALSE,
+  ...
 )
 }
 \arguments{
@@ -38,19 +39,21 @@ should be adjusted together. It is recommended to set this to \code{TRUE}
 when testing a set of closely related contrasts. See Section 13.3 of the
 LIMMA User's Guide (\code{\link[limma]{limmaUsersGuide}}) for details.
 Default is \code{FALSE}.}
+
+\item{...}{other arguments are not currently used}
 }
 \value{
 A \code{data.frame} with the following columns:
 
 \item{Contrast}{factor; the contrast of interest.}
 \item{GeneSet}{character; the gene set being tested.}
-\item{NGenes}{integer; number of genes in the set that were present in the
-\code{statistic} matrix.}
+\item{NGenes}{integer; number of genes in the set with values in the
+\code{statistic} matrix for a given contrast.}
 \item{Correlation}{numeric; inter-gene correlation
 (only included if \code{inter.gene.cor} was not a single value).}
 \item{Direction}{character; direction of change ("Up" or "Down").}
 \item{Statistic}{numeric; two-sample t-statistic (\code{use.ranks=FALSE})
-or standard normal z-statistic.}
+or z-statistic (\code{use.ranks=TRUE}).}
 \item{df}{numeric; degrees of freedom (only included if
 \code{use.ranks=FALSE}). Two less than the number of non-missing values in
 each column of the \code{statistic} matrix.}
@@ -62,7 +65,7 @@ included when only one set and contrast was tested).}
 Pre-ranked Correlation-Adjusted MEan RAnk gene set testing
 (CAMERA-PR) tests whether a set of genes is highly ranked relative to other
 genes in terms of differential expression, accounting for inter-gene
-correlation (Wu & Smyth, 2012). See \code{\link[camera]{cameraPR}} for
+correlation (Wu & Smyth, 2012). See \code{\link[limma]{cameraPR}} for
 details.
 
 While the language is centered around gene sets, any \emph{a priori} groups
@@ -99,7 +102,7 @@ terms of gene sets: methodological issues. \emph{Bioinformatics} 23,
 \href{https://doi.org/10.1093/bioinformatics/btm051}{doi:10.1093/bioinformatics/btm051}.
 }
 \seealso{
-\code\link{\link{limma}{cameraPR}},
+\code{\link[limma]{cameraPR}},
 \code{\link[limma]{rankSumTestWithCorrelation}}
 }
 \author{

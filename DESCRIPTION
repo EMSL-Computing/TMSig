@@ -1,7 +1,7 @@
 Package: most
 Type: Package
 Title: MOlecular Signature Toolkit
-Version: 0.1.0.9007
+Version: 0.1.0.9008
 Date: 2024-05-05
 Authors@R: 
     c(
@@ -22,7 +22,6 @@ Roxygen: list(markdown = TRUE)
 VignetteBuilder: knitr
 Depends:
     R (>= 3.6.0),
-    limma,
     Matrix
 Imports:
     circlize,
@@ -31,6 +30,7 @@ Imports:
     grDevices,
     grid,
     lifecycle,
+    limma,
     stats,
     utils
 Suggests: 
