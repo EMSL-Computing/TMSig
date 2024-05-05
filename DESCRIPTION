@@ -1,16 +1,19 @@
 Package: ostRich
 Type: Package
-Title: Tools to Prepare Omics Sets for Enrichment Analysis/Gene Set Testing
-Version: 0.1.0.9005
-Date: 2024-04-25
+Title: Tools for Omics Set Enrichment Analysis
+Version: 0.1.0.9006
+Date: 2024-05-05
 Authors@R: 
-    person(given = "Tyler", family = "Sagendorf", 
-           email = "tyler.sagendorf@pnnl.gov",
-           comment = c(ORCID = "0000-0003-1552-4870"),
-           role = c("aut", "cre"))
-Description: Tools to prepare lists of a priori biomolecular sets generated from 
-    high-throughput omics data, such as gene sets, for enrichment analysis/gene 
-    set testing.
+    c(
+      person(given = "Tyler", family = "Sagendorf", 
+             email = "tyler.sagendorf@pnnl.gov",
+             comment = c(ORCID = "0000-0003-1552-4870"),
+             role = c("aut", "cre")),
+      person(given = "Di", family = "Wu", role = "ctb"),
+      person(given = "Gordon", family = "Smyth", role = "ctb")
+    )
+Description: Tools to prepare and analyze lists of a priori biomolecular sets 
+    generated from high-throughput omics data, such as gene sets.
 License: GPL (>= 3)
 Bugreports: https://github.com/EMSL-Computing/ostRich/issues
 Encoding: UTF-8
@@ -19,6 +22,7 @@ Roxygen: list(markdown = TRUE)
 VignetteBuilder: knitr
 Depends:
     R (>= 3.6.0),
+    limma,
     Matrix
 Imports:
     circlize,
