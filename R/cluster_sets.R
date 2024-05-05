@@ -1,4 +1,4 @@
-#' @title Cluster similar sets
+#' @title Similarity-Based Clustering of Sets
 #'
 #' @description Determine clusters of highly similar sets. Used to reduce the
 #'   redundancy of sets prior to statistical analysis.

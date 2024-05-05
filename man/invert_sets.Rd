@@ -2,7 +2,7 @@
 % Please edit documentation in R/invert_sets.R
 \name{invert_sets}
 \alias{invert_sets}
-\title{Invert a list of sets, transposing positions of sets and elements}
+\title{Invert a List of Sets, Transposing Sets and Elements}
 \usage{
 invert_sets(x)
 }

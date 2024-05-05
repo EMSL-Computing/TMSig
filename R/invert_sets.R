@@ -1,4 +1,4 @@
-#' @title Invert a list of sets, transposing positions of sets and elements
+#' @title Invert a List of Sets, Transposing Sets and Elements
 #'
 #' @description `r lifecycle::badge("experimental")`
 #'

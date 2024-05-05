@@ -1,4 +1,4 @@
-#' @title Construct matrix of pairwise set similarity coefficients
+#' @title Construct a Matrix of Pairwise Set Similarity Coefficients
 #'
 #' @description Construct a sparse matrix of Jaccard or overlap similarity
 #'   coefficients for each pair of sets in a list.

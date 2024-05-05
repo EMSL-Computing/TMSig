@@ -1,4 +1,4 @@
-#' @title Filter a list of sets
+#' @title Filter a Named List of Sets
 #'
 #' @description Given a named list of sets, filter to those that contain at
 #'   least \code{min_size} and no more than \code{min_size} elements. The sets

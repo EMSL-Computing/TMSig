@@ -1,4 +1,4 @@
-#' @title Convert GMT file to named list of sets
+#' @title Read GMT File to a Named List of Sets
 #'
 #' @description Create a named list of sets from a GMT file, or a file
 #'   structured like a GMT.

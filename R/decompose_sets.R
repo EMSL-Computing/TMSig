@@ -1,4 +1,4 @@
-#' @title Decompose pairs of overlapping sets into 3 disjoint parts
+#' @title Decompose Pairs of Overlapping Sets Into 3 Disjoint Parts
 #'
 #' @description `r lifecycle::badge("experimental")`
 #'

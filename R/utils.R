@@ -1,4 +1,4 @@
-#' @title Prepare a list of sets for other functions
+#' @title Prepare a List of Sets for Other Functions
 #'
 #' @description Remove missing values, remove duplicate set-element pairs, and
 #'   create a \code{data.table}.
@@ -43,7 +43,7 @@
 
 ## enrichmap utility functions -------------------------------------------------
 
-#' @title Format the cells of the heatmap
+#' @title Format the Cells of the Heatmap
 #'
 #' @param j integer; column index.
 #' @param i integer; row index.
@@ -109,7 +109,7 @@
 
 
 
-#' @title Save the heatmap to a file
+#' @title Save the Heatmap to a File
 #'
 #' @param filename character; path to the file. While a default is provided, it
 #'   will never be used by enrichmap. The file extension will be used to

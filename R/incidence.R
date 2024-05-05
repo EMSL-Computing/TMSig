@@ -1,4 +1,4 @@
-#' @title Construct sparse incidence matrix from list of sets
+#' @title Construct Sparse Incidence Matrix from List of Sets
 #'
 #' @description Given a named list of sets, construct a sparse incidence matrix.
 #'

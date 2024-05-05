@@ -1,7 +1,5 @@
 #' @title Extend the Range of Values Out to the Nearest Digit
 #'
-#' @description Extend the range of values out to the nearest digit.
-#'
 #' @param x any \code{\link[base]{numeric}} object.
 #' @param nearest numeric; the range of \code{x} will be extended out to the
 #'   value specified by \code{nearest}. Default is 1, which extends the range

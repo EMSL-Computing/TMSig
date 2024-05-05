@@ -1,4 +1,4 @@
-#' @title Color functions for enrichmap
+#' @title Color Functions for enrichmap
 #'
 #' @description Heatmap color functions for plotting GSEA-like and CAMERA-like
 #'   results with \code{\link{enrichmap}}.

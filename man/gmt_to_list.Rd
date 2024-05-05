@@ -2,7 +2,7 @@
 % Please edit documentation in R/gmt_to_list.R
 \name{gmt_to_list}
 \alias{gmt_to_list}
-\title{Convert GMT file to named list of sets}
+\title{Read GMT File to a Named List of Sets}
 \usage{
 gmt_to_list(path, check = TRUE)
 }

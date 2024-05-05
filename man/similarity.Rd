@@ -2,7 +2,7 @@
 % Please edit documentation in R/similarity.R
 \name{similarity}
 \alias{similarity}
-\title{Construct matrix of pairwise set similarity coefficients}
+\title{Construct a Matrix of Pairwise Set Similarity Coefficients}
 \usage{
 similarity(x, type = c("jaccard", "overlap"))
 }

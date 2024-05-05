@@ -2,7 +2,7 @@
 % Please edit documentation in R/incidence_to_list.R
 \name{incidence_to_list}
 \alias{incidence_to_list}
-\title{Convert incidence matrix to a list of sets}
+\title{Convert Incidence Matrix to a Named List of Sets}
 \usage{
 incidence_to_list(incidence)
 }

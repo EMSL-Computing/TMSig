@@ -4,7 +4,7 @@
 \alias{enrichmap_color_functions}
 \alias{gsea_color_fun}
 \alias{camera_color_fun}
-\title{Color functions for enrichmap}
+\title{Color Functions for enrichmap}
 \usage{
 gsea_color_fun(statistics, colors = c("#3366ff", "darkred"))
 

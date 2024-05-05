@@ -19,7 +19,7 @@ maximum values of \code{x} after extending them outward to the value
 provided by \code{nearest}.
 }
 \description{
-Extend the range of values out to the nearest digit.
+Extend the Range of Values Out to the Nearest Digit
 }
 \examples{
 set.seed(0)

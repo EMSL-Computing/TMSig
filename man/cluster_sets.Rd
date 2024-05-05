@@ -2,7 +2,7 @@
 % Please edit documentation in R/cluster_sets.R
 \name{cluster_sets}
 \alias{cluster_sets}
-\title{Cluster similar sets}
+\title{Similarity-Based Clustering of Sets}
 \source{
 This function is based on the procedure described in the Molecular Signatures
 Database (MSigDB) v7.0 Release Notes (Liberzon 2011, 2015):

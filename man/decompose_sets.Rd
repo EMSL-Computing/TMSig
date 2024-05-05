@@ -2,7 +2,7 @@
 % Please edit documentation in R/decompose_sets.R
 \name{decompose_sets}
 \alias{decompose_sets}
-\title{Decompose pairs of overlapping sets into 3 disjoint parts}
+\title{Decompose Pairs of Overlapping Sets Into 3 Disjoint Parts}
 \source{
 Decomposition of sets is described by Jiang and Gentleman (2007) in
 section 2.3.1 "Overlap among gene sets". It is a method to reduce the

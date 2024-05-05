@@ -1,4 +1,4 @@
-#' @title Convert incidence matrix to a list of sets
+#' @title Convert Incidence Matrix to a Named List of Sets
 #'
 #' @description `r lifecycle::badge("experimental")`
 #'

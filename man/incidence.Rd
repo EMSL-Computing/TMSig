@@ -2,7 +2,7 @@
 % Please edit documentation in R/incidence.R
 \name{incidence}
 \alias{incidence}
-\title{Construct sparse incidence matrix from list of sets}
+\title{Construct Sparse Incidence Matrix from List of Sets}
 \usage{
 incidence(x)
 }
