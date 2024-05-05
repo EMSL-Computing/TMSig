@@ -1,7 +1,7 @@
-Package: ostRich
+Package: most
 Type: Package
-Title: Tools for Omics Set Enrichment Analysis
-Version: 0.1.0.9006
+Title: MOlecular Signature Toolkit
+Version: 0.1.0.9007
 Date: 2024-05-05
 Authors@R: 
     c(
@@ -12,10 +12,10 @@ Authors@R:
       person(given = "Di", family = "Wu", role = "ctb"),
       person(given = "Gordon", family = "Smyth", role = "ctb")
     )
-Description: Tools to prepare and analyze lists of a priori biomolecular sets 
-    generated from high-throughput omics data, such as gene sets.
+Description: Tools to prepare and analyze lists of a priori molecular 
+    signatures, such as gene sets.
 License: GPL (>= 3)
-Bugreports: https://github.com/EMSL-Computing/ostRich/issues
+Bugreports: https://github.com/EMSL-Computing/most/issues
 Encoding: UTF-8
 RoxygenNote: 7.3.1
 Roxygen: list(markdown = TRUE)

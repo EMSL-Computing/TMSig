@@ -2,11 +2,11 @@
 
 ## Issues
 
-If you encounter a problem with ostRich, please try the following before creating a new issue:
+If you encounter a problem with most, please try the following before creating a new issue:
 
 1. Read the documentation thoroughly, and check that the input matches what is expected (in most cases, this is a named list)
 2. Restart R and rerun the offending code
-3. Update ostRich to the latest version
+3. Update most to the latest version
 
 If none of these solutions work, please create a new issue that includes:
 

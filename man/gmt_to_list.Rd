@@ -26,7 +26,7 @@ Similar to \code{fgsea::gmtPathways}.
 }
 \examples{
 path <- system.file("extdata", "c5.go.v2023.2.Hs.symbols.gmt.gz",
-                    package = "ostRich")
+                    package = "most")
 
 x <- gmt_to_list(path)
 

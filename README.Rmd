@@ -13,13 +13,13 @@ knitr::opts_chunk$set(
 )
 ```
 
-# ostRich
+# most
 
 <!-- badges: start -->
-![R package version](https://img.shields.io/github/r-package/v/EMSL-Computing/ostRich?label=R%20package)
+![R package version](https://img.shields.io/github/r-package/v/EMSL-Computing/most?label=R%20package)
 <!-- badges: end -->
 
-ostRich contains tools to operate on sets and is intended for preparing _a priori_ biomolecular/omics sets for enrichment analysis/gene set testing. Examples of biomolecular sets: Reactome pathways, Gene Ontology gene sets, phosphorylation sites grouped by their known kinases, and metabolites/lipids grouped by chemical subclasses (e.g., acyl carnitines, fatty acids). **In general, the functions in this package work with any named list of character vectors.**
+most contains tools to operate on sets and is intended for preparing _a priori_ biomolecular/omics sets for enrichment analysis/gene set testing. Examples of biomolecular sets: Reactome pathways, Gene Ontology gene sets, phosphorylation sites grouped by their known kinases, and metabolites/lipids grouped by chemical subclasses (e.g., acyl carnitines, fatty acids). **In general, the functions in this package work with any named list of character vectors.**
 
 Below is a overview of some core functions:
 
@@ -38,19 +38,19 @@ Below is a overview of some core functions:
 
 ## Installation
 
-You can install the development version of ostRich like so:
+You can install the development version of most like so:
 
 ``` r
 if (!require("devtools", quietly = TRUE))
   install.packages("devtools")
 
-devtools::install_github("EMSL-Computing/ostRich")
+devtools::install_github("EMSL-Computing/most")
 ```
 
 ## Examples
 
 ```{r}
-library(ostRich)
+library(most)
 
 # Named list of sets
 x <- list("Set1" = letters[1:5],

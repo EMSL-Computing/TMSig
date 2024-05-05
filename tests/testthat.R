@@ -7,6 +7,6 @@
 # * https://testthat.r-lib.org/articles/special-files.html
 
 library(testthat)
-library(ostRich)
+library(most)
 
-test_check("ostRich")
+test_check("most")

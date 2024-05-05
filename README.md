@@ -1,15 +1,15 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# ostRich
+# most
 
 <!-- badges: start -->
 
 ![R package
-version](https://img.shields.io/github/r-package/v/EMSL-Computing/ostRich?label=R%20package)
+version](https://img.shields.io/github/r-package/v/EMSL-Computing/most?label=R%20package)
 <!-- badges: end -->
 
-ostRich contains tools to operate on sets and is intended for preparing
+most contains tools to operate on sets and is intended for preparing
 *a priori* biomolecular/omics sets for enrichment analysis/gene set
 testing. Examples of biomolecular sets: Reactome pathways, Gene Ontology
 gene sets, phosphorylation sites grouped by their known kinases, and
@@ -41,19 +41,19 @@ Below is a overview of some core functions:
 
 ## Installation
 
-You can install the development version of ostRich like so:
+You can install the development version of most like so:
 
 ``` r
 if (!require("devtools", quietly = TRUE))
   install.packages("devtools")
 
-devtools::install_github("EMSL-Computing/ostRich")
+devtools::install_github("EMSL-Computing/most")
 ```
 
 ## Examples
 
 ``` r
-library(ostRich)
+library(most)
 #> Loading required package: Matrix
 
 # Named list of sets

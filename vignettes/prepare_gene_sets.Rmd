@@ -25,7 +25,7 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 # Required packages
-library(ostRich)
+library(most)
 library(data.table)
 ```
 
@@ -37,7 +37,7 @@ We will use Gene Ontology gene sets[@ashburner_gene_2000; @the_gene_ontology_con
 ```{r read-gmt}
 # Path to GMT file - MSigDB Gene Ontology sets
 gmt_file <- system.file("extdata", "c5.go.v2023.2.Hs.symbols.gmt.gz",
-                        package = "ostRich")
+                        package = "most")
 
 gene_sets <- gmt_to_list(gmt_file)
 
