@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# most
+# MOST: MOlecular Signatures Toolkit
 
 <!-- badges: start -->
 
@@ -9,39 +9,49 @@
 version](https://img.shields.io/github/r-package/v/EMSL-Computing/most?label=R%20package)
 <!-- badges: end -->
 
-most contains tools to operate on sets and is intended for preparing
-*a priori* biomolecular/omics sets for enrichment analysis/gene set
-testing. Examples of biomolecular sets: Reactome pathways, Gene Ontology
-gene sets, phosphorylation sites grouped by their known kinases, and
-metabolites/lipids grouped by chemical subclasses (e.g., acyl
-carnitines, fatty acids). **In general, the functions in this package
-work with any named list of character vectors.**
+The `most` R package contains tools to prepare and analyze *a priori*
+molecular signatures, such as gene sets. Examples of molecular
+signatures: Reactome pathways, Gene Ontology gene sets, phosphorylation
+sites grouped by their known kinases, and metabolites/lipids grouped by
+chemical subclasses (e.g., acyl carnitines, fatty acids). **In general,
+functions in this package work with any named list of character
+vectors.**
 
 Below is a overview of some core functions:
 
-- `gmt_to_list`: Create a named list of sets from a GMT file.
+- `gmt_to_list`: create a named list of sets from a GMT file.
 
-- `incidence`: Compute a sparse incidence matrix with unique sets as
+- `incidence`: compute a sparse incidence matrix with unique sets as
   rows and unique elements as columns. A value of 1 indicates that a
   particular element is a member of that set, while a value of 0
   indicates that it is not.
 
-- `similarity`: Compute the matrix of pairwise Jaccard or overlap
+- `similarity`: compute the matrix of pairwise Jaccard or overlap
   similarity coefficients for all pairs of sets $A$ and $B$, where
 
   - $Jaccard(A, B) = \frac{|A \cap B|}{|A \cup B|}$
   - $Overlap(A, B) = \frac{|A \cap B|}{\min(|A|, |B|)}$
 
-- `filter_sets`: Restrict sets to only those elements in a
+- `filter_sets`: restrict sets to only those elements in a
   pre-determined background, if provided, and only keep those that pass
   minimum and maximum size thresholds.
 
 - `cluster_sets`: hierarchical clustering of highly similar sets. Used
   to reduce redundancy prior to analysis.
 
+- `cameraPR.matrix`: a matrix method for `limma::cameraPR` for testing
+  molecular signatures across one or more contrasts. Pre-Ranked
+  Correlation Adjusted MEan RAnk molecular signature analysis
+  (CAMERA-PR) accounts for inter-molecular correlation to control the
+  type I error rate (Wu & Smyth, 2012).
+
+- `enrichmap`: visualize molecular signature analysis results, such as
+  those from `cameraPR.matrix`, as a bubble heatmap with signatures as
+  rows and contrasts as columns.
+
 ## Installation
 
-You can install the development version of most like so:
+You can install the development version of `most` like so:
 
 ``` r
 if (!require("devtools", quietly = TRUE))
@@ -176,3 +186,8 @@ cluster_sets(x, cutoff = 1, type = "overlap")[]
 #> 6:   Set6       2        3
 #> 7:   Set7       3        4
 ```
+
+## References
+
+Wu, D., and Smyth, G. K. (2012). Camera: a competitive gene set test
+accounting for inter-gene correlation. 40, e133. .
