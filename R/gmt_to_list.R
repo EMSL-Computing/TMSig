@@ -17,7 +17,7 @@
 #'
 #' @examples
 #' path <- system.file("extdata", "c5.go.v2023.2.Hs.symbols.gmt.gz",
-#'                     package = "most")
+#'                     package = "TMSig")
 #'
 #' x <- gmt_to_list(path)
 #'

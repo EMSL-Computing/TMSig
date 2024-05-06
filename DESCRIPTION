@@ -1,8 +1,8 @@
-Package: most
+Package: TMSig
 Type: Package
-Title: MOlecular Signatures Toolkit
-Version: 0.1.0.9014
-Date: 2024-05-05
+Title: Tools for Analysis of Molecular Signatures
+Version: 0.1.0.9015
+Date: 2024-05-06
 Authors@R: 
     c(
       person(given = "Tyler", family = "Sagendorf", 
@@ -15,7 +15,7 @@ Authors@R:
 Description: Tools to prepare and analyze lists of a priori molecular 
     signatures, such as gene sets.
 License: GPL (>= 3)
-Bugreports: https://github.com/EMSL-Computing/most/issues
+Bugreports: https://github.com/EMSL-Computing/TMSig/issues
 Encoding: UTF-8
 RoxygenNote: 7.3.1
 Roxygen: list(markdown = TRUE)
