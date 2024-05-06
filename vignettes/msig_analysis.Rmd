@@ -1,5 +1,5 @@
 ---
-title: "Prepare Gene Sets for Enrichment Analysis"
+title: "Molecular Signatures Analysis"
 author: "Tyler Sagendorf"
 date: "Last compiled `r format(Sys.time(), '%d %B, %Y')`"
 output: 
@@ -9,11 +9,11 @@ bibliography: references.bib
 csl: apa-numeric-superscript-brackets.csl
 link-citations: true
 vignette: >
-  %\VignetteIndexEntry{Prepare Gene Sets for Enrichment Analysis}
+  %\VignetteIndexEntry{Molecular Signatures Analysis}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
-
+  
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -25,8 +25,10 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 # Required packages
-library(most)
+library(TMSig)
 library(data.table)
+library(stats) # model.matrix
+library(limma) # differential analysis
 ```
 
 
@@ -37,7 +39,7 @@ We will use Gene Ontology gene sets[@ashburner_gene_2000; @the_gene_ontology_con
 ```{r read-gmt}
 # Path to GMT file - MSigDB Gene Ontology sets
 gmt_file <- system.file("extdata", "c5.go.v2023.2.Hs.symbols.gmt.gz",
-                        package = "most")
+                        package = "TMSig")
 
 gene_sets <- gmt_to_list(gmt_file)
 
@@ -45,13 +47,13 @@ length(gene_sets) # 10461 gene sets
 
 head(names(gene_sets)) # first 6 gene set names
 
-gene_sets[1] # genes in first set
+gene_sets[[1]] # genes in first set
 ```
 
 
 # Filter Gene Sets
 
-We will restrict gene sets to only those genes in `background` (usually the genes from a particular experiment). Only those sets with at least 10 genes will be retained. We also set the upper limit on set size to be one less than the background size, which is a requirement for competitive analyses like GSEA[@subramanian_gene_2005] or CAMERA[@wu_camera_2012].
+We will restrict gene sets to only those genes in `background` (usually the genes from a particular experiment). Only those sets with at least 15 genes will be retained. We also set the upper limit on set size to be 15 less than the background size. This ensures that the number of genes in a set and not in that set is at least 15, as we will be performing modified two-sample t-tests later.
 
 Normally, the background would be the vector of unique genes that were detected in a particular omics experiment. For the purposes of this example, we will set the background to the top 4000 most common genes. This ensures that at least some gene sets will have a high degree of overlap, which is necessary for clustering later.
 
@@ -69,9 +71,9 @@ length(background) # 4000
 # Filter sets
 gene_sets_filt <- filter_sets(gene_sets, 
                               background = background, 
-                              min_size = 10L,
-                              max_size = length(background) - 1L)
-length(gene_sets_filt) # 5701 (down from 10461)
+                              min_size = 15L,
+                              max_size = length(background) - 15L)
+length(gene_sets_filt) # 4478 (down from 10461)
 ```
 
 We can plot the ratio of the new set sizes to their original sizes. This ratio serves as a measure of confidence that what genes remain for testing is correctly described by the gene set name. The ratio for each set should always be calculated as the proportion of genes from the original database that are in the data.
@@ -98,7 +100,7 @@ Notice that as sets get larger they retain a smaller proportion of their origina
 We can determine what minimum proportion of genes are retained by the top 90% of sets.
 
 ```{r}
-quantile(r, 1 - 0.9) # 0.3870968
+quantile(r, 1 - 0.9) # 0.3934992
 ```
 
 The top 90% of gene sets retain at least `r round(quantile(r, 1 - 0.9) * 100, 1)`% of their original genes.
@@ -106,9 +108,11 @@ The top 90% of gene sets retain at least `r round(quantile(r, 1 - 0.9) * 100, 1)
 
 # Cluster Gene Sets
 
-Restricting gene sets to a background tends to always increase the similarity of the gene sets that remain, especially when using the Gene Ontology database. To partly address this, we can cluster highly similar sets and only retain one set from each cluster for the analysis. This helps to reduce redundancy of enrichment analysis/gene set testing results. **At the very least, this should be used to remove aliased sets by setting `cutoff` to 1.** Two or more sets are aliased if they contain the same genes, but they have different descriptions.
+Restricting gene sets to a background tends to always increase the similarity of the gene sets that remain, especially when using the Gene Ontology database. To partly address this, we can cluster highly similar sets and only retain one set from each cluster for the analysis. This helps to reduce redundancy of results. 
 
-The `cutoff` is the minimum similarity coefficient used to classify two sets as sufficiently similar. A larger `h` (cut height) will increase the maximum size of clusters.
+**At the very least, this should be used to remove aliased sets by setting `cutoff` to 1.** Two or more sets are aliased if they contain the same genes, but they have different descriptions.
+
+The `cutoff` is the minimum similarity coefficient used to classify two sets as sufficiently similar. A larger `h` (cut height) will increase the maximum size of clusters. By default, complete-linkage hierarchical clustering is used, though this can be changed with the \code{method} argument.
 
 ```{r cluster-sets}
 # Cluster sets with default parameters. Same as cluster_sets(gene_sets_filt)
@@ -117,6 +121,7 @@ cluster_dt <- cluster_sets(gene_sets_filt,
                            cutoff = 0.85,
                            method = "complete",
                            h = 0.9)
+setDT(cluster_dt)
 ```
 
 ```{r}
@@ -139,7 +144,7 @@ subset(cluster_dt, cluster <= 5)
 
 ```{r}
 # Total number of clusters
-max(cluster_dt$cluster) # 5491
+max(cluster_dt$cluster) # 4319 (down from 4478)
 
 # Number of clusters with n sets
 barplot(table(table(cluster_dt$cluster)),
@@ -147,7 +152,7 @@ barplot(table(table(cluster_dt$cluster)),
         ylab = "Number of Clusters")
 ```
 
-From the bar plot, most clusters consist of singleton sets. The largest cluster(s) contain 4 sets.
+From the bar plot, most clusters consist of singleton sets. The largest cluster(s) contain 3 sets.
 
 It is useful to record the cluster information in a separate table, like so:
 
@@ -157,7 +162,7 @@ dt <- copy(cluster_dt)
 # Number of sets per cluster
 dt[, n_sets := .N, by = "cluster"]
 
-# Keep clusters of >= 2 sets
+# Keep clusters with more than one set
 keep_sets <- subset(dt, subset = n_sets > 1L)[["set"]]
 
 # Jaccard similarity matrix
@@ -208,8 +213,7 @@ head(dt, 10L)
 Note that most of the sets in the `similar_sets` column are subsets or aliases of the set in the `set` column:
 
 ```{r}
-# If overlap == 1, Jaccard == 1
-table(dt$overlap_coef == 1)
+table(dt$overlap_coef == 1 | dt$jaccard_coef == 1)
 ```
 
 Now, we will keep the first set from each cluster. Since we have already sorted the rows so that the set to keep appears in the first row of each cluster, we can remove any sets where the cluster is duplicated.
@@ -221,10 +225,10 @@ head(keep_sets)
 
 # Filter sets once more
 gene_sets_filt <- gene_sets_filt[keep_sets]
-length(gene_sets_filt) # 5491 (down from 5701)
+length(gene_sets_filt) # 4319 (down from 4478)
 ```
 
-The reduction in the number of sets with clustering is marginal (-3.7%), in this case, but it can vary depending on the choice parameters and the data. Again, at the very least, **clustering should be performed to remove aliases**.
+The reduction in the number of sets with clustering is marginal (-3.6%), in this case, but it can vary depending on the choice parameters and the data. Again, **at the very least, clustering should be performed to remove aliases!**
 
 We will check the proportion of the background genes that are present in these filtered sets. We will refer to this as the "coverage".
 
@@ -235,7 +239,69 @@ length(unique(unlist(gene_sets_filt))) /
 
 Despite removing terms, the coverage is still 100%. This is because we mostly removed subsets.
 
-Now, `gene_sets_filt` can be used with any enrichment analysis/gene set testing procedure of your choice. We recommend `camera` or `cameraPR` from the limma package.
+
+# CAMERA
+
+Now, `gene_sets_filt` can be used with any enrichment analysis/gene set testing procedure of your choice. We will use `cameraPR`, which is the pre-ranked version of Correlation Adjusted MEan RAnk gene set testing [@wu_camera_2012]. 
+
+We will simulate a matrix of gene expression data for those 4000 genes we selected earlier and perform differential analysis using `limma`.
+
+```{r}
+# Simulate experimental data with control and treatment groups (3 samples each)
+group <- rep(c("control", "treatment"), each = 3)
+design <- model.matrix(~ 0 + group)
+contrasts <- makeContrasts(contrasts = "grouptreatment - groupcontrol",
+                           levels = colnames(design))
+
+ngenes <- 4000L
+nsamples <- length(group)
+
+set.seed(0)
+y <- matrix(data = rnorm(ngenes * nsamples),
+            nrow = ngenes, ncol = nsamples,
+            dimnames = list(background,
+                            make.unique(group)))
+```
+
+Now, we introduce differential expression in select gene sets. We will make genes in the "GOBP_OXIDATIVE_PHOSPHORYLATION" set higher in control relative to treatment samples, and we will make genes in the "GOBP_INSULIN_SECRETION" set higher in treatment relative to control samples. Since the contrast is "treatment - control", the direction of change will be "Down" for OXPHOS and "Up" for insulin secretion.
+
+```{r}
+oxphos_genes <- gene_sets_filt[["GOBP_OXIDATIVE_PHOSPHORYLATION"]]
+insulin_genes <- gene_sets_filt[["GOBP_INSULIN_SECRETION"]]
+intersect(oxphos_genes, insulin_genes) # check gene overlap
+
+# Oxphos genes are higher in control relative to treatment samples
+y[oxphos_genes, 1:3] <- y[oxphos_genes, 1:3] + 1
+
+# Insulin secretion genes are higher in treatment relative to control samples
+y[insulin_genes, 4:6] <- y[insulin_genes, 4:6] + 1
+```
+
+```{r}
+# Differential analysis with LIMMA
+fit <- lmFit(y, design)
+fit.contr <- contrasts.fit(fit, contrasts = contrasts)
+fit.smooth <- eBayes(fit.contr)
+
+modt <- fit.smooth$t # matrix of moderated t-statistics for cameraPR.matrix
+head(modt) # 4000 x 1 matrix
+```
+
+```{r}
+# CAMERA-PR (matrix method)
+res <- cameraPR(statistic = modt, index = gene_sets_filt)
+
+head(res)
+```
+
+Both oxidative phosphorylation and insulin secretion terms have adjusted p-values below 0.05 and are ranked near the top with the correct direction of change, as expected. However, other gene sets also appear as statistically significant after adjustment due to their genes overlapping with these two terms.
+
+```{r}
+# Number of sets passing FDR threshold
+table(res$Contrast, res$FDR < 0.05)
+```
+
+To illustrate the above point, notice that "GOBP_OXIDATIVE_PHOSPHORYLATION" and "GOBP_AEROBIC_RESPIRATION" have the same direction of change and are both significant. Their Jaccard and Overlap coefficients are `r similarity(gene_sets_filt[c("GOBP_OXIDATIVE_PHOSPHORYLATION", "GOBP_AEROBIC_RESPIRATION")])[1, 2]` and `r similarity(gene_sets_filt[c("GOBP_OXIDATIVE_PHOSPHORYLATION", "GOBP_AEROBIC_RESPIRATION")], type = "overlap")[1, 2]`, respectively. That is, oxidative phosphorylation is a subset of aerobic respiration (at least when both sets are restricted to the background we defined earlier), so it is being driven by changes in OXPHOS.
 
 
 # Session Info
