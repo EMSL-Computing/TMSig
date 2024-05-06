@@ -19,7 +19,7 @@ knitr::opts_chunk$set(
 ![R package version](https://img.shields.io/github/r-package/v/EMSL-Computing/TMSig?label=R%20package)
 <!-- badges: end -->
 
-The `TMSig` R package contains tools to prepare and analyze _a priori_ molecular signatures, such as gene sets. Examples of molecular signatures: Reactome pathways, Gene Ontology gene sets, phosphorylation sites grouped by their known kinases, and metabolites/lipids grouped by chemical subclasses (e.g., acyl carnitines, fatty acids). **In general, functions in this package work with any named list of character vectors.**
+The `TMSig` R package contains tools to prepare and analyze _a priori_ molecular signatures, such as gene sets. Examples of molecular signatures: Reactome pathways, Gene Ontology gene sets, phosphorylation sites grouped by their known kinases, and metabolites/lipids grouped by chemical subclasses (e.g., acyl carnitines, fatty acids). In general, functions in this package work with any named list of character vectors.
 
 ## Installation
 
@@ -101,7 +101,7 @@ If you encounter a problem with TMSig, please try the following before creating 
 2. Restart R and rerun the offending code
 3. Update TMSig to the latest version
 
-If none of these solutions work, please ![create a new issue](https://github.com/EMSL-Computing/TMSig/issues) that includes:
+If none of these solutions work, please [create a new issue](https://github.com/EMSL-Computing/TMSig/issues) that includes:
 
 1. A clear statement of the problem in the title
 2. A small reproducible example
@@ -111,13 +111,11 @@ If none of these solutions work, please ![create a new issue](https://github.com
 
 ## Pull Requests
 
-All contributed code should adhere to the tidyverse style guide: https://style.tidyverse.org/index.html. This makes it easier for others to understand, diagnose problems, and make changes. When in doubt, refer to the existing codebase.
-
-If adding new functionality, please include unit tests.
-
-Verify that `devtools::check(document = TRUE)` runs without errors, warnings, or notes before ![submitting a pull request](https://github.com/EMSL-Computing/TMSig/pulls).
+- All contributed code should adhere to the tidyverse style guide: https://style.tidyverse.org/index.html. This makes it easier for others to understand, diagnose problems, and make changes. When in doubt, refer to the existing codebase.
+- If adding new functionality, please include unit tests.
+- Verify that `devtools::check(document = TRUE)` runs without errors, warnings, or notes before [submitting a pull request](https://github.com/EMSL-Computing/TMSig/pulls).
 
 
 ## References
 
-Wu, D., and Smyth, G. K. (2012). Camera: a competitive gene set test accounting for inter-gene correlation. *Nucleic Acids Research* 40, e133. ![doi:10.1093/nar/gks461](https://doi.org/10.1093/nar/gks461).
+Wu, D., and Smyth, G. K. (2012). Camera: a competitive gene set test accounting for inter-gene correlation. *Nucleic Acids Research* 40, e133. [doi:10.1093/nar/gks461](https://doi.org/10.1093/nar/gks461).

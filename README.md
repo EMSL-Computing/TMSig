@@ -13,9 +13,8 @@ The `TMSig` R package contains tools to prepare and analyze *a priori*
 molecular signatures, such as gene sets. Examples of molecular
 signatures: Reactome pathways, Gene Ontology gene sets, phosphorylation
 sites grouped by their known kinases, and metabolites/lipids grouped by
-chemical subclasses (e.g., acyl carnitines, fatty acids). **In general,
-functions in this package work with any named list of character
-vectors.**
+chemical subclasses (e.g., acyl carnitines, fatty acids). In general,
+functions in this package work with any named list of character vectors.
 
 ## Installation
 
@@ -195,7 +194,7 @@ creating a new issue:
 2.  Restart R and rerun the offending code
 3.  Update TMSig to the latest version
 
-If none of these solutions work, please ![create a new
+If none of these solutions work, please [create a new
 issue](https://github.com/EMSL-Computing/TMSig/issues) that includes:
 
 1.  A clear statement of the problem in the title
@@ -205,19 +204,17 @@ issue](https://github.com/EMSL-Computing/TMSig/issues) that includes:
 
 ## Pull Requests
 
-All contributed code should adhere to the tidyverse style guide:
-<https://style.tidyverse.org/index.html>. This makes it easier for
-others to understand, diagnose problems, and make changes. When in
-doubt, refer to the existing codebase.
-
-If adding new functionality, please include unit tests.
-
-Verify that `devtools::check(document = TRUE)` runs without errors,
-warnings, or notes before ![submitting a pull
-request](https://github.com/EMSL-Computing/TMSig/pulls).
+- All contributed code should adhere to the tidyverse style guide:
+  <https://style.tidyverse.org/index.html>. This makes it easier for
+  others to understand, diagnose problems, and make changes. When in
+  doubt, refer to the existing codebase.
+- If adding new functionality, please include unit tests.
+- Verify that `devtools::check(document = TRUE)` runs without errors,
+  warnings, or notes before [submitting a pull
+  request](https://github.com/EMSL-Computing/TMSig/pulls).
 
 ## References
 
 Wu, D., and Smyth, G. K. (2012). Camera: a competitive gene set test
 accounting for inter-gene correlation. *Nucleic Acids Research* 40,
-e133. ![<doi:10.1093/nar/gks461>](https://doi.org/10.1093/nar/gks461).
+e133. [doi:10.1093/nar/gks461](https://doi.org/10.1093/nar/gks461).
