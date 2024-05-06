@@ -7,6 +7,6 @@
 # * https://testthat.r-lib.org/articles/special-files.html
 
 library(testthat)
-library(most)
+library(TMSig)
 
-test_check("most")
+test_check("TMSig")
