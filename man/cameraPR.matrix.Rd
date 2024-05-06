@@ -54,7 +54,7 @@ A \code{data.frame} with the following columns:
 \item{Direction}{character; direction of change ("Up" or "Down").}
 \item{TwoSampleT}{numeric; two-sample t-statistic (only included if
 \code{use.ranks=FALSE}).}
-\item{df}{numeric; degrees of freedom (only included if
+\item{df}{integer; degrees of freedom (only included if
 \code{use.ranks=FALSE}). Two less than the number of non-missing values in
 each column of the \code{statistic} matrix.}
 \item{PValue}{numeric; two-tailed p-value.}

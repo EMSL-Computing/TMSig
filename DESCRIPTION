@@ -1,7 +1,7 @@
 Package: TMSig
 Type: Package
 Title: Tools for Analysis of Molecular Signatures
-Version: 1.0.0
+Version: 1.0.1
 Date: 2024-05-06
 Authors@R: 
     c(
@@ -22,6 +22,7 @@ Roxygen: list(markdown = TRUE)
 VignetteBuilder: knitr
 Depends:
     R (>= 3.6.0),
+    limma,
     Matrix
 Imports:
     circlize,
@@ -30,7 +31,6 @@ Imports:
     grDevices,
     grid,
     lifecycle,
-    limma,
     stats,
     utils
 Suggests: 
