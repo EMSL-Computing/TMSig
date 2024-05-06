@@ -1,5 +1,5 @@
 ---
-title: "Molecular Signatures Analysis"
+title: "Analysis of Gene Ontology Sets"
 author: "Tyler Sagendorf"
 date: "Last compiled `r format(Sys.time(), '%d %B, %Y')`"
 output: 
@@ -9,7 +9,7 @@ bibliography: references.bib
 csl: apa-numeric-superscript-brackets.csl
 link-citations: true
 vignette: >
-  %\VignetteIndexEntry{Molecular Signatures Analysis}
+  %\VignetteIndexEntry{Analysis of Gene Ontology Sets}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -152,7 +152,7 @@ barplot(table(table(cluster_dt$cluster)),
         ylab = "Number of Clusters")
 ```
 
-From the bar plot, most clusters consist of singleton sets. The largest cluster(s) contain 3 sets.
+From the bar plot, most clusters consist of singleton sets. The largest cluster(s) contain `r as.integer(rev(names(table(table(cluster_dt$cluster))))[1])` sets.
 
 It is useful to record the cluster information in a separate table, like so:
 
@@ -210,13 +210,13 @@ setorderv(dt,
 head(dt, 10L)
 ```
 
-Note that most of the sets in the `similar_sets` column are subsets or aliases of the set in the `set` column:
+Most of the sets in the `similar_sets` column are subsets or aliases of the set in the `set` column:
 
 ```{r}
 table(dt$overlap_coef == 1 | dt$jaccard_coef == 1)
 ```
 
-Now, we will keep the first set from each cluster. Since we have already sorted the rows so that the set to keep appears in the first row of each cluster, we can remove any sets where the cluster is duplicated.
+Now, we will keep the first set from each cluster. Since we have already sorted the rows so that the set to keep appears in the first row of each cluster, we can remove any sets where the cluster is duplicated (i.e., sets that are not in the first row of each cluster).
 
 ```{r}
 # Select first set from each cluster
@@ -252,15 +252,16 @@ group <- rep(c("control", "treatment"), each = 3)
 design <- model.matrix(~ 0 + group)
 contrasts <- makeContrasts(contrasts = "grouptreatment - groupcontrol",
                            levels = colnames(design))
+# Shorten contrasts
+colnames(contrasts) <- gsub("group", "", colnames(contrasts))
 
-ngenes <- 4000L
+ngenes <- length(background) # 4000
 nsamples <- length(group)
 
 set.seed(0)
 y <- matrix(data = rnorm(ngenes * nsamples),
             nrow = ngenes, ncol = nsamples,
-            dimnames = list(background,
-                            make.unique(group)))
+            dimnames = list(background, make.unique(group)))
 ```
 
 Now, we introduce differential expression in select gene sets. We will make genes in the "GOBP_OXIDATIVE_PHOSPHORYLATION" set higher in control relative to treatment samples, and we will make genes in the "GOBP_INSULIN_SECRETION" set higher in treatment relative to control samples. Since the contrast is "treatment - control", the direction of change will be "Down" for OXPHOS and "Up" for insulin secretion.
@@ -291,17 +292,17 @@ head(modt) # 4000 x 1 matrix
 # CAMERA-PR (matrix method)
 res <- cameraPR(statistic = modt, index = gene_sets_filt)
 
-head(res)
+head(res, 12)
 ```
 
-Both oxidative phosphorylation and insulin secretion terms have adjusted p-values below 0.05 and are ranked near the top with the correct direction of change, as expected. However, other gene sets also appear as statistically significant after adjustment due to their genes overlapping with these two terms.
+Both insulin secretion and oxidative phosphorylation gene sets have adjusted p-values below 0.05 and are ranked at the top of "Down" and "Up" sets, as expected. However, other gene sets also appear as statistically significant after adjustment due to their genes overlapping with these two terms.
 
 ```{r}
 # Number of sets passing FDR threshold
 table(res$Contrast, res$FDR < 0.05)
 ```
 
-To illustrate the above point, notice that "GOBP_OXIDATIVE_PHOSPHORYLATION" and "GOBP_AEROBIC_RESPIRATION" have the same direction of change and are both significant. Their Jaccard and Overlap coefficients are `r similarity(gene_sets_filt[c("GOBP_OXIDATIVE_PHOSPHORYLATION", "GOBP_AEROBIC_RESPIRATION")])[1, 2]` and `r similarity(gene_sets_filt[c("GOBP_OXIDATIVE_PHOSPHORYLATION", "GOBP_AEROBIC_RESPIRATION")], type = "overlap")[1, 2]`, respectively. That is, oxidative phosphorylation is a subset of aerobic respiration (at least when both sets are restricted to the background we defined earlier), so it is being driven by changes in OXPHOS.
+To illustrate the above point, notice that "GOBP_OXIDATIVE_PHOSPHORYLATION" and "GOBP_AEROBIC_RESPIRATION" have the same direction of change and are both significant. Their Jaccard and Overlap coefficients are `r similarity(gene_sets_filt[c("GOBP_OXIDATIVE_PHOSPHORYLATION", "GOBP_AEROBIC_RESPIRATION")])[1, 2]` and `r similarity(gene_sets_filt[c("GOBP_OXIDATIVE_PHOSPHORYLATION", "GOBP_AEROBIC_RESPIRATION")], type = "overlap")[1, 2]`, respectively. That is, oxidative phosphorylation is a subset of aerobic respiration (at least, when both sets are restricted to the background we defined earlier), so it is being driven by changes in OXPHOS.
 
 
 # Session Info
