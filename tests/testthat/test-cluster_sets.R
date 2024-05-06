@@ -27,19 +27,20 @@ test_that("x must contain 2 or more sets", {
 
 
 test_that("a message is produced when no pairs of sets pass threshold", {
-  x <- list("A" = c("a", "b"), "B" = c("c", "d"))
+  x <- list("A" = c("a", "b"),
+            "B" = c("c", "d"))
 
   expect_message(
-    object <- cluster_sets(x),
+    df <- cluster_sets(x),
     "No pair of sets passes the similarity cutoff."
   )
 
-  expected <- data.table(set = c("A", "B"),
+  expected <- data.frame(set = c("A", "B"),
                          cluster = 1:2,
                          set_size = rep(2L, 2),
                          stringsAsFactors = FALSE)
 
-  expect_identical(object, expected)
+  expect_identical(df, expected)
 })
 
 
@@ -53,7 +54,7 @@ test_that("results are correct", {
             "G" = letters[3:6]) # overlaps with A-E
 
   df <- cluster_sets(x, cutoff = 0.5)
-  expected <- data.table(set = c("A", "B", "C", "D", "G", "E", "F"),
+  expected <- data.frame(set = c("A", "B", "C", "D", "G", "E", "F"),
                          cluster = c(1L, 1L, 1L, 1L, 2L, 3L, 4L),
                          set_size = c(5L, 4L, 4L, 3L, 4L, 1L, 3L),
                          stringsAsFactors = FALSE)

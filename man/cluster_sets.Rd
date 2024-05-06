@@ -40,7 +40,7 @@ is \eqn{\geq} \code{cutoff}.}
 \code{\link[stats]{cutree}}. Default is 0.9.}
 }
 \value{
-A \code{data.table} with columns \code{"set"}, \code{"cluster"}, and
+A \code{data.frame} with columns \code{"set"}, \code{"cluster"}, and
 \code{"set_size"}.
 }
 \description{
@@ -94,8 +94,6 @@ excluding these sets during the hierarchical clustering step, the speed of
 }
 
 \examples{
-require(data.table)
-
 x <- list("A" = letters[1:5],
           "B" = letters[1:4], # subset of A
           "C" = letters[1:4], # aliased with B
@@ -104,24 +102,23 @@ x <- list("A" = letters[1:5],
           "F" = c("x", "y", "z"), # distinct elements
           "G" = letters[3:6]) # overlaps with A-E
 
-# The brackets are required to print the table
-cluster_sets(x)[]
+cluster_sets(x) # default clustering
 
 # Relax similarity cutoff
-dt <- cluster_sets(x, cutoff = 0.5)[]
+(df <- cluster_sets(x, cutoff = 0.5))
 
 # Keep the first (largest) set from each cluster
-subset(dt, subset = !duplicated(cluster))[["set"]] # A, G, E, F
+subset(df, subset = !duplicated(cluster))[["set"]] # A, G, E, F
 
 # Keep the smallest set from each cluster
-setorderv(dt, cols = "set_size", order = 1)
-subset(dt, subset = !duplicated(cluster))[["set"]] # E, D, F, G
+df <- df[order(df$set_size), ]
+subset(df, subset = !duplicated(cluster))[["set"]] # E, D, F, G
 
 # Cluster aliased sets
-cluster_sets(x, type = "jaccard", cutoff = 1)[]
+cluster_sets(x, type = "jaccard", cutoff = 1)
 
 # Cluster subsets
-cluster_sets(x, type = "overlap", cutoff = 1)[]
+cluster_sets(x, type = "overlap", cutoff = 1)
 }
 \references{
 Liberzon, A., Subramanian, A., Pinchback, R., Thorvaldsdóttir, H., Tamayo,

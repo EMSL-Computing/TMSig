@@ -64,7 +64,7 @@
 #' \code{h}, and \code{method} are exactly what is set for MSigDB (private
 #' correspondence).
 #'
-#' @return A \code{data.table} with columns \code{"set"}, \code{"cluster"}, and
+#' @return A \code{data.frame} with columns \code{"set"}, \code{"cluster"}, and
 #'   \code{"set_size"}.
 #'
 #' @references
@@ -81,14 +81,12 @@
 #'
 #' @seealso \code{\link{filter_sets}}, \code{\link{similarity}}
 #'
-#' @importFrom data.table data.table := setorderv
+#' @importFrom data.table data.table := setorderv setDF
 #' @importFrom stats as.dist hclust cutree
 #'
 #' @export cluster_sets
 #'
 #' @examples
-#' require(data.table)
-#'
 #' x <- list("A" = letters[1:5],
 #'           "B" = letters[1:4], # subset of A
 #'           "C" = letters[1:4], # aliased with B
@@ -97,24 +95,23 @@
 #'           "F" = c("x", "y", "z"), # distinct elements
 #'           "G" = letters[3:6]) # overlaps with A-E
 #'
-#' # The brackets are required to print the table
-#' cluster_sets(x)[]
+#' cluster_sets(x) # default clustering
 #'
 #' # Relax similarity cutoff
-#' dt <- cluster_sets(x, cutoff = 0.5)[]
+#' (df <- cluster_sets(x, cutoff = 0.5))
 #'
 #' # Keep the first (largest) set from each cluster
-#' subset(dt, subset = !duplicated(cluster))[["set"]] # A, G, E, F
+#' subset(df, subset = !duplicated(cluster))[["set"]] # A, G, E, F
 #'
 #' # Keep the smallest set from each cluster
-#' setorderv(dt, cols = "set_size", order = 1)
-#' subset(dt, subset = !duplicated(cluster))[["set"]] # E, D, F, G
+#' df <- df[order(df$set_size), ]
+#' subset(df, subset = !duplicated(cluster))[["set"]] # E, D, F, G
 #'
 #' # Cluster aliased sets
-#' cluster_sets(x, type = "jaccard", cutoff = 1)[]
+#' cluster_sets(x, type = "jaccard", cutoff = 1)
 #'
 #' # Cluster subsets
-#' cluster_sets(x, type = "overlap", cutoff = 1)[]
+#' cluster_sets(x, type = "overlap", cutoff = 1)
 
 cluster_sets <- function(x,
                          type = c("jaccard", "overlap"),
@@ -149,6 +146,8 @@ cluster_sets <- function(x,
     setorderv(dt, cols = c("cluster", "set_size", "set"),
               order = c(1, -1, 1))
 
+    setDF(dt) # convert to data.frame
+
     return(dt)
   }
 
@@ -177,6 +176,8 @@ cluster_sets <- function(x,
 
   setorderv(dt, cols = c("cluster", "set_size", "set"),
             order = c(1, -1, 1))
+
+  setDF(dt) # convert to data.frame
 
   return(dt)
 }
