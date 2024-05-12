@@ -178,21 +178,21 @@ cameraPR.matrix <- function(statistic,
   # Identify sets that are too small or too large in at least one contrast
   extreme_sets <- which(apply(m, 1, function(mi) any(mi < 2L | mi == G)))
   if (length(extreme_sets)) {
-      # If all sets will be dropped, throw an error
-      if (length(extreme_sets) == nsets)
-        stop("No sets in `index` have at least 2 and fewer than",
-             "apply(!is.na(statistic), 2, sum) genes with nonmissing ",
-             "values in `statistic`.")
+    # If all sets will be dropped, throw an error
+    if (length(extreme_sets) == nsets)
+      stop("No sets in `index` have at least 2 and fewer than",
+           "apply(!is.na(statistic), 2, sum) genes with nonmissing ",
+           "values in `statistic`.")
 
-      # Drop sets that are too small or too large
-      warning("Sets in `index` with fewer than 2 and at most ",
-              "apply(!is.na(statistic), 2, sum) genes with nonmissing ",
-              "values in at least one contrast will be dropped.")
-      m <- m[-extreme_sets, , drop = FALSE]
-      imat <- imat[-extreme_sets, , drop = FALSE]
+    # Drop sets that are too small or too large
+    warning("Sets in `index` with fewer than 2 and at most ",
+            "apply(!is.na(statistic), 2, sum) genes with nonmissing ",
+            "values in at least one contrast will be dropped.")
+    m <- m[-extreme_sets, , drop = FALSE]
+    imat <- imat[-extreme_sets, , drop = FALSE]
 
-      all_set_names <- rownames(imat)
-      nsets <- length(all_set_names)
+    all_set_names <- rownames(imat)
+    nsets <- length(all_set_names)
   }
 
   # Check inter.gene.cor
@@ -239,7 +239,13 @@ cameraPR.matrix <- function(statistic,
     zero.cor.idx <- which(inter.gene.cor == 0)
     if (length(zero.cor.idx)) {
       sigma2.zero.cor <- t(t(m_prod) / 12 * (G + 1L))
-      sigma2[zero.cor.idx] <- sigma2.zero.cor[zero.cor.idx]
+
+      # If inter.gene.cor is 0 and scalar, update all sigma2
+      if (length(inter.gene.cor) == 1L) {
+        sigma2 <- sigma2.zero.cor
+      } else {
+        sigma2[zero.cor.idx, ] <- sigma2.zero.cor[zero.cor.idx, ]
+      }
     }
 
     # Adjust sigma2 for ties in ranks
