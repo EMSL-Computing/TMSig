@@ -32,7 +32,7 @@
 #'   original results. (The same logic can be applied for set 2.)}
 #' }
 #'
-#' @returns A list of disjoint parts of sets. May contain aliases.
+#' @returns A named list of disjoint parts of sets. May contain aliases.
 #'
 #' @seealso \code{\link{filter_sets}}
 #'
@@ -40,7 +40,7 @@
 #'
 #' Jiang, Z., & Gentleman, R. (2007). Extensions to gene set enrichment.
 #' \emph{Bioinformatics, 23}(3), 306–313.
-#' \url{https://doi.org/10.1093/bioinformatics/btl599}
+#' \href{https://doi.org/10.1093/bioinformatics/btl599}{doi:10.1093/bioinformatics/btl599}
 #'
 #' @import Matrix
 #' @importFrom data.table data.table rbindlist `:=`

@@ -2,7 +2,7 @@
 % Please edit documentation in R/filter_sets.R
 \name{filter_sets}
 \alias{filter_sets}
-\title{Filter a Named List of Sets}
+\title{Filter a Named List of Sets by Size}
 \usage{
 filter_sets(x, background, min_size = 5L, max_size = Inf)
 }
@@ -12,22 +12,21 @@ filter_sets(x, background, min_size = 5L, max_size = Inf)
 \item{background}{character; optional vector of at least 2 elements. \code{x}
 will be filtered to only those elements of \code{background}.}
 
-\item{min_size}{integer (\eqn{\geq 2}); the minimum set size.}
+\item{min_size}{integer (\eqn{\geq 2}); the minimum allowable set size.}
 
-\item{max_size}{integer (\eqn{\geq 2}); the maximum set size.}
+\item{max_size}{integer (\eqn{\geq 2}); the maximum allowable set size.}
 }
 \value{
 A named list of sets at most the same size as \code{x}.
 }
 \description{
 Given a named list of sets, filter to those that contain at
-least \code{min_size} and no more than \code{min_size} elements. The sets
-are optionally filtered to elements of \code{background} before filtering
+least \code{min_size} and no more than \code{max_size} elements. The sets
+are optionally restricted to elements of \code{background} before filtering
 by size.
 }
 \details{
-Elements of \code{x} and \code{background} will be coerced to type
-\code{character}.
+Elements of \code{background} will be coerced to type \code{character}.
 
 If either \code{min_size} or \code{max_size} are less than 2, they will be
 set to 2.

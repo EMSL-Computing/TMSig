@@ -13,6 +13,15 @@
 #' @param h numeric 0-1; cut height used to define clusters. Passed to
 #'   \code{\link[stats]{cutree}}. Default is 0.9.
 #'
+#' @returns A \code{data.frame} with 3 columns:
+#'
+#'   \item{\code{set}}{character; the name of the set.}
+#'   \item{\code{cluster}}{integer; the cluster identifier.}
+#'   \item{\code{set_size}}{integer; the size of the set (number of elements).}
+#'
+#'   Results are arranged in ascending order by cluster, descending order by set
+#'   size, and then alphanumerically by set name.
+#'
 #' @section Function Details:
 #'
 #'   Given a named list of sets, \code{cluster_sets} calculates all pairwise
@@ -22,9 +31,6 @@
 #'   matrix (calculated as 1 - coefficients). Lastly,
 #'   \code{\link[stats]{cutree}} is used with cut height \code{h} to define
 #'   clusters, and the results are stored in a \code{data.table}.
-#'
-#'   Results are arranged in ascending order by cluster, descending order by set
-#'   size, and then alphanumerically by set name.
 #'
 #' @section Set Size:
 #'
@@ -42,7 +48,7 @@
 #'   of the overlap equal to \eqn{n - 1}. For example, if sets have \eqn{Overlap
 #'   \geq 0.85}, their minimum sizes are both 7 with an overlap size of 6. That
 #'   is, each set with fewer than 7 elements will always appear as a singleton
-#'   cluster, if they are not aliased.
+#'   cluster, if they are not subsets or aliased.
 #'
 #' @section Optimization:
 #'
@@ -59,13 +65,9 @@
 #' Database (MSigDB) v7.0 Release Notes (Liberzon 2011, 2015):
 #' \url{https://docs.gsea-msigdb.org/#MSigDB/Release_Notes/MSigDB_7.0/}.
 #' Specifically, sections "C2:CP:Reactome — Major Overhaul" and "C5 (Gene
-#' Ontology Collection) — Major Overhaul". Though hierarchical clustering is a
-#' widely used approach, the default values of \code{cutoff}, cut height
-#' \code{h}, and \code{method} are exactly what is set for MSigDB (private
+#' Ontology Collection) — Major Overhaul". Though hierarchical clustering is
+#' widely used, the defaults are exactly what is set for MSigDB (private
 #' correspondence).
-#'
-#' @return A \code{data.frame} with columns \code{"set"}, \code{"cluster"}, and
-#'   \code{"set_size"}.
 #'
 #' @references
 #'

@@ -2,22 +2,22 @@
 #'
 #' @description Pre-ranked Correlation-Adjusted MEan RAnk gene set testing
 #'   (CAMERA-PR) tests whether a set of genes is highly ranked relative to other
-#'   genes in terms of differential expression, accounting for inter-gene
-#'   correlation (Wu & Smyth, 2012). See \code{\link[limma]{cameraPR}} for
-#'   details.
+#'   genes in terms of some measure of differential expression, accounting for
+#'   inter-gene correlation (Wu & Smyth, 2012). See
+#'   \code{\link[limma]{cameraPR}} for details.
 #'
-#'   While the language is centered around gene sets, any \emph{a priori} groups
-#'   of biomolecules may be tested.
+#'   While the language is gene-centric, any \emph{a priori} groups of molecules
+#'   may be tested.
 #'
 #' @param statistic a matrix of statistics (e.g., moderated t-statistics;
-#'   possibly with \code{\link[base]{NA}}s) with genes as row names and one or
-#'   more contrasts as column names.
+#'   possibly with \code{\link[base]{NA}}s) with genes/molecules as row names
+#'   and one or more contrasts or coefficients as column names.
 #' @param index a named list of sets to test. Passed to \code{\link{incidence}}.
-#'   \code{index} must be a list of genes (character vectors), not the result of
+#'   \code{index} must be a list of character vectors, not the result of
 #'   \code{\link[limma]{ids2indices}}, so it is more restrictive than what
 #'   \code{\link[limma]{cameraPR.default}} allows.
-#' @param use.ranks logical; whether to perform a rank-based test (\code{TRUE})
-#'   or a parametric test (\code{FALSE}; default).
+#' @param use.ranks logical; whether to perform a parametric test (\code{FALSE};
+#'   default) or a rank-based test (\code{TRUE}).
 #' @param inter.gene.cor numeric; the inter-gene correlation within tested sets.
 #'   May be a single value or a named vector with names matching those of
 #'   \code{index}.
@@ -47,6 +47,18 @@
 #'   \item{PValue}{numeric; two-tailed p-value.}
 #'   \item{FDR}{numeric; Benjamini and Hochberg FDR adjusted p-value (not
 #'   included when only one set and contrast was tested).}
+#'
+#' @section Test Assumptions:
+#'
+#'   If \code{use.ranks=FALSE}, the parametric version of CAMERA-PR will be
+#'   used. Since this is a modification of Student's two sample t-test, it is
+#'   assumed that the statistics in each column of \code{statistic} are
+#'   approximately normally distributed. In \code{\link[limma]{camera.default}},
+#'   the moderated t-statistics are converted to z-statistics with
+#'   \code{\link[limma]{zscoreT}} and used for the analysis.
+#'
+#'   If \code{use.ranks=TRUE}, a modified signed rank test will be used, so
+#'   there are no distributional assumptions.
 #'
 #' @references Wu, D., and Smyth, G. K. (2012). Camera: a competitive gene set
 #'   test accounting for inter-gene correlation. \emph{Nucleic Acids Research}
@@ -238,6 +250,7 @@ cameraPR.matrix <- function(statistic,
     # Different calculation for sigma2 if the correlation is zero
     zero.cor.idx <- which(inter.gene.cor == 0)
     if (length(zero.cor.idx)) {
+
       sigma2.zero.cor <- t(t(m_prod) / 12 * (G + 1L))
 
       # If inter.gene.cor is 0 and scalar, update all sigma2

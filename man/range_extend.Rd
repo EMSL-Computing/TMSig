@@ -7,7 +7,8 @@
 range_extend(x, nearest = 1)
 }
 \arguments{
-\item{x}{any \code{\link[base]{numeric}} object.}
+\item{x}{any \code{\link[base]{numeric}} object. Passed to
+\code{\link[base]{range}}.}
 
 \item{nearest}{numeric; the range of \code{x} will be extended out to the
 value specified by \code{nearest}. Default is 1, which extends the range

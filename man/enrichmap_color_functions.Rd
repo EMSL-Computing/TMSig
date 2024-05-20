@@ -28,7 +28,18 @@ results with \code{\link{enrichmap}}.
 For \code{gsea_color_fun}, the \code{statistics} are expected to be
 normalized enrichment scores (NES). Due to how the NES is formulated,
 values between -1 and 1 are never significant or otherwise interesting, so
-they are given a white fill so as to not appear in the heatmap.
+they are given a white fill so as to not appear in the heatmap (see
+examples).
+}
+\examples{
+set.seed(0)
+x <- rnorm(10, mean = 0, sd = 2)
+
+camera_color_fun(x)
+camera_color_fun(x[x >= 0]) # positive only
+
+gsea_color_fun(x)
+gsea_color_fun(x[x >= 0]) # positive only
 }
 \seealso{
 \code{\link{range_extend}}

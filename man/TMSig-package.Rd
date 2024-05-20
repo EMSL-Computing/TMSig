@@ -4,7 +4,7 @@
 \name{TMSig-package}
 \alias{TMSig}
 \alias{TMSig-package}
-\title{TMSig: Tools for Analysis of Molecular Signatures}
+\title{TMSig: Tools for Molecular Signatures}
 \description{
 Tools to prepare and analyze lists of a priori molecular signatures, such as gene sets.
 }

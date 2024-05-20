@@ -21,14 +21,14 @@
 #'           "C" = c("x", "y", "z", "z"), # duplicates
 #'           "D" = c("a", NA)) # missing values
 #'
-#' (mat <- incidence(x))
+#' (imat <- incidence(x))
 #'
 #' # Sizes of sets and their intersections
-#' tcrossprod(mat)
+#' tcrossprod(imat)
 #'
 #' # Number of elements unique to each set
-#' keep <- apply(mat, 2, sum) == 1
-#' apply(mat[, keep], 1, sum)
+#' keep <- apply(imat, 2, sum) == 1
+#' apply(imat[, keep], 1, sum)
 
 incidence <- function(x) {
   # Validate x, remove missing values, remove duplicate set-element pairs

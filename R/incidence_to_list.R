@@ -10,7 +10,8 @@
 #'
 #' @returns a named list of sets with the same length as \code{nrow(incidence)}.
 #'
-#' @note This function does not currently check that the input is valid.
+#' @note Currently, there are no checks to ensure \code{incidence} is a valid
+#'   incidence matrix.
 #'
 #' @export incidence_to_list
 #'
@@ -20,9 +21,9 @@
 #'           "C" = c("x", "y", "z", "z"), # duplicates
 #'           "D" = c("a", NA)) # missing values
 #'
-#' (mat <- incidence(x)) # incidence matrix
+#' (imat <- incidence(x)) # incidence matrix
 #'
-#' incidence_to_list(mat)
+#' incidence_to_list(imat)
 
 incidence_to_list <- function(incidence) {
   # The incidence matrix is assumed to be in the correct form with sets as rows

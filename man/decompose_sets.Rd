@@ -29,7 +29,7 @@ decompose_sets(x, overlap = 1L)
 elements in common will be decomposed.}
 }
 \value{
-A list of disjoint parts of sets. May contain aliases.
+A named list of disjoint parts of sets. May contain aliases.
 }
 \description{
 \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
@@ -60,7 +60,7 @@ decompose_sets(x, overlap = 5L)
 \references{
 Jiang, Z., & Gentleman, R. (2007). Extensions to gene set enrichment.
 \emph{Bioinformatics, 23}(3), 306–313.
-\url{https://doi.org/10.1093/bioinformatics/btl599}
+\href{https://doi.org/10.1093/bioinformatics/btl599}{doi:10.1093/bioinformatics/btl599}
 }
 \seealso{
 \code{\link{filter_sets}}

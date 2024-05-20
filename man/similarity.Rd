@@ -10,11 +10,11 @@ similarity(x, type = c("jaccard", "overlap"))
 \item{x}{a named list of sets. Elements must be of type \code{"character"}.}
 
 \item{type}{character; the type of similarity measure to use. Either
-\code{"jaccard"} or \code{"overlap"}.}
+\code{"jaccard"} or \code{"overlap"}. May be abbreviated.}
 }
 \value{
-An object of class \code{\link[Matrix:dgCMatrix-class]{dgCMatrix}}
-containing all pairwise similarity coefficients.
+A symmetric \code{\link[Matrix:dgCMatrix-class]{dgCMatrix}}
+containing all pairwise set similarity coefficients.
 }
 \description{
 Construct a sparse matrix of Jaccard or overlap similarity
@@ -37,7 +37,7 @@ smaller set (Szymkiewicz 1934; Simpson, 1943, 1947, 1960; Fallaw 1979):
 
 The Jaccard coefficient can identify aliased sets (sets which contain the
 same elements, but have different names), while the overlap coefficient can
-identify both aliased sets and subsets, though the two are not easily
+identify both aliased sets and subsets. Aliases and subsets are not easily
 distinguished without also having the matrix of Jaccard coefficients or the
 set sizes.
 }
@@ -58,7 +58,7 @@ x <- list("A" = c("a", "b", "c", "d", "e"),
           "D" = c("a", "b", "c")) # subset of A
 
 (j <- similarity(x)) # Jaccard coefficients
-(o <- similarity(x, type = "overlap"))
+(o <- similarity(x, type = "overlap")) # overlap coefficients
 }
 \references{
 Jaccard, P. (1912). The distribution of the flora in the alpine
