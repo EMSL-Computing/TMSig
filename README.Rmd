@@ -19,7 +19,7 @@ knitr::opts_chunk$set(
 ![R package version](https://img.shields.io/github/r-package/v/EMSL-Computing/TMSig?label=R%20package)
 <!-- badges: end -->
 
-The `TMSig` **R** package contains tools to prepare and analyze _a priori_ molecular signatures, such as gene sets.
+The `TMSig` **R** package contains tools to prepare, analyze, and visualize _a priori_ molecular signatures, such as gene sets.
 
 We define a molecular signature as any collection of genes, proteins, post-translational modifications (PTMs), metabolites, lipids, or other molecules with an associated biological interpretation. Most molecular signatures databases are gene-centric, such as the Molecular Signatures Database (MSigDB; Liberzon et al., 2011, 2015), though there are others like the Metabolomics Workbench Reference List of Metabolite Names (RefMet) database (https://www.metabolomicsworkbench.org/databases/refmet/index.php; Fahy & Subramaniam, 2020).
 
@@ -32,7 +32,8 @@ You can install the development version of `TMSig` like so:
 if (!require("devtools", quietly = TRUE))
   install.packages("devtools")
 
-devtools::install_github("EMSL-Computing/TMSig")
+# Install package and build vignettes
+devtools::install_github("EMSL-Computing/TMSig", build_vignettes = TRUE)
 ```
 
 

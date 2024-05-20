@@ -9,8 +9,8 @@
 version](https://img.shields.io/github/r-package/v/EMSL-Computing/TMSig?label=R%20package)
 <!-- badges: end -->
 
-The `TMSig` **R** package contains tools to prepare and analyze *a
-priori* molecular signatures, such as gene sets.
+The `TMSig` **R** package contains tools to prepare, analyze, and
+visualize *a priori* molecular signatures, such as gene sets.
 
 We define a molecular signature as any collection of genes, proteins,
 post-translational modifications (PTMs), metabolites, lipids, or other
@@ -30,7 +30,8 @@ You can install the development version of `TMSig` like so:
 if (!require("devtools", quietly = TRUE))
   install.packages("devtools")
 
-devtools::install_github("EMSL-Computing/TMSig")
+# Install package and build vignettes
+devtools::install_github("EMSL-Computing/TMSig", build_vignettes = TRUE)
 ```
 
 ## Overview
