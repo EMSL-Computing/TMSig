@@ -1,7 +1,7 @@
 #' @title Set Enrichment Bubble Heatmap
 #'
 #' @description Create a bubble heatmap summarizing set enrichment analysis
-#'   results.
+#'   results, such as those from \code{\link{cameraPR.matrix}}.
 #'
 #' @param x an object that can be coerced to a \code{data.table} with columns
 #'   \code{contrast_column}, \code{set_column}, \code{statistic_column}, and
@@ -51,10 +51,10 @@
 #' @param cell_size \code{\link[grid]{unit}} object; the size of each heatmap
 #'   cell (used for both height and width). Default is \code{unit(14,
 #'   "points")}.
-#' @param filename character; the filename used to save the heatmap. If missing
+#' @param filename character; the file name used to save the heatmap. If missing
 #'   (default), the heatmap will be displayed instead.
 #' @param height numeric; height of the file in \code{units}.
-#' @param width similar to \code{height}.
+#' @param width numeric; width of the file in \code{units}.
 #' @param units character; units that define \code{height} and \code{width}.
 #'   Defaults to "in" (inches).
 #' @param heatmap_args list; additional arguments passed to
@@ -85,7 +85,7 @@
 enrichmap <- function(x,
                       n_top = 15L,
                       set_column = "GeneSet",
-                      statistic_column = "TwoSidedT",
+                      statistic_column = "TwoSampleT",
                       contrast_column = "Contrast",
                       padj_column = "FDR",
                       padj_legend_title = padj_column,

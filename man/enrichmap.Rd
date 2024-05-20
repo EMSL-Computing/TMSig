@@ -8,7 +8,7 @@ enrichmap(
   x,
   n_top = 15L,
   set_column = "GeneSet",
-  statistic_column = "TwoSidedT",
+  statistic_column = "TwoSampleT",
   contrast_column = "Contrast",
   padj_column = "FDR",
   padj_legend_title = padj_column,
@@ -96,12 +96,12 @@ contrasts.}
 cell (used for both height and width). Default is \code{unit(14,
   "points")}.}
 
-\item{filename}{character; the filename used to save the heatmap. If missing
+\item{filename}{character; the file name used to save the heatmap. If missing
 (default), the heatmap will be displayed instead.}
 
 \item{height}{numeric; height of the file in \code{units}.}
 
-\item{width}{similar to \code{height}.}
+\item{width}{numeric; width of the file in \code{units}.}
 
 \item{units}{character; units that define \code{height} and \code{width}.
 Defaults to "in" (inches).}
@@ -125,7 +125,7 @@ Nothing. Displays heatmap or saves the heatmap to a file (if
 }
 \description{
 Create a bubble heatmap summarizing set enrichment analysis
-results.
+results, such as those from \code{\link{cameraPR.matrix}}.
 }
 \seealso{
 \code{\link[ComplexHeatmap]{ComplexHeatmap-package}}
