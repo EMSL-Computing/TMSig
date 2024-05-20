@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# TMSig: Tools for Analysis of Molecular Signatures
+# TMSig: Tools for Analyzing Molecular Signatures
 
 <!-- badges: start -->
 
@@ -9,12 +9,18 @@
 version](https://img.shields.io/github/r-package/v/EMSL-Computing/TMSig?label=R%20package)
 <!-- badges: end -->
 
-The `TMSig` R package contains tools to prepare and analyze *a priori*
-molecular signatures, such as gene sets. Examples of molecular
-signatures: Reactome pathways, Gene Ontology gene sets, phosphorylation
-sites grouped by their known kinases, and metabolites/lipids grouped by
-chemical subclasses (e.g., acyl carnitines, fatty acids). In general,
-functions in this package work with any named list of character vectors.
+The `TMSig` **R** package contains tools to prepare and analyze *a
+priori* molecular signatures, such as gene sets.
+
+We define a molecular signature as any collection of genes, proteins,
+post-translational modifications (PTMs), metabolites, lipids, or other
+molecules with an associated biological interpretation. Most molecular
+signatures databases are gene-centric, such as the Molecular Signatures
+Database (MSigDB; Liberzon et al., 2011, 2015), though there are others
+like the Metabolomics Workbench Reference List of Metabolite Names
+(RefMet) database
+(<https://www.metabolomicsworkbench.org/databases/refmet/index.php>;
+Fahy & Subramaniam, 2020).
 
 ## Installation
 
@@ -28,6 +34,8 @@ devtools::install_github("EMSL-Computing/TMSig")
 ```
 
 ## Overview
+
+Below is an overview of some of the core functions.
 
 - `gmt_to_list`: create a named list of sets from a GMT file.
 
@@ -49,11 +57,11 @@ devtools::install_github("EMSL-Computing/TMSig")
 - `cluster_sets`: hierarchical clustering of highly similar sets. Used
   to reduce redundancy prior to analysis.
 
-- `cameraPR.matrix`: a matrix method for `limma::cameraPR` for testing
-  molecular signatures in one or more contrasts. Pre-Ranked Correlation
-  Adjusted MEan RAnk gene set testing (CAMERA-PR) accounts for
-  inter-gene correlation to control the type I error rate (Wu & Smyth,
-  2012).
+- `cameraPR.matrix`: a fast matrix method for `limma::cameraPR` for
+  testing molecular signatures in one or more contrasts. Pre-Ranked
+  Correlation Adjusted MEan RAnk gene set testing (CAMERA-PR) accounts
+  for inter-gene correlation to control the type I error rate (Wu &
+  Smyth, 2012).
 
 - `enrichmap`: visualize molecular signature analysis results, such as
   those from `cameraPR.matrix`, as a bubble heatmap with signatures as
@@ -63,6 +71,7 @@ devtools::install_github("EMSL-Computing/TMSig")
 
 ``` r
 library(TMSig)
+#> Loading required package: limma
 #> Loading required package: Matrix
 
 # Named list of sets
@@ -186,35 +195,40 @@ cluster_sets(x, cutoff = 1, type = "overlap")
 
 ## Issues
 
-If you encounter a problem with TMSig, please try the following before
-creating a new issue:
-
-1.  Read the documentation and check that the input is in the correct
-    format (usually, this is a named list of character vectors)
-2.  Restart R and rerun the offending code
-3.  Update TMSig to the latest version
-
-If none of these solutions work, please [create a new
+If you encounter a problem with TMSig, please [create a new
 issue](https://github.com/EMSL-Computing/TMSig/issues) that includes:
 
 1.  A clear statement of the problem in the title
-2.  A small reproducible example
+2.  A (small) reproducible example
 3.  Additional detailed explanation, as needed
 4.  Output of `sessionInfo()`
 
 ## Pull Requests
 
-- All contributed code should adhere to the tidyverse style guide:
-  <https://style.tidyverse.org/index.html>. This makes it easier for
-  others to understand, diagnose problems, and make changes. When in
-  doubt, refer to the existing codebase.
-- If adding new functionality, please include unit tests.
 - Verify that `devtools::check(document = TRUE)` runs without errors,
   warnings, or notes before [submitting a pull
   request](https://github.com/EMSL-Computing/TMSig/pulls).
+- All contributed code should, ideally, adhere to the tidyverse style
+  guide: <https://style.tidyverse.org/index.html>. This makes it easier
+  for others to understand, diagnose problems, and make changes. When in
+  doubt, refer to the existing codebase.
 
 ## References
 
-Wu, D., and Smyth, G. K. (2012). Camera: a competitive gene set test
-accounting for inter-gene correlation. *Nucleic Acids Research* 40,
-e133. [doi:10.1093/nar/gks461](https://doi.org/10.1093/nar/gks461).
+Fahy, E., & Subramaniam, S. (2020). RefMet: A reference nomenclature for
+metabolomics. *Nature Methods, 17*(12), 1173–1174.
+[doi:10.1038/s41592-020-01009-y](https://doi.org/10.1038/s41592-020-01009-y)
+
+Liberzon, A., Subramanian, A., Pinchback, R., Thorvaldsdóttir, H.,
+Tamayo, P., & Mesirov, J. P. (2011). Molecular signatures database
+(MSigDB) 3.0. *Bioinformatics, 27*(12), 1739–1740.
+[doi:10.1093/bioinformatics/btr260](https://doi.org/10.1093/bioinformatics/btr260)
+
+Liberzon, A., Birger, C., Thorvaldsdóttir, H., Ghandi, M., Mesirov, J.
+P., & Tamayo, P. (2015). The Molecular Signatures Database (MSigDB)
+hallmark gene set collection. *Cell systems, 1*(6), 417–425.
+[doi:10.1016/j.cels.2015.12.004](https://doi.org/10.1016/j.cels.2015.12.004)
+
+Wu, D., & Smyth, G. K. (2012). Camera: A competitive gene set test
+accounting for inter-gene correlation. *Nucleic Acids Research, 40*(17),
+e133–e133. <https://doi.org/10.1093/nar/gks461>
