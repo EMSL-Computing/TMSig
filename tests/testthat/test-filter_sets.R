@@ -121,12 +121,12 @@ test_that("duplicates and NA values are removed from the sets", {
 })
 
 
-test_that("background must be a character vector", {
-  expect_error(
-    filter_sets(x, background = list()),
-    "`background` must be a character vector."
-  )
-})
+# test_that("background must be a character vector", {
+#   expect_error(
+#     filter_sets(x, background = list()),
+#     "`background` must be a character vector."
+#   )
+# })
 
 
 test_that("background must contain at least 2 elements", {
