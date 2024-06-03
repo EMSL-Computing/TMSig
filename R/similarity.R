@@ -16,7 +16,7 @@
 #'   coefficient \eqn{J} as the size of their intersection divided by the size
 #'   of their union (Jaccard, 1912):
 #'
-#'   \deqn{J(A, B) = \frac{|A \cap B|}{|A \cup B}}
+#'   \deqn{J(A, B) = \frac{|A \cap B|}{|A \cup B|}}
 #'
 #'   The overlap coefficient (also known as the Szymkiewicz–Simpson coefficient)
 #'   is defined as the size of the intersection divided by the size of the
@@ -38,11 +38,13 @@
 #'   is especially efficient for sparse similarity matrices.
 #'
 #' @references Jaccard, P. (1912). The distribution of the flora in the alpine
-#'   zone. \emph{New Phytologist, 11}, 37–50.
-#'   \url{https://doi.org/10.1111/j.1469-8137.1912.tb05611.x}
+#'   zone. \emph{The New Phytologist, 11}(2), 37–50.
+#'   doi:\href{https://doi.org/10.1111/j.1469-8137.1912.tb05611.x}{10.1111/j.1469-8137.1912.tb05611.x}.
+#'   \url{https://www.jstor.org/stable/2427226}
 #'
 #'   Szymkiewicz, D. (1934). Une contribution statistique à la géographie
 #'   floristique. \emph{Acta Societatis Botanicorum Poloniae, 11}(3), 249–265.
+#'   doi:\href{https://doi.org/10.5586/asbp.1934.012}{10.5586/asbp.1934.012}.
 #'
 #'   Simpson, G. G. (1943). Mammals and the nature of continents. \emph{American
 #'   Journal of Science, 241}(1), 1–31.
@@ -78,7 +80,7 @@ similarity <- function(x,
 {
   type <- match.arg(type, choices = c("jaccard", "overlap"))
 
-  # Incidence matrix with elements as rows and set identifiers as columns
+  # Incidence matrix with set identifiers as rows and elements as columns
   # 1 if the element is a member of the set; 0 otherwise
   incidence_mat <- incidence(x)
 

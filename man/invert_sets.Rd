@@ -32,6 +32,6 @@ x <- list("A" = c("a", "b", "c"),
 (y <- invert_sets(x))
 
 # Decompose sets into disjoint parts
-x_dc <- lapply(y, paste, collapse = ", ")
-(x_dc <- invert_sets(x_dc))
+yc <- lapply(y, paste, collapse = ", ")
+invert_sets(yc)
 }

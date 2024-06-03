@@ -77,12 +77,11 @@ may be tested.
 If \code{use.ranks=FALSE}, the parametric version of CAMERA-PR will be
 used. Since this is a modification of Student's two sample t-test, it is
 assumed that the statistics in each column of \code{statistic} are
-approximately normally distributed. In \code{\link[limma]{camera.default}},
+approximately Normally distributed. In \code{\link[limma]{camera.default}},
 the moderated t-statistics are converted to z-statistics with
 \code{\link[limma]{zscoreT}} and used for the analysis.
 
-If \code{use.ranks=TRUE}, a modified signed rank test will be used, so
-there are no distributional assumptions.
+If \code{use.ranks=TRUE}, a modified Wilcoxon rank sum test will be used.
 }
 
 \examples{
@@ -131,12 +130,12 @@ cameraPR(statistic = fit.smooth$t, index = index, use.ranks = TRUE)
 Wu, D., and Smyth, G. K. (2012). Camera: a competitive gene set
 test accounting for inter-gene correlation. \emph{Nucleic Acids Research}
 40, e133.
-\href{https://doi.org/10.1093/nar/gks461}{doi:10.1093/nar/gks461}.
+doi:\href{https://doi.org/10.1093/nar/gks461}{10.1093/nar/gks461}.
 
 Goeman, J. J., and Bühlmann, P. (2007). Analyzing gene expression data in
 terms of gene sets: methodological issues. \emph{Bioinformatics} 23,
 980-987.
-\href{https://doi.org/10.1093/bioinformatics/btm051}{doi:10.1093/bioinformatics/btm051}.
+doi:\href{https://doi.org/10.1093/bioinformatics/btm051}{10.1093/bioinformatics/btm051}.
 }
 \seealso{
 \code{\link[limma]{cameraPR}},

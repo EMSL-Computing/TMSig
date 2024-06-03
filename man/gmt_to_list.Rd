@@ -21,6 +21,10 @@ A named list of character vectors.
 Create a named list of sets from a GMT file, or a file
 structured like a GMT.
 }
+\details{
+The second entry in each line of the GMT file is assumed to be a URL
+or some other additional information, so it is discarded.
+}
 \note{
 Similar to \code{fgsea::gmtPathways}.
 }

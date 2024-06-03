@@ -1,6 +1,6 @@
 #' @title Set Enrichment Bubble Heatmap
 #'
-#' @description Create a bubble heatmap summarizing set enrichment analysis
+#' @description Create a bubble heatmap summarizing molecular signature analysis
 #'   results, such as those from \code{\link{cameraPR.matrix}}.
 #'
 #' @param x an object that can be coerced to a \code{data.table} with columns
@@ -12,25 +12,24 @@
 #' @param set_column character; the name of a column in \code{x} containing
 #'   unique set identifiers that will be used as the row names in the heatmap.
 #'   Default is "GeneSet".
-#' @param statistic_column similar to \code{set_column}. The name of a column
-#'   containing the statistic for each pathway. Determines the heatmap body
-#'   colors.
+#' @param statistic_column character; the name of a column in \code{x}
+#'   containing the statistic for each combination of contrast and molecular
+#'   signature. Determines the heatmap body colors.
 #' @param contrast_column character; the name of a column in \code{x} containing
 #'   contrasts that will be used as columns for the heatmap. Entries of
 #'   \code{x[[rownames_colum]]} must be uniquely defined for each contrast
 #'   group.
-#' @param padj_column similar to \code{set_column}. The name of a column
-#'   containing the adjusted p-values that determine the area of each circle in
-#'   the heatmap.
+#' @param padj_column character; the name of a column in \code{x} containing the
+#'   adjusted p-values. Determines the area of each bubble in the heatmap.
 #' @param padj_legend_title character; title of the background fill legend.
 #'   Defaults to \code{padj_column}.
 #' @param padj_aggregate_fun function; a function used to aggregate the adjusted
 #'   p-values in \code{x[[pvalue_column]]} across contrasts for each unique
-#'   entry in \code{x[[set_column]]}. Passed to \code{\link[base]{match.fun}}.
-#'   The default computes the median of the \eqn{-log_{10}} adjusted p-values.
+#'   entry in \code{x[[set_column]]}. The default computes the median of the
+#'   \eqn{-log_{10}} adjusted p-values.
 #' @param padj_cutoff numeric; cutoff for terms to be statistically significant.
-#'   If \code{plot_sig_only=TRUE}, only those pathways with at least one
-#'   \code{padj_column} value less than this threshold may appear in the
+#'   If \code{plot_sig_only=TRUE}, only those molecular signatures with at least
+#'   one \code{padj_column} value less than this threshold may appear in the
 #'   heatmap. Default is 0.05.
 #' @param plot_sig_only logical; whether to plot only those \code{n_top} terms
 #'   that have at least one \code{padj_column} value less than
@@ -38,16 +37,17 @@
 #' @param padj_fill character; the background color used for values in
 #'   \code{padj_column} that are less than \code{padj_cutoff}. Default is
 #'   "grey".
-#' @param colors vector of length 2 specifying the colors for the largest
-#'   negative and largest positive values of \code{x[[statistic_column]]},
-#'   respectively. Default is "#3366ff" (blue) and "darkred".
+#' @param colors character; vector of length 2 specifying the colors for the
+#'   largest negative and largest positive values of
+#'   \code{x[[statistic_column]]}, respectively. Default is "#3366ff" (blue) and
+#'   "darkred".
 #' @param heatmap_color_fun function; used to create the legend for the heatmap
 #'   bubble fill. See \code{\link{enrichmap_color_functions}} for details.
-#' @param scale_by character; whether to scale the circles such that the
+#' @param scale_by character; whether to scale the bubbles such that the
 #'   most-significant term in each row (\code{scale_by="row"}), column
 #'   (\code{scale_by="column"}), or overall (\code{scale_by="max"}) is of
 #'   maximum area. Default is "row" to better visualize patterns across
-#'   contrasts.
+#'   contrasts. May be abbreviated.
 #' @param cell_size \code{\link[grid]{unit}} object; the size of each heatmap
 #'   cell (used for both height and width). Default is \code{unit(14,
 #'   "points")}.
@@ -56,7 +56,7 @@
 #' @param height numeric; height of the file in \code{units}.
 #' @param width numeric; width of the file in \code{units}.
 #' @param units character; units that define \code{height} and \code{width}.
-#'   Defaults to "in" (inches).
+#'   Defaults to "in" (inches). See \code{\link[grid]{unit}} for possible units.
 #' @param heatmap_args list; additional arguments passed to
 #'   \code{\link[ComplexHeatmap]{Heatmap}}.
 #' @param padj_args list; additional arguments passed to

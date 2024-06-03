@@ -60,7 +60,7 @@ decompose_sets(x, overlap = 5L)
 \references{
 Jiang, Z., & Gentleman, R. (2007). Extensions to gene set enrichment.
 \emph{Bioinformatics, 23}(3), 306–313.
-\href{https://doi.org/10.1093/bioinformatics/btl599}{doi:10.1093/bioinformatics/btl599}
+doi:\href{https://doi.org/10.1093/bioinformatics/btl599}{10.1093/bioinformatics/btl599}
 }
 \seealso{
 \code{\link{filter_sets}}

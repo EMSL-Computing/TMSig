@@ -9,6 +9,9 @@
 #'   \code{FALSE}, files with different extensions may be read, so long as they
 #'   are in the expected format.
 #'
+#' @details The second entry in each line of the GMT file is assumed to be a URL
+#'   or some other additional information, so it is discarded.
+#'
 #' @returns A named list of character vectors.
 #'
 #' @export gmt_to_list

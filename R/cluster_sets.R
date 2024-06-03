@@ -30,25 +30,25 @@
 #'   complete-linkage hierarchical clustering is performed on the dissimilarity
 #'   matrix (calculated as 1 - coefficients). Lastly,
 #'   \code{\link[stats]{cutree}} is used with cut height \code{h} to define
-#'   clusters, and the results are stored in a \code{data.table}.
+#'   clusters, and the results are stored in a \code{data.frame}.
 #'
 #' @section Set Size:
 #'
-#'   For two non-aliased sets to have \eqn{Jaccard \geq x}, where \eqn{x} is
-#'   some threshold, sets must have minimum sizes \eqn{n1 = \lceil \frac{x}{1 -
-#'   x} \rceil} and \eqn{n2 = n1 + 1} with the size of the overlap equal to
-#'   \eqn{n1}. For example, if sets have \eqn{J \geq 0.85}, their minimum sizes
+#'   For two non-aliased sets to have \eqn{Jaccard~\geq~x}, where \eqn{x} is
+#'   some threshold, sets must have minimum sizes \eqn{n1~=~\lceil \frac{x}{1 -
+#'   x} \rceil} and \eqn{n2~=~n1~+~1} with the size of the overlap equal to
+#'   \eqn{n1}. For example, if sets have \eqn{J~\geq~0.85}, their minimum sizes
 #'   are 6 and 7 with an overlap size of 6. That is, each set with fewer than 6
 #'   elements will always appear as a singleton cluster, if they are not
 #'   aliased.
 #'
-#'   For two non-aliased sets to have \eqn{Overlap \geq x}, where one set is not
+#'   For two non-aliased sets to have \eqn{Overlap~\geq~x}, where one set is not
 #'   a subset of the other and \eqn{x} is some threshold, the sets must both be
-#'   of minimum size \eqn{n = 1 + \lceil \frac{x}{1 - x} \rceil} with the size
-#'   of the overlap equal to \eqn{n - 1}. For example, if sets have \eqn{Overlap
-#'   \geq 0.85}, their minimum sizes are both 7 with an overlap size of 6. That
-#'   is, each set with fewer than 7 elements will always appear as a singleton
-#'   cluster, if they are not subsets or aliased.
+#'   of minimum size \eqn{n~=~1~+~\lceil \frac{x}{1 - x} \rceil} with the size
+#'   of the overlap equal to \eqn{n - 1}. For example, if sets have
+#'   \eqn{Overlap~\geq~0.85}, their minimum sizes are both 7 with an overlap
+#'   size of 6. That is, each set with fewer than 7 elements will always appear
+#'   as a singleton cluster, if they are not subsets or aliased.
 #'
 #' @section Optimization:
 #'
@@ -74,12 +74,12 @@
 #' Liberzon, A., Subramanian, A., Pinchback, R., Thorvaldsdóttir, H., Tamayo,
 #' P., & Mesirov, J. P. (2011). Molecular signatures database (MSigDB) 3.0.
 #' \emph{Bioinformatics, 27}(12), 1739–1740.
-#' \url{https://doi.org/10.1093/bioinformatics/btr260}
+#' doi:\href{https://doi.org/10.1093/bioinformatics/btr260}{10.1093/bioinformatics/btr260}
 #'
 #' Liberzon, A., Birger, C., Thorvaldsdóttir, H., Ghandi, M., Mesirov, J. P., &
 #' Tamayo, P. (2015). The Molecular Signatures Database (MSigDB) hallmark gene
 #' set collection. \emph{Cell systems, 1}(6), 417–425.
-#' \url{https://doi.org/10.1016/j.cels.2015.12.004}
+#' doi:\href{https://doi.org/10.1016/j.cels.2015.12.004}{10.1016/j.cels.2015.12.004}
 #'
 #' @seealso \code{\link{filter_sets}}, \code{\link{similarity}}
 #'

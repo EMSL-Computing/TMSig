@@ -40,7 +40,7 @@
 #'
 #' Jiang, Z., & Gentleman, R. (2007). Extensions to gene set enrichment.
 #' \emph{Bioinformatics, 23}(3), 306–313.
-#' \href{https://doi.org/10.1093/bioinformatics/btl599}{doi:10.1093/bioinformatics/btl599}
+#' doi:\href{https://doi.org/10.1093/bioinformatics/btl599}{10.1093/bioinformatics/btl599}
 #'
 #' @import Matrix
 #' @importFrom data.table data.table rbindlist `:=`
@@ -101,7 +101,7 @@ decompose_sets <- function(x, overlap = 1L)
   n <- 2L # only pairs of sets are currently supported
 
   # Coefficients used to convert each disjoint component from binary to int.
-  coefs <- matrix(2L ^ ((n - 1):0), nrow = 1L)
+  coefs <- matrix(2L ^ seq(n - 1L, 0L), nrow = 1L)
   # e.g., n = 5 --> (16, 8, 4, 2, 1)
 
   outcomes <- rep(list(0:1), n) # 1 = in set; 0 = not in set

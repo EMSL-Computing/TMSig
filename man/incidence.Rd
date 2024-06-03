@@ -11,11 +11,16 @@ incidence(x)
 }
 \value{
 An object of class \code{\link[Matrix:dgCMatrix-class]{dgCMatrix}}
-with unique set names as rows and unique elements as columns. A value of 1
-indicates the element is a member of the set.
+with unique set names as rows and unique elements as columns.
 }
 \description{
 Given a named list of sets, construct a sparse incidence matrix.
+}
+\details{
+The incidence matrix, \eqn{B}, is defined such that
+
+\deqn{B_{ij} = \begin{cases} 1, & \text{if } \text{element } e_j \in
+\text{set } s_i \\ 0, & \text{otherwise} \end{cases}}
 }
 \examples{
 x <- list("A" = c("a", "b", "c"),
@@ -25,10 +30,13 @@ x <- list("A" = c("a", "b", "c"),
 
 (imat <- incidence(x))
 
-# Sizes of sets and their intersections
+# Sizes of sets and their pairwise intersections
 tcrossprod(imat)
 
-# Number of elements unique to each set
+# Number of sets in which each element and pair of elements appears
+crossprod(imat)
+
+# Count number of elements unique to each set
 keep <- apply(imat, 2, sum) == 1
 apply(imat[, keep], 1, sum)
 }
