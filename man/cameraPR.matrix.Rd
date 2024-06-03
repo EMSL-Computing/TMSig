@@ -11,6 +11,7 @@
   inter.gene.cor = 0.01,
   sort = TRUE,
   adjust.globally = FALSE,
+  alternative = c("two.sided", "less", "greater"),
   ...
 )
 }
@@ -40,6 +41,11 @@ when testing a set of closely related contrasts. See Section 13.3 of the
 LIMMA User's Guide (\code{\link[limma]{limmaUsersGuide}}) for details.
 Default is \code{FALSE}.}
 
+\item{alternative}{character; the alternative hypothesis. Must be one of
+"\code{two.sided}" (default), "\code{greater}", or "\code{less}". May be
+abbreviated. A warning will be issued if anything other than
+"\code{two.sided}" is specified when \code{use.ranks=FALSE}.}
+
 \item{...}{other arguments are not currently used}
 }
 \value{
@@ -57,9 +63,11 @@ A \code{data.frame} with the following columns:
 \item{df}{integer; degrees of freedom (only included if
 \code{use.ranks=FALSE}). Two less than the number of non-missing values in
 each column of the \code{statistic} matrix.}
-\item{PValue}{numeric; two-tailed p-value.}
-\item{FDR}{numeric; Benjamini and Hochberg FDR adjusted p-value (not
-included when only one set and contrast was tested).}
+\item{PValue}{numeric; one- or two-tailed (if
+\code{alternative="two.sided"}) p-value.}
+\item{FDR}{numeric; Benjamini and Hochberg FDR adjusted p-value. Only
+included if multiple sets were tested, or if there are multiple contrasts
+and \code{adjust.globally=TRUE}.}
 }
 \description{
 Pre-ranked Correlation-Adjusted MEan RAnk gene set testing
@@ -85,7 +93,6 @@ If \code{use.ranks=TRUE}, a modified Wilcoxon rank sum test will be used.
 }
 
 \examples{
-require(limma)
 require(stats)
 
 # Simulate experimental data with control and treatment groups (3 samples
@@ -120,11 +127,15 @@ fit.smooth <- eBayes(fit.contr)
 index <- list(set1 = rownames(y)[index1],
               set2 = rownames(y)[index2])
 
+# Compute z-score equivalents of moderated t-statistics
+statistic <- zscoreT(fit.smooth$t, fit.smooth$df.total)
+head(statistic)
+
 # Only set1 is DE
-cameraPR(statistic = fit.smooth$t, index = index)
+cameraPR(statistic = statistic, index = index)
 
 # Non-parametric version
-cameraPR(statistic = fit.smooth$t, index = index, use.ranks = TRUE)
+cameraPR(statistic = statistic, index = index, use.ranks = TRUE)
 }
 \references{
 Wu, D., and Smyth, G. K. (2012). Camera: a competitive gene set

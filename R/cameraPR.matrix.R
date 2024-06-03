@@ -28,6 +28,10 @@
 #'   when testing a set of closely related contrasts. See Section 13.3 of the
 #'   LIMMA User's Guide (\code{\link[limma]{limmaUsersGuide}}) for details.
 #'   Default is \code{FALSE}.
+#' @param alternative character; the alternative hypothesis. Must be one of
+#'   "\code{two.sided}" (default), "\code{greater}", or "\code{less}". May be
+#'   abbreviated. A warning will be issued if anything other than
+#'   "\code{two.sided}" is specified when \code{use.ranks=FALSE}.
 #' @inheritParams limma::cameraPR
 #'
 #' @returns A \code{data.frame} with the following columns:
@@ -44,9 +48,11 @@
 #'   \item{df}{integer; degrees of freedom (only included if
 #'   \code{use.ranks=FALSE}). Two less than the number of non-missing values in
 #'   each column of the \code{statistic} matrix.}
-#'   \item{PValue}{numeric; two-tailed p-value.}
-#'   \item{FDR}{numeric; Benjamini and Hochberg FDR adjusted p-value (not
-#'   included when only one set and contrast was tested).}
+#'   \item{PValue}{numeric; one- or two-tailed (if
+#'   \code{alternative="two.sided"}) p-value.}
+#'   \item{FDR}{numeric; Benjamini and Hochberg FDR adjusted p-value. Only
+#'   included if multiple sets were tested, or if there are multiple contrasts
+#'   and \code{adjust.globally=TRUE}.}
 #'
 #' @section Test Assumptions:
 #'
@@ -84,7 +90,6 @@
 #' @exportS3Method limma::cameraPR
 #'
 #' @examples
-#' require(limma)
 #' require(stats)
 #'
 #' # Simulate experimental data with control and treatment groups (3 samples
@@ -119,11 +124,15 @@
 #' index <- list(set1 = rownames(y)[index1],
 #'               set2 = rownames(y)[index2])
 #'
+#' # Compute z-score equivalents of moderated t-statistics
+#' statistic <- zscoreT(fit.smooth$t, fit.smooth$df.total)
+#' head(statistic)
+#'
 #' # Only set1 is DE
-#' cameraPR(statistic = fit.smooth$t, index = index)
+#' cameraPR(statistic = statistic, index = index)
 #'
 #' # Non-parametric version
-#' cameraPR(statistic = fit.smooth$t, index = index, use.ranks = TRUE)
+#' cameraPR(statistic = statistic, index = index, use.ranks = TRUE)
 
 cameraPR.matrix <- function(statistic,
                             index,
@@ -131,11 +140,16 @@ cameraPR.matrix <- function(statistic,
                             inter.gene.cor = 0.01,
                             sort = TRUE,
                             adjust.globally = FALSE,
+                            alternative = c("two.sided", "less", "greater"),
                             ...)
 {
   dots <- names(list(...))
   if (length(dots))
     warning("Extra arguments disregarded: ", sQuote(dots))
+
+  # Alternative hypothesis
+  alternative <- match.arg(alternative,
+                           choices = c("two.sided", "less", "greater"))
 
   genes <- rownames(statistic)
   contrast_names <- colnames(statistic)
@@ -275,6 +289,9 @@ cameraPR.matrix <- function(statistic,
     Down <- pt(zuppertail, df = Inf, lower.tail = FALSE)
     Up <- pt(zlowertail, df = Inf)
   } else {
+    if (alternative != "two.sided")
+      warning("One-sided tests are not recommended when use.ranks=FALSE.")
+
     # Global mean and variance of statistics in each contrast
     meanStat <- apply(statistic, 2, mean, na.rm = TRUE)
     varStat <- apply(statistic, 2, var, na.rm = TRUE)
@@ -319,10 +336,21 @@ cameraPR.matrix <- function(statistic,
                       nrow = nsets, ncol = ncontrasts,
                       dimnames = list(all_set_names,
                                       contrast_names))
-  Direction[D] <- "Down"
 
-  # Two-sided p-values
-  TwoSided <- 2 * pmin(Down, Up)
+  # Create matrix of p-values and update direction according to alternative
+  # hypothesis
+  switch(alternative,
+         two.sided = {
+           PValue <- 2 * pmin(Down, Up)
+           Direction[D] <- "Down"
+         },
+         less = {
+           PValue <- Down
+           Direction[] <- "Down"
+         },
+         greater = {
+           PValue <- Up
+         })
 
   ## Assemble into list of data tables for each contrast
   tab <- lapply(colnames(statistic), function(contrast_i) {
@@ -330,7 +358,7 @@ cameraPR.matrix <- function(statistic,
       GeneSet = all_set_names,
       NGenes = m[, contrast_i],
       Direction = Direction[, contrast_i],
-      PValue = TwoSided[, contrast_i],
+      PValue = PValue[, contrast_i],
       stringsAsFactors = FALSE
     )
 
@@ -371,3 +399,4 @@ cameraPR.matrix <- function(statistic,
 
   return(tab)
 }
+
