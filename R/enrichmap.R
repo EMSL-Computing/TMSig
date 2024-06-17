@@ -161,16 +161,19 @@ enrichmap <- function(x,
 
   x <- unique(x[, cols_to_keep, with = FALSE]) # remove unnecessary columns
 
-  n <- x[, .N, by = set_column][["N"]] # number of entries by row name
+  # All n should be 1 if there are no duplicates
+  n <- x[, .N, by = c(contrast_column, set_column)][["N"]]
 
   # Multiple set_column entries per contrast
-  if (!all(n == max(n)))
-    stop("`set_column` is not uniquely defined for each contrast.")
+  if (any(n != 1L))
+    stop("set_column=", sQuote(set_column),
+         " is not uniquely defined for each contrast.")
 
   # Reshape data to wide format and convert to a matrix
   x <- dcast(x,
              formula = get(set_column) ~ get(contrast_column),
-             value.var = c(statistic_column, padj_column))
+             value.var = c(statistic_column, padj_column),
+             fill = NA)
   x <- as.matrix(x, rownames = 1)
 
   # Matrices of adjusted p-values and set statistics
@@ -198,8 +201,8 @@ enrichmap <- function(x,
       grid_width = max(cell_size, unit(4, "mm"))
     ),
     border = TRUE,
-    row_names_max_width = max_text_width(rownames(x)),
-    column_names_max_height = max_text_width(contrasts),
+    row_labels = rownames(x),
+    column_labels = contrasts,
     cluster_columns = FALSE,
     clustering_distance_rows = "euclidean",
     clustering_method_rows = ifelse(anyNA(x), "average", "complete"),
@@ -213,6 +216,14 @@ enrichmap <- function(x,
   heatmap_args <-  modifyList(x = base_heatmap_args,
                               val = heatmap_args,
                               keep.null = TRUE)
+
+  # If row or column labels were updated, use the new values to calculate max
+  # text width and height to avoid overlapping elements or unnecessary spacing
+  heatmap_args[["row_names_max_width"]] <-
+    max_text_width(heatmap_args[["row_labels"]])
+
+  heatmap_args[["column_names_max_height"]] <-
+    max_text_width(heatmap_args[["column_labels"]])
 
   # Mark missing values
   heatmap_args$rect_gp <- gpar(col = NA, fill = heatmap_args$na_col)
