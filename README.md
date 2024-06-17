@@ -18,9 +18,7 @@ molecules with an associated biological interpretation. Most molecular
 signatures databases are gene-centric, such as the Molecular Signatures
 Database (MSigDB; Liberzon et al., 2011, 2015), though there are others
 like the Metabolomics Workbench Reference List of Metabolite Names
-(RefMet) database
-(<https://www.metabolomicsworkbench.org/databases/refmet/index.php>;
-Fahy & Subramaniam, 2020).
+(RefMet) database (Fahy & Subramaniam, 2020).
 
 ## Installation
 
@@ -45,11 +43,13 @@ Below is an overview of some of the core functions.
   particular element is a member of that set, while a value of 0
   indicates that it is not.
 
-- `similarity`: compute the matrix of pairwise Jaccard or overlap
-  similarity coefficients for all pairs of sets $A$ and $B$, where
+- `similarity`: compute the matrix of pairwise Jaccard, overlap, or
+  Ōtsuka similarity coefficients for all pairs of sets $A$ and $B$,
+  where
 
-  - $Jaccard(A, B) = \frac{|A \cap B|}{|A \cup B|}$
-  - $Overlap(A, B) = \frac{|A \cap B|}{\min(|A|, |B|)}$
+  - Jaccard(A, B) = $\frac{|A \cap B|}{|A \cup B|}$
+  - Overlap(A, B) = $\frac{|A \cap B|}{\min(|A|, |B|)}$
+  - Ōtsuka(A, B) = $\frac{|A \cap B|}{\sqrt{|A| \times |B|}}$
 
 - `filter_sets`: restrict sets to only those elements in a
   pre-determined background, if provided, and only keep those that pass
@@ -166,6 +166,17 @@ similarity(x, type = "overlap") # overlap
 #> Set5 1.00  1.0  1.0 1.0000000    1    . .        
 #> Set6 .     .    .   .            .    1 .        
 #> Set7 0.75  0.5  0.5 0.3333333    .    . 1.0000000
+
+similarity(x, type = "otsuka") # Ōtsuka
+#> 7 x 7 sparse Matrix of class "dgCMatrix"
+#>           Set1      Set2      Set3      Set4      Set5 Set6      Set7
+#> Set1 1.0000000 0.8944272 0.8944272 0.7745967 0.4472136    . 0.6708204
+#> Set2 0.8944272 1.0000000 1.0000000 0.8660254 0.5000000    . 0.5000000
+#> Set3 0.8944272 1.0000000 1.0000000 0.8660254 0.5000000    . 0.5000000
+#> Set4 0.7745967 0.8660254 0.8660254 1.0000000 0.5773503    . 0.2886751
+#> Set5 0.4472136 0.5000000 0.5000000 0.5773503 1.0000000    . .        
+#> Set6 .         .         .         .         .            1 .        
+#> Set7 0.6708204 0.5000000 0.5000000 0.2886751 .            . 1.0000000
 ```
 
 ``` r

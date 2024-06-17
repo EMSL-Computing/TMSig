@@ -21,7 +21,7 @@ knitr::opts_chunk$set(
 
 The `TMSig` **R** package contains tools to prepare, analyze, and visualize _a priori_ molecular signatures, such as gene sets.
 
-We define a molecular signature as any collection of genes, proteins, post-translational modifications (PTMs), metabolites, lipids, or other molecules with an associated biological interpretation. Most molecular signatures databases are gene-centric, such as the Molecular Signatures Database (MSigDB; Liberzon et al., 2011, 2015), though there are others like the Metabolomics Workbench Reference List of Metabolite Names (RefMet) database (https://www.metabolomicsworkbench.org/databases/refmet/index.php; Fahy & Subramaniam, 2020).
+We define a molecular signature as any collection of genes, proteins, post-translational modifications (PTMs), metabolites, lipids, or other molecules with an associated biological interpretation. Most molecular signatures databases are gene-centric, such as the Molecular Signatures Database (MSigDB; Liberzon et al., 2011, 2015), though there are others like the Metabolomics Workbench Reference List of Metabolite Names (RefMet) database (Fahy & Subramaniam, 2020).
 
 
 ## Installation
@@ -45,9 +45,10 @@ Below is an overview of some of the core functions.
 
 - `incidence`: compute a sparse incidence matrix with unique sets as rows and unique elements as columns. A value of 1 indicates that a particular element is a member of that set, while a value of 0 indicates that it is not.
 
-- `similarity`: compute the matrix of pairwise Jaccard or overlap similarity coefficients for all pairs of sets $A$ and $B$, where
-  - $Jaccard(A, B) = \frac{|A \cap B|}{|A \cup B|}$
-  - $Overlap(A, B) = \frac{|A \cap B|}{\min(|A|, |B|)}$
+- `similarity`: compute the matrix of pairwise Jaccard, overlap, or Ōtsuka similarity coefficients for all pairs of sets $A$ and $B$, where
+  - Jaccard(A, B) = $\frac{|A \cap B|}{|A \cup B|}$
+  - Overlap(A, B) = $\frac{|A \cap B|}{\min(|A|, |B|)}$
+  - Ōtsuka(A, B) = $\frac{|A \cap B|}{\sqrt{|A| \times |B|}}$
 
 - `filter_sets`: restrict sets to only those elements in a pre-determined background, if provided, and only keep those that pass minimum and maximum size thresholds.
 
@@ -87,6 +88,8 @@ crossprod(imat) # occurrence of each element and pair of elements
 similarity(x) # Jaccard (default)
 
 similarity(x, type = "overlap") # overlap
+
+similarity(x, type = "otsuka") # Ōtsuka
 ```
 
 ```{r}
