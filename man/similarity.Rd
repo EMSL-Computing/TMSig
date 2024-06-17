@@ -4,21 +4,21 @@
 \alias{similarity}
 \title{Construct a Matrix of Pairwise Set Similarity Coefficients}
 \usage{
-similarity(x, type = c("jaccard", "overlap"))
+similarity(x, type = c("jaccard", "overlap", "otsuka"))
 }
 \arguments{
 \item{x}{a named list of sets. Elements must be of type \code{"character"}.}
 
 \item{type}{character; the type of similarity measure to use. Either
-\code{"jaccard"} or \code{"overlap"}. May be abbreviated.}
+\code{"jaccard"}, \code{"overlap"}, or \code{"otsuka"}. May be abbreviated.}
 }
 \value{
 A symmetric \code{\link[Matrix:dgCMatrix-class]{dgCMatrix}}
 containing all pairwise set similarity coefficients.
 }
 \description{
-Construct a sparse matrix of Jaccard or overlap similarity
-coefficients for each pair of sets in a list.
+Construct a sparse matrix of similarity coefficients for each
+pair of sets in a list.
 }
 \section{Set Similarity}{
 
@@ -29,17 +29,26 @@ of their union (Jaccard, 1912):
 
 \deqn{J(A, B) = \frac{|A \cap B|}{|A \cup B|}}
 
-The overlap coefficient (also known as the Szymkiewicz–Simpson coefficient)
-is defined as the size of the intersection divided by the size of the
-smaller set (Szymkiewicz 1934; Simpson, 1943, 1947, 1960; Fallaw 1979):
+The overlap coefficient is defined as the size of the intersection divided
+by the size of the smaller set (Simpson, 1943, 1947, 1960; Fallaw 1979):
 
 \deqn{Overlap(A, B) = \frac{|A \cap B|}{min(|A|, |B|)}}
 
-The Jaccard coefficient can identify aliased sets (sets which contain the
-same elements, but have different names), while the overlap coefficient can
-identify both aliased sets and subsets. Aliases and subsets are not easily
-distinguished without also having the matrix of Jaccard coefficients or the
-set sizes.
+The Ōtsuka coefficient is defined as the size of the intersection divided
+by the geometric mean of the set sizes (Ōtsuka, 1936), which is equivalent
+to the cosine similarity of two bit vectors:
+
+\deqn{Ōtsuka(A, B) = \frac{|A \cap B|}{\sqrt{|A| \times |B|}}}
+
+The Jaccard and Ōtsuka coefficients can identify aliased sets (sets which
+contain the same elements, but have different names), while the overlap
+coefficient can identify both aliased sets and subsets. Aliases and subsets
+are not easily distinguished without also having the matrix of Jaccard (or
+Ōtsuka) coefficients or the set sizes.
+
+Notice the relationship between the similarity coefficients:
+
+\deqn{0 \leq J(A, B) \leq Ōtsuka(A, B) \leq Overlap(A, B) \leq 1}
 }
 
 \section{Optimization}{
@@ -59,6 +68,7 @@ x <- list("A" = c("a", "b", "c", "d", "e"),
 
 (j <- similarity(x)) # Jaccard coefficients
 (o <- similarity(x, type = "overlap")) # overlap coefficients
+(ot <- similarity(x, type = "otsuka")) # Ōtsuka coefficients
 }
 \references{
 Jaccard, P. (1912). The distribution of the flora in the alpine
@@ -66,9 +76,10 @@ zone. \emph{The New Phytologist, 11}(2), 37–50.
 doi:\href{https://doi.org/10.1111/j.1469-8137.1912.tb05611.x}{10.1111/j.1469-8137.1912.tb05611.x}.
 \url{https://www.jstor.org/stable/2427226}
 
-Szymkiewicz, D. (1934). Une contribution statistique à la géographie
-floristique. \emph{Acta Societatis Botanicorum Poloniae, 11}(3), 249–265.
-doi:\href{https://doi.org/10.5586/asbp.1934.012}{10.5586/asbp.1934.012}.
+Ōtsuka, Y. (1936). The faunal character of the Japanese Pleistocene marine
+Mollusca, as evidence of the climate having become colder during the
+Pleistocene in Japan. \emph{Bulletin of the Biogeographical Society of
+Japan, 6}(16), 165–170.
 
 Simpson, G. G. (1943). Mammals and the nature of continents. \emph{American
 Journal of Science, 241}(1), 1–31.
@@ -80,8 +91,8 @@ of America, 58}(7), 613–688.
 Simpson, G. G. (1960). Notes on the measurement of faunal resemblance.
 \emph{American Journal of Science, 258-A}, 300–311.
 
-Fallaw, W. C. (1979). A Test of the Simpson Coefficient and Other Binary
-Coefficients of Faunal Similarity. \emph{Journal of Paleontology, 53}(4),
+Fallaw, W. C. (1979). A test of the Simpson coefficient and other binary
+coefficients of faunal similarity. \emph{Journal of Paleontology, 53}(4),
 1029–1034. \url{http://www.jstor.org/stable/1304126}
 }
 \seealso{

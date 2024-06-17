@@ -15,7 +15,7 @@ correspondence).
 \usage{
 cluster_sets(
   x,
-  type = c("jaccard", "overlap"),
+  type = c("jaccard", "overlap", "otsuka"),
   cutoff = 0.85,
   method = "complete",
   h = 0.9
@@ -25,7 +25,7 @@ cluster_sets(
 \item{x}{a named list of sets. Elements must be of type \code{"character"}.}
 
 \item{type}{character; the type of similarity measure to use. Either
-\code{"jaccard"} or \code{"overlap"}. May be abbreviated.}
+\code{"jaccard"}, \code{"overlap"}, or \code{"otsuka"}. May be abbreviated.}
 
 \item{cutoff}{numeric 0-1; minimum similarity coefficient required to
 classify two sets as being similar. Default is 0.85.}
@@ -56,32 +56,12 @@ redundancy of sets prior to statistical analysis.
 
 
 Given a named list of sets, \code{cluster_sets} calculates all pairwise
-Jaccard or overlap similarity coefficients (see \code{\link{similarity}}
-for details). Any coefficients below \code{cutoff} are set to 0 and
-complete-linkage hierarchical clustering is performed on the dissimilarity
-matrix (calculated as 1 - coefficients). Lastly,
+Jaccard, overlap, or Ōtsuka similarity coefficients (see
+\code{\link{similarity}} for details). Any coefficients below \code{cutoff}
+are set to 0 and complete-linkage hierarchical clustering is performed on
+the dissimilarity matrix (calculated as 1 - coefficients). Lastly,
 \code{\link[stats]{cutree}} is used with cut height \code{h} to define
 clusters, and the results are stored in a \code{data.frame}.
-}
-
-\section{Set Size}{
-
-
-For two non-aliased sets to have \eqn{Jaccard~\geq~x}, where \eqn{x} is
-some threshold, sets must have minimum sizes \eqn{n1~=~\lceil \frac{x}{1 -
-  x} \rceil} and \eqn{n2~=~n1~+~1} with the size of the overlap equal to
-\eqn{n1}. For example, if sets have \eqn{J~\geq~0.85}, their minimum sizes
-are 6 and 7 with an overlap size of 6. That is, each set with fewer than 6
-elements will always appear as a singleton cluster, if they are not
-aliased.
-
-For two non-aliased sets to have \eqn{Overlap~\geq~x}, where one set is not
-a subset of the other and \eqn{x} is some threshold, the sets must both be
-of minimum size \eqn{n~=~1~+~\lceil \frac{x}{1 - x} \rceil} with the size
-of the overlap equal to \eqn{n - 1}. For example, if sets have
-\eqn{Overlap~\geq~0.85}, their minimum sizes are both 7 with an overlap
-size of 6. That is, each set with fewer than 7 elements will always appear
-as a singleton cluster, if they are not subsets or aliased.
 }
 
 \section{Optimization}{
@@ -95,6 +75,44 @@ excluding these sets during the hierarchical clustering step, the speed of
 1 (as the size of the dissimilarity matrix decreases).
 }
 
+\section{Minimum Set Size}{
+
+
+Sets that are not sufficiently large will always appear as singleton
+clusters, unless they are aliased or subsets (overlap similarity only). For
+two sets \eqn{A} and \eqn{B} to be sufficiently similar, defined as having
+a similarity coefficient at least equal to some cutoff (e.g.,
+\eqn{Jaccard~\geq~x}), they must have minimum sizes \eqn{n1 = |A|}, \eqn{n2
+  = |B|}, and intersection size \eqn{|A \cap B|}:
+
+\itemize{
+\item{\strong{Jaccard:} \eqn{n1 = \lceil \frac{x}{1 - x} \rceil,
+    \quad n2 = n1 + 1, \quad |A \cap B| = n1}}
+\item{\strong{Overlap:} \eqn{n1 = n2 = 1 + \lceil \frac{x}{1 - x}
+    \rceil, \quad |A \cap B| = n1 - 1}}
+\item{\strong{Ōtsuka:} \eqn{n1 = \lceil \frac{x^2}{1 - x^2} \rceil,
+    \quad n2 = n1 + 1, \quad |A \cap B| = n1}}
+}
+
+where \eqn{\lceil y \rceil} is the ceiling function applied to some real
+number \eqn{y}.
+
+For example, if the cutoff is \eqn{x = 0.85}, then the minimum set and
+intersection sizes are
+
+\itemize{
+\item{\strong{Jaccard:} \eqn{n1 = 6, \quad n2 = 7, \quad |A \cap B| =
+    6}}
+\item{\strong{Overlap:} \eqn{n1 = n2 = 7, \quad |A \cap B| = 6}}
+\item{\strong{Ōtsuka:} \eqn{n1 = 3, \quad n2 = 4, \quad |A \cap B| =
+    3}}
+}
+
+That is, sets with fewer elements or intersection sizes will always appear
+as singleton clusters unless they are aliased or, in the case of the
+overlap similarity, subsets.
+}
+
 \examples{
 x <- list("A" = letters[1:5],
           "B" = letters[1:4], # subset of A
@@ -104,9 +122,12 @@ x <- list("A" = letters[1:5],
           "F" = c("x", "y", "z"), # distinct elements
           "G" = letters[3:6]) # overlaps with A-E
 
-cluster_sets(x) # default clustering
+# Default clustering based on Jaccard similarity
+cluster_sets(x)
+cluster_sets(x, type = "overlap") # overlap similarity
+cluster_sets(x, type = "otsuka") # Ōtsuka similarity
 
-# Relax similarity cutoff
+# Relax Jaccard similarity cutoff
 (df <- cluster_sets(x, cutoff = 0.5))
 
 # Keep the first (largest) set from each cluster
@@ -116,10 +137,11 @@ subset(df, subset = !duplicated(cluster))[["set"]] # A, G, E, F
 df <- df[order(df$set_size), ]
 subset(df, subset = !duplicated(cluster))[["set"]] # E, D, F, G
 
-# Cluster aliased sets
+# Cluster aliased sets (type = "otsuka" would produce
+# identical results)
 cluster_sets(x, type = "jaccard", cutoff = 1)
 
-# Cluster subsets
+# Cluster subsets and aliased sets
 cluster_sets(x, type = "overlap", cutoff = 1)
 }
 \references{
