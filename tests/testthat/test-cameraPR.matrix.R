@@ -41,22 +41,38 @@ test_that("at least some genes in `index` must match rownames(statistic)", {
 })
 
 
+test_that("min.size is valid", {
+  index1 <- list("A" = rownames(statistic)[1:400],
+                 "B" = rownames(statistic)[1:100])
+
+  expect_no_warning(
+    out <- cameraPR.matrix(statistic = statistic,
+                           index = index1,
+                           min.size = 101L)
+  )
+
+  # "A" is kept only
+  expect_true(length(unique(out$GeneSet)) ==  1L)
+
+  err1 <- expect_error(
+    cameraPR.matrix(statistic = statistic,
+                    index = index1,
+                    min.size = 10000)
+  )$message
+
+  expect_identical(
+    err1,
+    paste0("`min.size` must be smaller than the number of non-missing values ",
+           "in each contrast column of the `statistic` matrix.")
+  )
+})
+
+
 test_that("gene sets with extreme sizes will be dropped", {
   # Warned when at least one set can not be tested
   index1 <- list("A" = "gene1",
                  "B" = c("gene1", "gene2"),
                  "C" = paste0("gene", 101:103))
-
-  wrn <- expect_warning(
-    cameraPR.matrix(statistic, index = index1)
-  )$message
-
-  expect_identical(
-    wrn,
-    paste0("Sets in `index` with fewer than 2 and at most ",
-           "apply(!is.na(statistic), 2, sum) genes with nonmissing ",
-           "values in at least one contrast will be dropped.")
-  )
 
   # Error when sets have insufficient data, or they include all genes in
   # statistic matrix in at least one contrast
@@ -67,8 +83,8 @@ test_that("gene sets with extreme sizes will be dropped", {
 
   expect_identical(
     err,
-    paste0("No sets in `index` have at least 2 and fewer than",
-           "apply(!is.na(statistic), 2, sum) genes with nonmissing ",
+    paste0("No sets in `index` have at least `min.size` and fewer than ",
+           "min(apply(!is.na(statistic), 2, sum)) genes with nonmissing ",
            "values in `statistic`.")
   )
 })

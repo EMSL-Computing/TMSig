@@ -32,6 +32,11 @@
 #'   "\code{two.sided}" (default), "\code{greater}", or "\code{less}". May be
 #'   abbreviated. A warning will be issued if anything other than
 #'   "\code{two.sided}" is specified when \code{use.ranks=FALSE}.
+#' @param min.size integer; the minimum set size. To be considered for testing,
+#'   sets must have at least \code{min.size} elements with non-missing values in
+#'   all contrasts. The default value of 2 is the minimum possible set size
+#'   required for testing, though a value of 10 or higher is recommended; higher
+#'   values tend to produce more robust results.
 #' @inheritParams limma::cameraPR
 #'
 #' @returns A \code{data.frame} with the following columns:
@@ -141,11 +146,19 @@ cameraPR.matrix <- function(statistic,
                             sort = TRUE,
                             adjust.globally = FALSE,
                             alternative = c("two.sided", "less", "greater"),
+                            min.size = 2L,
                             ...)
 {
   dots <- names(list(...))
   if (length(dots))
     warning("Extra arguments disregarded: ", sQuote(dots))
+
+  # isTRUE catches NA_real_
+  if (isTRUE(!is.vector(min.size, mode = "numeric") ||
+             length(min.size) != 1L))
+    stop("`min.size` must be a single integer.")
+
+  min.size <- max(2L, min.size)
 
   # Alternative hypothesis
   alternative <- match.arg(alternative,
@@ -166,6 +179,10 @@ cameraPR.matrix <- function(statistic,
 
   if (any(G < 3L))
     stop("Each column of `statistic` must have at least 3 nonmissing values.")
+
+  if (any(min.size >= G))
+    stop("`min.size` must be smaller than the number of non-missing values ",
+         "in each contrast column of the `statistic` matrix.")
 
   # data.table with columns "sets" and "elements"
   dt <- .prepare_sets(index) # this also validates index
@@ -201,18 +218,15 @@ cameraPR.matrix <- function(statistic,
   storage.mode(m) <- "integer"
 
   # Identify sets that are too small or too large in at least one contrast
-  extreme_sets <- which(apply(m, 1, function(mi) any(mi < 2L | mi == G)))
+  extreme_sets <- which(apply(m, 1, function(mi) any(mi < min.size | mi == G)))
   if (length(extreme_sets)) {
     # If all sets will be dropped, throw an error
     if (length(extreme_sets) == nsets)
-      stop("No sets in `index` have at least 2 and fewer than",
-           "apply(!is.na(statistic), 2, sum) genes with nonmissing ",
+      stop("No sets in `index` have at least `min.size` and fewer than ",
+           "min(apply(!is.na(statistic), 2, sum)) genes with nonmissing ",
            "values in `statistic`.")
 
     # Drop sets that are too small or too large
-    warning("Sets in `index` with fewer than 2 and at most ",
-            "apply(!is.na(statistic), 2, sum) genes with nonmissing ",
-            "values in at least one contrast will be dropped.")
     m <- m[-extreme_sets, , drop = FALSE]
     imat <- imat[-extreme_sets, , drop = FALSE]
 
@@ -363,8 +377,8 @@ cameraPR.matrix <- function(statistic,
     )
 
     if (!use.ranks) {
-      tab_i[, `:=`(df = df.camera[, contrast_i],
-                   TwoSampleT = two.sample.t[, contrast_i])]
+      tab_i[, `:=`(TwoSampleT = two.sample.t[, contrast_i],
+                   df = df.camera[, contrast_i])]
       setcolorder(tab_i, neworder = c("TwoSampleT", "df"), before = "PValue")
     }
 

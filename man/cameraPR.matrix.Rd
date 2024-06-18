@@ -12,6 +12,7 @@
   sort = TRUE,
   adjust.globally = FALSE,
   alternative = c("two.sided", "less", "greater"),
+  min.size = 2L,
   ...
 )
 }
@@ -45,6 +46,12 @@ Default is \code{FALSE}.}
 "\code{two.sided}" (default), "\code{greater}", or "\code{less}". May be
 abbreviated. A warning will be issued if anything other than
 "\code{two.sided}" is specified when \code{use.ranks=FALSE}.}
+
+\item{min.size}{integer; the minimum set size. To be considered for testing,
+sets must have at least \code{min.size} elements with non-missing values in
+all contrasts. The default value of 2 is the minimum possible set size
+required for testing, though a value of 10 or higher is recommended; higher
+values tend to produce more robust results.}
 
 \item{...}{other arguments are not currently used}
 }

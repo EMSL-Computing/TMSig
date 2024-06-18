@@ -1,8 +1,8 @@
 Package: TMSig
 Type: Package
 Title: Tools for Molecular Signatures
-Version: 1.0.0.9010
-Date: 2024-06-17
+Version: 1.0.0.9011
+Date: 2024-06-18
 Authors@R: 
     c(
       person(given = "Tyler", family = "Sagendorf", 
