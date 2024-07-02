@@ -376,11 +376,9 @@ cameraPR.matrix <- function(statistic,
       stringsAsFactors = FALSE
     )
 
-    if (!use.ranks) {
+    if (!use.ranks)
       tab_i[, `:=`(TwoSampleT = two.sample.t[, contrast_i],
                    df = df.camera[, contrast_i])]
-      setcolorder(tab_i, neworder = c("TwoSampleT", "df"), before = "PValue")
-    }
 
     return(tab_i)
   })
@@ -390,10 +388,8 @@ cameraPR.matrix <- function(statistic,
   tab[, Contrast := factor(Contrast, levels = contrast_names)]
 
   # Include column for inter-gene correlation
-  if (!fixed.cor) {
+  if (!fixed.cor)
     tab[, Correlation := inter.gene.cor[GeneSet]]
-    setcolorder(tab, neworder = "Correlation", before = "Direction")
-  }
 
   if (nrow(tab) > 1L) { # more than 1 gene set and/or contrast
     if (adjust.globally) {
@@ -408,6 +404,12 @@ cameraPR.matrix <- function(statistic,
     if (sort)
       setorderv(tab, cols = c("Contrast", "PValue"), order = c(1, 1))
   }
+
+  # Reorder columns
+  neworder <- c("Contrast", "GeneSet", "NGenes", "Correlation",
+                "Direction", "TwoSampleT", "df", "PValue", "FDR")
+  neworder <- intersect(neworder, colnames(tab))
+  setcolorder(tab, neworder = neworder)
 
   setDF(tab) # convert to data.frame to match cameraPR.default
 

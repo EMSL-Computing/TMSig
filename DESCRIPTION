@@ -1,8 +1,8 @@
 Package: TMSig
 Type: Package
 Title: Tools for Molecular Signatures
-Version: 1.1.0
-Date: 2024-06-26
+Version: 1.1.1
+Date: 2024-07-02
 Authors@R: 
     c(
       person(given = "Tyler", family = "Sagendorf", 
@@ -17,7 +17,7 @@ Description: Tools to prepare and analyze lists of a priori molecular
 License: GPL (>= 3)
 Bugreports: https://github.com/EMSL-Computing/TMSig/issues
 Encoding: UTF-8
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 Roxygen: list(markdown = TRUE)
 VignetteBuilder: knitr
 Depends:
