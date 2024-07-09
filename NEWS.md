@@ -1,3 +1,11 @@
+# TMSig devel
+
+**MINOR CHANGES:**
+
+- Simplified internals of several functions. In most cases, this also led to a slight reduction in computation time and memory usage.
+- Minor documentation fixes.
+
+
 # TMSig 1.1.1 (2024-07-02)
 
 **BUG FIXES**

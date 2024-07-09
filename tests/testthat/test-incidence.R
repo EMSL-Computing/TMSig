@@ -54,7 +54,7 @@ test_that("missing values are discarded", {
 
 
 test_that("all values cannot be missing", {
-  x <- list("A" = c(NA, NA))
+  x <- list("A" = rep(NA_character_, 2))
 
   expect_error(
     incidence(x),

@@ -47,16 +47,16 @@
 #'   clusters, unless they are aliased or subsets (overlap similarity only). For
 #'   two sets \eqn{A} and \eqn{B} to be sufficiently similar, defined as having
 #'   a similarity coefficient at least equal to some cutoff (e.g.,
-#'   \eqn{Jaccard~\geq~x}), they must have minimum sizes \eqn{n1 = |A|}, \eqn{n2
-#'   = |B|}, and intersection size \eqn{|A \cap B|}:
+#'   \eqn{Jaccard~\geq~x}), they must have minimum sizes \eqn{|A|}, \eqn{|B|},
+#'   and intersection size \eqn{|A \cap B|}:
 #'
 #'   \itemize{
-#'     \item{\strong{Jaccard:} \eqn{n1 = \lceil \frac{x}{1 - x} \rceil,
-#'     \quad n2 = n1 + 1, \quad |A \cap B| = n1}}
-#'     \item{\strong{Overlap:} \eqn{n1 = n2 = 1 + \lceil \frac{x}{1 - x}
-#'     \rceil, \quad |A \cap B| = n1 - 1}}
-#'     \item{\strong{Ōtsuka:} \eqn{n1 = \lceil \frac{x^2}{1 - x^2} \rceil,
-#'     \quad n2 = n1 + 1, \quad |A \cap B| = n1}}
+#'     \item{\strong{Jaccard:} \eqn{|A| = \lceil \frac{x}{1 - x} \rceil,
+#'     \quad |B| = 1 + |A|, \quad |A \cap B| = |A|}}
+#'     \item{\strong{Overlap:} \eqn{|A| = |B| = 1 + \lceil \frac{x}{1 - x}
+#'     \rceil, \quad |A \cap B| = |A| - 1}}
+#'     \item{\strong{Ōtsuka:} \eqn{|A| = \lceil \frac{x^2}{1 - x^2} \rceil,
+#'     \quad |B| = 1 + |A|, \quad |A \cap B| = |A|}}
 #'   }
 #'
 #'   where \eqn{\lceil y \rceil} is the ceiling function applied to some real
@@ -66,15 +66,15 @@
 #'   intersection sizes are
 #'
 #'   \itemize{
-#'     \item{\strong{Jaccard:} \eqn{n1 = 6, \quad n2 = 7, \quad |A \cap B| =
+#'     \item{\strong{Jaccard:} \eqn{|A| = 6, \quad |B| = 7, \quad |A \cap B| =
 #'     6}}
-#'     \item{\strong{Overlap:} \eqn{n1 = n2 = 7, \quad |A \cap B| = 6}}
-#'     \item{\strong{Ōtsuka:} \eqn{n1 = 3, \quad n2 = 4, \quad |A \cap B| =
+#'     \item{\strong{Overlap:} \eqn{|A| = |B| = 7, \quad |A \cap B| = 6}}
+#'     \item{\strong{Ōtsuka:} \eqn{|A| = 3, \quad |B| = 4, \quad |A \cap B| =
 #'     3}}
 #'   }
 #'
-#'   That is, sets with fewer elements or intersection sizes will always appear
-#'   as singleton clusters unless they are aliased or, in the case of the
+#'   That is, sets with fewer elements or smaller intersections will always
+#'   appear as singleton clusters unless they are aliased or, in the case of the
 #'   overlap similarity, subsets.
 #'
 #' @source
@@ -92,12 +92,14 @@
 #' Liberzon, A., Subramanian, A., Pinchback, R., Thorvaldsdóttir, H., Tamayo,
 #' P., & Mesirov, J. P. (2011). Molecular signatures database (MSigDB) 3.0.
 #' \emph{Bioinformatics, 27}(12), 1739–1740.
-#' doi:\href{https://doi.org/10.1093/bioinformatics/btr260}{10.1093/bioinformatics/btr260}
+#' doi:\href{https://doi.org/10.1093/bioinformatics/btr260
+#' }{10.1093/bioinformatics/btr260}
 #'
 #' Liberzon, A., Birger, C., Thorvaldsdóttir, H., Ghandi, M., Mesirov, J. P., &
 #' Tamayo, P. (2015). The Molecular Signatures Database (MSigDB) hallmark gene
 #' set collection. \emph{Cell systems, 1}(6), 417–425.
-#' doi:\href{https://doi.org/10.1016/j.cels.2015.12.004}{10.1016/j.cels.2015.12.004}
+#' doi:\href{https://doi.org/10.1016/j.cels.2015.12.004
+#' }{10.1016/j.cels.2015.12.004}
 #'
 #' @seealso \code{\link{filter_sets}}, \code{\link{similarity}}
 #'
@@ -146,14 +148,16 @@ cluster_sets <- function(x,
   if (cutoff < 0 | cutoff > 1)
     stop("`cutoff` must be between 0 and 1.")
 
-  # x is used later to get set sizes
+  # Needed to determine set sizes
   dt <- .prepare_sets(x)
   x <- split(x = dt[["elements"]], f = dt[["sets"]])
 
-  # Similarity matrix (not optimal because similarity uses .prepare_sets)
+  ## Pairwise set similarity matrix
   s <- similarity(x, type = type)
   diag(s) <- 0
   s[s < cutoff] <- 0
+
+  set_sizes <- lengths(x)
 
   # Cluster sets that are sufficiently similar to at least one other set. The
   # remaining sets will be appended to the results at the end.
@@ -162,46 +166,39 @@ cluster_sets <- function(x,
   if (sum(keep) == 0L) {
     message("No pair of sets passes the similarity cutoff.")
 
-    dt <- data.table(set = names(x),
-                     cluster = seq_along(x),
-                     set_size = lengths(x),
+    dt <- data.table(set = names(set_sizes),
+                     cluster = seq_along(set_sizes),
+                     stringsAsFactors = FALSE)
+  } else {
+    s <- s[keep, keep] # at least a 2x2 matrix
+
+    # Convert sparse similarity matrix to dense dissimilarity matrix - may
+    # produce a warning
+    d <- as.dist(1 - s)
+
+    # Hierarchical clustering
+    hc <- hclust(d, method = method)
+    clusters <- cutree(hc, h = h)
+
+    dt <- data.table(set = names(clusters),
+                     cluster = clusters,
                      stringsAsFactors = FALSE)
 
-    setorderv(dt, cols = c("cluster", "set_size", "set"),
-              order = c(1, -1, 1))
+    # Append sets that were not similar to any others and place each in its own
+    # cluster
+    other_sets <- data.table(set = names(set_sizes)[!keep],
+                             stringsAsFactors = FALSE)
+    other_sets[, cluster := seq_along(set) + max(dt[["cluster"]])]
 
-    setDF(dt) # convert to data.frame
-
-    return(dt)
+    dt <- rbind(dt, other_sets)
   }
 
-  s <- s[keep, keep] # at least a 2x2 matrix
-
-  # Convert sparse similarity matrix to dense dissimilarity matrix - may produce
-  # a warning
-  d <- as.dist(1 - s)
-
-  # Hierarchical clustering
-  hc <- hclust(d, method = method)
-  clusters <- cutree(hc, h = h)
-
-  dt <- data.table(set = names(clusters),
-                   cluster = clusters,
-                   stringsAsFactors = FALSE)
-
-  # Append sets that were not similar to any others and place each in its own
-  # cluster
-  other_sets <- data.table(set = names(x)[!keep],
-                           stringsAsFactors = FALSE)
-  other_sets[, cluster := seq_along(set) + max(dt$cluster)]
-
-  dt <- rbind(dt, other_sets)
-  dt[, set_size := lengths(x)[set]]
+  dt[, set_size := set_sizes[set]]
 
   setorderv(dt, cols = c("cluster", "set_size", "set"),
             order = c(1, -1, 1))
 
-  setDF(dt) # convert to data.frame
+  setDF(dt)
 
   return(dt)
 }

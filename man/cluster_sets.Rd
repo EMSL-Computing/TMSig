@@ -82,16 +82,16 @@ Sets that are not sufficiently large will always appear as singleton
 clusters, unless they are aliased or subsets (overlap similarity only). For
 two sets \eqn{A} and \eqn{B} to be sufficiently similar, defined as having
 a similarity coefficient at least equal to some cutoff (e.g.,
-\eqn{Jaccard~\geq~x}), they must have minimum sizes \eqn{n1 = |A|}, \eqn{n2
-  = |B|}, and intersection size \eqn{|A \cap B|}:
+\eqn{Jaccard~\geq~x}), they must have minimum sizes \eqn{|A|}, \eqn{|B|},
+and intersection size \eqn{|A \cap B|}:
 
 \itemize{
-\item{\strong{Jaccard:} \eqn{n1 = \lceil \frac{x}{1 - x} \rceil,
-    \quad n2 = n1 + 1, \quad |A \cap B| = n1}}
-\item{\strong{Overlap:} \eqn{n1 = n2 = 1 + \lceil \frac{x}{1 - x}
-    \rceil, \quad |A \cap B| = n1 - 1}}
-\item{\strong{Ōtsuka:} \eqn{n1 = \lceil \frac{x^2}{1 - x^2} \rceil,
-    \quad n2 = n1 + 1, \quad |A \cap B| = n1}}
+\item{\strong{Jaccard:} \eqn{|A| = \lceil \frac{x}{1 - x} \rceil,
+    \quad |B| = 1 + |A|, \quad |A \cap B| = |A|}}
+\item{\strong{Overlap:} \eqn{|A| = |B| = 1 + \lceil \frac{x}{1 - x}
+    \rceil, \quad |A \cap B| = |A| - 1}}
+\item{\strong{Ōtsuka:} \eqn{|A| = \lceil \frac{x^2}{1 - x^2} \rceil,
+    \quad |B| = 1 + |A|, \quad |A \cap B| = |A|}}
 }
 
 where \eqn{\lceil y \rceil} is the ceiling function applied to some real
@@ -101,15 +101,15 @@ For example, if the cutoff is \eqn{x = 0.85}, then the minimum set and
 intersection sizes are
 
 \itemize{
-\item{\strong{Jaccard:} \eqn{n1 = 6, \quad n2 = 7, \quad |A \cap B| =
+\item{\strong{Jaccard:} \eqn{|A| = 6, \quad |B| = 7, \quad |A \cap B| =
     6}}
-\item{\strong{Overlap:} \eqn{n1 = n2 = 7, \quad |A \cap B| = 6}}
-\item{\strong{Ōtsuka:} \eqn{n1 = 3, \quad n2 = 4, \quad |A \cap B| =
+\item{\strong{Overlap:} \eqn{|A| = |B| = 7, \quad |A \cap B| = 6}}
+\item{\strong{Ōtsuka:} \eqn{|A| = 3, \quad |B| = 4, \quad |A \cap B| =
     3}}
 }
 
-That is, sets with fewer elements or intersection sizes will always appear
-as singleton clusters unless they are aliased or, in the case of the
+That is, sets with fewer elements or smaller intersections will always
+appear as singleton clusters unless they are aliased or, in the case of the
 overlap similarity, subsets.
 }
 
@@ -148,12 +148,14 @@ cluster_sets(x, type = "overlap", cutoff = 1)
 Liberzon, A., Subramanian, A., Pinchback, R., Thorvaldsdóttir, H., Tamayo,
 P., & Mesirov, J. P. (2011). Molecular signatures database (MSigDB) 3.0.
 \emph{Bioinformatics, 27}(12), 1739–1740.
-doi:\href{https://doi.org/10.1093/bioinformatics/btr260}{10.1093/bioinformatics/btr260}
+doi:\href{https://doi.org/10.1093/bioinformatics/btr260
+}{10.1093/bioinformatics/btr260}
 
 Liberzon, A., Birger, C., Thorvaldsdóttir, H., Ghandi, M., Mesirov, J. P., &
 Tamayo, P. (2015). The Molecular Signatures Database (MSigDB) hallmark gene
 set collection. \emph{Cell systems, 1}(6), 417–425.
-doi:\href{https://doi.org/10.1016/j.cels.2015.12.004}{10.1016/j.cels.2015.12.004}
+doi:\href{https://doi.org/10.1016/j.cels.2015.12.004
+}{10.1016/j.cels.2015.12.004}
 }
 \seealso{
 \code{\link{filter_sets}}, \code{\link{similarity}}

@@ -40,7 +40,8 @@
 #'
 #' Jiang, Z., & Gentleman, R. (2007). Extensions to gene set enrichment.
 #' \emph{Bioinformatics, 23}(3), 306–313.
-#' doi:\href{https://doi.org/10.1093/bioinformatics/btl599}{10.1093/bioinformatics/btl599}
+#' doi:\href{https://doi.org/10.1093/bioinformatics/btl599
+#' }{10.1093/bioinformatics/btl599}
 #'
 #' @import Matrix
 #' @importFrom data.table data.table rbindlist `:=`
@@ -61,14 +62,13 @@ decompose_sets <- function(x, overlap = 1L)
 {
   lifecycle::signal_stage("experimental", "decompose_sets()")
 
-  if (!is.numeric(overlap) |
-      isTRUE(is.infinite(overlap)) |
-      length(overlap) != 1L) {
+  if (!is.vector(overlap, mode = "numeric") ||
+      isTRUE(is.infinite(overlap)) ||
+      length(overlap) != 1L)
     stop("`overlap` must be a single integer specifying the minimum ",
          "intersection size required to decompose pairs of sets.")
-  }
 
-  overlap <- max(1L, round(overlap))
+  overlap <- max(1L, floor(overlap))
 
   # This also validates x. Since the size of the intersection between a set and
   # any other set is at most the size of that set, we can pre-filter to sets of
@@ -76,7 +76,7 @@ decompose_sets <- function(x, overlap = 1L)
   x <- filter_sets(x, min_size = overlap)
 
   if (length(x) < 2L)
-    stop("`x` must contain 2 or more sets.", call. = FALSE)
+    stop("Fewer than 2 sets with at least `overlap` elements.")
 
   incidence <- incidence(x)
 
@@ -87,15 +87,14 @@ decompose_sets <- function(x, overlap = 1L)
   # Indices of sufficiently overlapping pairs of sets
   idx <- which(imat >= overlap, arr.ind = TRUE, useNames = FALSE)
 
+  if (nrow(idx) == 0L)
+    stop("Fewer than 2 sets with at least `overlap` elements in common.")
+
   # Flip columns to preserve order of sets in x
-  idx <- idx[, ncol(idx):1L, drop = FALSE]
+  idx <- idx[, 2:1, drop = FALSE]
 
   # Convert indices to set names
   set_pairs <- array(rownames(imat)[idx], dim = dim(idx))
-
-  if (nrow(set_pairs) == 0L)
-    stop("No pairs of sets in `x` have at least `overlap` elements ",
-         "in common.")
 
   # Set decomposition ----
   n <- 2L # only pairs of sets are currently supported

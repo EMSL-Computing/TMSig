@@ -26,21 +26,6 @@ test_that("each contrast must have at least 3 nonmissing values", {
 })
 
 
-test_that("at least some genes in `index` must match rownames(statistic)", {
-  # Elements should be "gene1", "gene2"
-  index1 <- list("A" = c("1", "2"))
-
-  err1 <- expect_error(
-    cameraPR.matrix(statistic, index1)
-  )$message
-
-  expect_identical(
-    err1,
-    "No genes in `index` match rownames of `statistic` matrix."
-  )
-})
-
-
 test_that("min.size is valid", {
   index1 <- list("A" = rownames(statistic)[1:400],
                  "B" = rownames(statistic)[1:100])

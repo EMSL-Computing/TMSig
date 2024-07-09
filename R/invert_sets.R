@@ -30,15 +30,7 @@
 #' invert_sets(yc)
 
 invert_sets <- function(x) {
-  ## Parsimonious approach (slower):
-  # imat <- incidence(x)
-  # imat <- t(imat)
-  #
-  # y <- incidence_to_list(imat)
-
   dt <- .prepare_sets(x)
 
-  y <- split(x = dt[["sets"]], f = dt[["elements"]])
-
-  return(y)
+  split(x = dt[["sets"]], f = dt[["elements"]])
 }

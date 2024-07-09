@@ -20,11 +20,14 @@ test_that("sets must be a named list", {
 })
 
 
-test_that("an error is thrown if all sets are empty", {
-  expect_error(
-    filter_sets(list("A" = c())),
-    "All sets in `x` are empty."
-  )
+test_that("an error is thrown if all sets are empty or only contain NA", {
+  err1 <- expect_error(
+    filter_sets(list("A" = character(0L),
+                     "B" = NA_character_))
+  )$message
+
+  expect_identical(err1,
+                   "All sets in `x` are empty or only contain missing values.")
 })
 
 
@@ -45,7 +48,7 @@ test_that("min_size and max_size must each be a single integer", {
 test_that("sets must be non-NA character vectors", {
 
   expect_error(
-    filter_sets(list("A" = NA_character_)),
+    filter_sets(list("A" = NA_character_, "B" = c())),
     "All sets in `x` are empty or only contain missing values."
   )
 
@@ -118,22 +121,6 @@ test_that("duplicates and NA values are removed from the sets", {
 
   expect_identical(out,
                    list("A" = c("a", "b", "c")))
-})
-
-
-# test_that("background must be a character vector", {
-#   expect_error(
-#     filter_sets(x, background = list()),
-#     "`background` must be a character vector."
-#   )
-# })
-
-
-test_that("background must contain at least 2 elements", {
-  expect_error(
-    filter_sets(x, background = c("a", "a", NA)),
-    "`background` must contain at least 2 unique, nonmissing elements."
-  )
 })
 
 

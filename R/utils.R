@@ -18,24 +18,28 @@
   sets <- rep(names(x), lengths(x))
 
   # All genes (may include duplicates from the same set)
-  elements <- unlist(x, use.names = FALSE)
+  elements <- unlist(x, recursive = FALSE, use.names = FALSE)
 
-  # Remove missing elements and check type
-  keep <- !is.na(elements)
-  elements <- elements[keep]
-
-  if (length(elements) == 0L)
-    stop("All sets in `x` are empty or only contain missing values.")
-
-  if (!is.character(elements))
+  if (!is.vector(elements, mode = "character"))
     stop("`x` must be a named list of character vectors.")
 
-  sets <- sets[keep]
+  # Remove missing elements and check type
+  keep <- which(!is.na(elements))
 
-  dt <- data.table("sets" = sets,
-                   "elements" = elements,
+  if (length(keep) == 0L)
+    stop("All sets in `x` are empty or only contain missing values.")
+
+  if (length(keep) != length(elements)) {
+    elements <- elements[keep]
+    sets <- sets[keep]
+  }
+
+  dt <- data.table(sets = sets,
+                   elements = elements,
                    stringsAsFactors = FALSE)
-  dt <- unique(dt) # remove duplicates
+
+  # Remove duplicate set-element pairs
+  dt <- unique(dt)
 
   return(dt)
 }

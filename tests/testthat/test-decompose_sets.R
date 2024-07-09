@@ -3,7 +3,7 @@ test_that("x must contain at least 2 sets", {
 
   expect_error(
     decompose_sets(x, overlap = 2L),
-    "`x` must contain 2 or more sets."
+    "Fewer than 2 sets with at least `overlap` elements."
   )
 })
 
@@ -24,12 +24,12 @@ test_that("overlap must be a length 1 integer", {
 
 
 test_that("at least one pair must have overlap elements in common", {
-  x <- list("A" = c("a", "b"), "B" = c("b", "c"))
+  x <- list("A" = c("a", "b"),
+            "B" = c("b", "c"))
 
   expect_error(
     decompose_sets(x, overlap = 2L),
-    paste0("No pairs of sets in `x` have at least `overlap` ",
-           "elements in common.")
+    "Fewer than 2 sets with at least `overlap` elements in common."
   )
 })
 

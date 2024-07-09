@@ -73,7 +73,8 @@ x <- list("A" = c("a", "b", "c", "d", "e"),
 \references{
 Jaccard, P. (1912). The distribution of the flora in the alpine
 zone. \emph{The New Phytologist, 11}(2), 37–50.
-doi:\href{https://doi.org/10.1111/j.1469-8137.1912.tb05611.x}{10.1111/j.1469-8137.1912.tb05611.x}.
+doi:\href{https://doi.org/10.1111/j.1469-8137.1912.tb05611.x
+}{10.1111/j.1469-8137.1912.tb05611.x}.
 \url{https://www.jstor.org/stable/2427226}
 
 Ōtsuka, Y. (1936). The faunal character of the Japanese Pleistocene marine

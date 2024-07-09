@@ -9,12 +9,13 @@ filter_sets(x, background, min_size = 5L, max_size = Inf)
 \arguments{
 \item{x}{a named list of sets. Elements must be of type \code{"character"}.}
 
-\item{background}{character; optional vector of at least 2 elements. \code{x}
-will be filtered to only those elements of \code{background}.}
+\item{background}{character; optional character vector. \code{x} will be
+filtered to only those elements of \code{background}. If \code{background}
+is any other atomic vector, it will be coerced to type \code{character}.}
 
-\item{min_size}{integer (\eqn{\geq 2}); the minimum allowable set size.}
+\item{min_size}{integer (\eqn{\geq 1}); the minimum allowable set size.}
 
-\item{max_size}{integer (\eqn{\geq 2}); the maximum allowable set size.}
+\item{max_size}{integer (\eqn{\geq 1}); the maximum allowable set size.}
 }
 \value{
 A named list of sets at most the same size as \code{x}.
@@ -24,12 +25,6 @@ Given a named list of sets, filter to those that contain at
 least \code{min_size} and no more than \code{max_size} elements. The sets
 are optionally restricted to elements of \code{background} before filtering
 by size.
-}
-\details{
-Elements of \code{background} will be coerced to type \code{character}.
-
-If either \code{min_size} or \code{max_size} are less than 2, they will be
-set to 2.
 }
 \examples{
 x <- list("A" = c("a", "b", "c"),

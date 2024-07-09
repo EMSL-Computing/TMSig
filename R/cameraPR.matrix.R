@@ -72,13 +72,13 @@
 #'
 #' @references Wu, D., and Smyth, G. K. (2012). Camera: a competitive gene set
 #'   test accounting for inter-gene correlation. \emph{Nucleic Acids Research}
-#'   40, e133.
-#'   doi:\href{https://doi.org/10.1093/nar/gks461}{10.1093/nar/gks461}.
+#'   40, e133. doi:\href{https://doi.org/10.1093/nar/gks461
+#'   }{10.1093/nar/gks461}.
 #'
 #'   Goeman, J. J., and Bühlmann, P. (2007). Analyzing gene expression data in
 #'   terms of gene sets: methodological issues. \emph{Bioinformatics} 23,
-#'   980-987.
-#'   doi:\href{https://doi.org/10.1093/bioinformatics/btm051}{10.1093/bioinformatics/btm051}.
+#'   980-987. doi:\href{https://doi.org/10.1093/bioinformatics/btm051
+#'   }{10.1093/bioinformatics/btm051}.
 #'
 #' @author Di Wu, Gordon Smyth, and Tyler Sagendorf
 #'
@@ -153,25 +153,18 @@ cameraPR.matrix <- function(statistic,
   if (length(dots))
     warning("Extra arguments disregarded: ", sQuote(dots))
 
-  # isTRUE catches NA_real_
-  if (isTRUE(!is.vector(min.size, mode = "numeric") ||
-             length(min.size) != 1L))
-    stop("`min.size` must be a single integer.")
-
-  min.size <- max(2L, min.size)
-
   # Alternative hypothesis
   alternative <- match.arg(alternative,
                            choices = c("two.sided", "less", "greater"))
 
-  genes <- rownames(statistic)
+  background <- rownames(statistic)
   contrast_names <- colnames(statistic)
   ncontrasts <- length(contrast_names)
 
-  if (!all(is.numeric(statistic)))
+  if (any(!is.numeric(statistic)))
     stop("`statistic` must be a numeric matrix.")
 
-  if (is.null(genes) | is.null(contrast_names))
+  if (is.null(background) | is.null(contrast_names))
     stop("`statistic` matrix must have row and column names.")
 
   # Number of non-NA statistics (number of genes) in each contrast
@@ -180,41 +173,27 @@ cameraPR.matrix <- function(statistic,
   if (any(G < 3L))
     stop("Each column of `statistic` must have at least 3 nonmissing values.")
 
+  min.size <- max(2L, min.size)
+
   if (any(min.size >= G))
     stop("`min.size` must be smaller than the number of non-missing values ",
          "in each contrast column of the `statistic` matrix.")
 
-  # data.table with columns "sets" and "elements"
-  dt <- .prepare_sets(index) # this also validates index
-  dt <- subset(dt, subset = elements %in% genes) # restrict sets to background
+  # Restrict each set to only those elements in the `statistic` matrix
+  index <- filter_sets(x = index,
+                       background = background,
+                       min_size = min.size,
+                       max_size = length(background) - 1L)
 
-  if (nrow(dt) == 0L)
-    stop("No genes in `index` match rownames of `statistic` matrix.")
-
-  # Include genes from statistic matrix that are not members of any set
-  other_genes <- setdiff(genes, dt$elements)
-
-  if (length(other_genes)) {
-    dt <- rbind(dt,
-                data.table(sets = rep("GENES_NOT_IN_SETS",
-                                      length(other_genes)),
-                           elements = other_genes,
-                           stringsAsFactors = FALSE))
-    # Preserve order when splitting (affects final results if sort = FALSE)
-    dt[, sets := factor(sets, levels = unique(sets))]
-
-    index <- split(x = dt$elements, f = dt$sets)
-  }
-
-  ## Sparse incidence matrix
+  # Sparse incidence matrix
   imat <- incidence(index)
-  # Remove row containing genes not in any set (keeps those extra genes)
-  imat <- imat[rownames(imat) != "GENES_NOT_IN_SETS", genes, drop = FALSE]
 
+  genes_in_sets <- colnames(imat)
   all_set_names <- rownames(imat)
   nsets <- length(all_set_names)
 
-  m <- as.matrix(imat %*% !is.na(statistic)) # number of genes in each set
+  # Number of genes in each set
+  m <- as.matrix(imat %*% !is.na(statistic[genes_in_sets, , drop = FALSE]))
   storage.mode(m) <- "integer"
 
   # Identify sets that are too small or too large in at least one contrast
@@ -230,6 +209,7 @@ cameraPR.matrix <- function(statistic,
     m <- m[-extreme_sets, , drop = FALSE]
     imat <- imat[-extreme_sets, , drop = FALSE]
 
+    genes_in_sets <- colnames(imat)
     all_set_names <- rownames(imat)
     nsets <- length(all_set_names)
   }
@@ -262,11 +242,12 @@ cameraPR.matrix <- function(statistic,
 
     # Matrix of ranks of statistics by contrast. May include NA's
     rank_mat <- apply(statistic, 2, function(ci) frank(ci, na.last = "keep"))
+    rownames(rank_mat) <- background # apply removes rownames
     rank_mat[is.na(rank_mat)] <- 0L # avoid propagating NA's in the sum
 
-    sumRanksInSet <- as.matrix(imat %*% rank_mat)
+    sumRanksInSet <- as.matrix(imat %*% rank_mat[genes_in_sets, , drop = FALSE])
     m_prod <- m * m2 # used several times
-    U <- m_prod + m * (m + 1L) / 2 - sumRanksInSet
+    U <- m_prod + m * (m + 1L) / 2L - sumRanksInSet
     mu <- 0.5 * m_prod
 
     sigma2 <- asin(1) +
@@ -277,7 +258,6 @@ cameraPR.matrix <- function(statistic,
     # Different calculation for sigma2 if the correlation is zero
     zero.cor.idx <- which(inter.gene.cor == 0)
     if (length(zero.cor.idx)) {
-
       sigma2.zero.cor <- t(t(m_prod) / 12 * (G + 1L))
 
       # If inter.gene.cor is 0 and scalar, update all sigma2
@@ -318,7 +298,7 @@ cameraPR.matrix <- function(statistic,
 
     # imat %*% statistic results in the sum of statistics in each set, so divide
     # by m (set size) to get the mean
-    meanStatInSet <- as.matrix(imat %*% statistic / m)
+    meanStatInSet <- as.matrix(imat %*% statistic[genes_in_sets, ] / m)
 
     # Difference between the means of statistics in a set and not in a set
     delta <- t(G / t(m2) * (t(meanStatInSet) - meanStat))

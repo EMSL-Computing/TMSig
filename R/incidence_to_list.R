@@ -31,14 +31,13 @@ incidence_to_list <- function(incidence) {
   idx <- which(incidence == 1, arr.ind = TRUE, useNames = FALSE)
 
   # Convert indices to names of sets and elements
-  dt <- data.table(sets = rownames(incidence)[idx[, 1L]],
-                   elements = colnames(incidence)[idx[, 2L]],
-                   stringsAsFactors = FALSE)
+  elements <- colnames(incidence)[idx[, 2L]]
+  sets <- rownames(incidence)[idx[, 1L]]
 
   # Convert to factor to prevent ordering by set name when splitting
-  dt[, sets := factor(sets, levels = unique(sets))]
+  sets <- factor(sets, levels = unique(sets))
 
-  x <- split(x = dt[["elements"]], f = dt[["sets"]])
+  x <- split(x = elements, f = sets)
 
   return(x)
 }
