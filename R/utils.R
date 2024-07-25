@@ -71,11 +71,12 @@
 .layer_fun <- function(j, i, x, y, w, h, f) {
   # Cell background
   grid.rect(x = x, y = y, width = w, height = h,
-            gp = gpar(col = NA,
+            gp = gpar(col = heatmap_args$rect_gp$col,
                       fill = ifelse(
                         pindex(padj_mat, i, j) < padj_cutoff, padj_fill,
                         ifelse(is.na(pindex(padj_mat, i, j)),
-                               NA_character_, "white")
+                               heatmap_args$na_col, # black, default
+                               heatmap_args$rect_gp$fill) # white, default
                       )
             ))
 

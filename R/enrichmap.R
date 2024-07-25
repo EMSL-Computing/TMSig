@@ -217,6 +217,16 @@ enrichmap <- function(x,
                               val = heatmap_args,
                               keep.null = TRUE)
 
+  # Default rect_gp
+  if (is.null(heatmap_args[["rect_gp"]]))
+    heatmap_args[["rect_gp"]] <- gpar(col = NA, fill = "white")
+
+  if (is.null(heatmap_args[["rect_gp"]][["col"]]))
+    heatmap_args[["rect_gp"]][["col"]] <- NA
+
+  if (is.null(heatmap_args[["rect_gp"]][["fill"]]))
+    heatmap_args[["rect_gp"]][["fill"]] <- "white"
+
   # If row or column labels were updated, use the new values to calculate max
   # text width and height to avoid overlapping elements or unnecessary spacing
   heatmap_args[["row_names_max_width"]] <-
@@ -225,15 +235,12 @@ enrichmap <- function(x,
   heatmap_args[["column_names_max_height"]] <-
     max_text_width(heatmap_args[["column_labels"]])
 
-  # Mark missing values
-  heatmap_args$rect_gp <- gpar(col = NA, fill = heatmap_args$na_col)
-
   # Color function for circles and statistic legend
   col_fun <- heatmap_args$col
 
   # If layer_fun is specified, set the environment to be the environment of
   # enrichmap. This allows it to access all objects created before this point.
-  if (!is.null(heatmap_args$layer_fun))
+  if (!is.null(heatmap_args[["layer_fun"]]))
     environment(heatmap_args$layer_fun) <- environment()
 
   # Create heatmap

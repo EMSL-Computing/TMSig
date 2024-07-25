@@ -1,4 +1,4 @@
-# TMSig DEV (2024-07-24)
+# TMSig DEV (2024-07-25)
 
 **MINOR CHANGES**
 
@@ -9,6 +9,7 @@
 
 - Added Bioconductor packages to Remotes field of DESCRIPTION.
 - `cameraPR.matrix`: fixed integer overflow that could occur when testing very large sets with `use.ranks=TRUE`.
+- `enrichmap`: heatmap rectangle fill and border color can now be changed via the `heatmap_args` parameter.
 
 
 # TMSig 1.1.1 (2024-07-02)
