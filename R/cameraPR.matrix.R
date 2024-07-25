@@ -194,7 +194,6 @@ cameraPR.matrix <- function(statistic,
 
   # Number of genes in each set
   m <- as.matrix(imat %*% !is.na(statistic[genes_in_sets, , drop = FALSE]))
-  storage.mode(m) <- "integer"
 
   # Identify sets that are too small or too large in at least one contrast
   extreme_sets <- which(apply(m, 1, function(mi) any(mi < min.size | mi == G)))
@@ -221,17 +220,14 @@ cameraPR.matrix <- function(statistic,
   if (any(abs(inter.gene.cor) >= 1))
     stop("`inter.gene.cor` must be between -1 and 1.")
 
-  if (length(inter.gene.cor) > 1L) {
+  fixed.cor <- length(inter.gene.cor) == 1L
+  if (!fixed.cor) {
     inter.gene.cor <- inter.gene.cor[all_set_names]
 
     if (anyNA(inter.gene.cor))
       stop("Length of `inter.gene.cor` must be 1 or the same length as ",
            "index. If the latter, names of `inter.gene.cor` should match ",
            "names of `index`.")
-
-    fixed.cor <- FALSE
-  } else {
-    fixed.cor <- TRUE
   }
 
   # Number of genes not in each set
@@ -253,7 +249,7 @@ cameraPR.matrix <- function(statistic,
     sigma2 <- asin(1) +
       (m2 - 1L) * (asin(0.5) + (m - 1L) * asin(inter.gene.cor / 2)) +
       (m - 1L) * asin((inter.gene.cor + 1) / 2)
-    sigma2 <- sigma2 * m_prod / 2 / pi
+    sigma2 <- sigma2 / 2 / pi * m_prod
 
     # Different calculation for sigma2 if the correlation is zero
     zero.cor.idx <- which(inter.gene.cor == 0)
@@ -261,10 +257,11 @@ cameraPR.matrix <- function(statistic,
       sigma2.zero.cor <- t(t(m_prod) / 12 * (G + 1L))
 
       # If inter.gene.cor is 0 and scalar, update all sigma2
-      if (length(inter.gene.cor) == 1L) {
+      if (fixed.cor) {
         sigma2 <- sigma2.zero.cor
       } else {
-        sigma2[zero.cor.idx, ] <- sigma2.zero.cor[zero.cor.idx, ]
+        sigma2[zero.cor.idx, , drop = FALSE] <-
+          sigma2.zero.cor[zero.cor.idx, , drop = FALSE]
       }
     }
 
@@ -273,7 +270,7 @@ cameraPR.matrix <- function(statistic,
       NTIES <- table(r[r != 0]) # remove 0's (formerly NA's)
       sum(NTIES * (NTIES + 1L) * (NTIES - 1L)) # 0, if there are no ties
     })
-    adjustment <- t(adjustment / t(m * (m + 1L) * (m - 1L)))
+    adjustment <- t(adjustment / t(m) / t(m + 1L) / t(m - 1L))
     sigma2 <- sigma2 * (1 - adjustment)
 
     # Two-sample z-statistics

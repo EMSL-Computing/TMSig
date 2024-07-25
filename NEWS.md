@@ -1,4 +1,4 @@
-# TMSig DEV (2024-07-10)
+# TMSig DEV (2024-07-24)
 
 **MINOR CHANGES**
 
@@ -8,6 +8,7 @@
 **BUG FIXES**
 
 - Added Bioconductor packages to Remotes field of DESCRIPTION.
+- `cameraPR.matrix`: fixed integer overflow that could occur when testing very large sets with `use.ranks=TRUE`.
 
 
 # TMSig 1.1.1 (2024-07-02)
