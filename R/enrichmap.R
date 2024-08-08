@@ -1,7 +1,8 @@
 #' @title Set Enrichment Bubble Heatmap
 #'
 #' @description Create a bubble heatmap summarizing molecular signature analysis
-#'   results, such as those from \code{\link{cameraPR.matrix}}.
+#'   results, such as those from \code{\link{cameraPR.matrix}}. May also be used
+#'   to generate bubble heatmaps of differential analysis results.
 #'
 #' @param x an object that can be coerced to a \code{data.table} with columns
 #'   \code{contrast_column}, \code{set_column}, \code{statistic_column}, and
@@ -72,15 +73,45 @@
 #'
 #' @importFrom circlize colorRamp2
 #' @importFrom ComplexHeatmap max_text_width Heatmap Legend draw
-#' @importFrom data.table as.data.table `:=` `.N` setorderv dcast
 #' @importFrom grDevices dev.off
-#' @importFrom grid gpar unit
+#' @importFrom grid gpar unit is.unit
 #' @importFrom stats median
 #' @importFrom utils modifyList
 #'
 #' @export enrichmap
 #'
 #' @seealso \code{\link[ComplexHeatmap]{ComplexHeatmap-package}}
+#'
+#' @examples
+#' ## Simulate results of cameraPR.matrix
+#' set.seed(1)
+#' df <- 5000L
+#' x <- data.frame(
+#'     Contrast = rep(paste("Contrast", 1:3), each = 4),
+#'     GeneSet = rep(paste("GeneSet", 1:4), times = 3),
+#'     TwoSampleT = 5 * rt(n = 12L, df = df)
+#' )
+#'
+#' # Calculate z-statistics, two-sided p-values, and BH adjusted p-values
+#' x$ZScore <- limma::zscoreT(x = x$TwoSampleT, df = df)
+#' x$PValue <- 2 * pnorm(abs(x$ZScore), lower.tail = FALSE)
+#' x$FDR <- p.adjust(x$PValue, method = "BH")
+#'
+#' ## Plot results
+#' # Same as enrichmap(x, statistic_column = "ZScore")
+#' enrichmap(x = x,
+#'           set_column = "GeneSet",
+#'           statistic_column = "ZScore",
+#'           contrast_column = "Contrast",
+#'           padj_column = "FDR",
+#'           padj_cutoff = 0.05)
+#'
+#' # Include gene sets with adjusted p-values above padj_cutoff (0.05). Also
+#' # update adjusted p-value legend title.
+#' enrichmap(x = x,
+#'           statistic_column = "ZScore",
+#'           plot_sig_only = FALSE,
+#'           padj_legend_title = "BH Adjusted\nP-Value")
 
 enrichmap <- function(x,
                       n_top = 15L,
@@ -108,101 +139,46 @@ enrichmap <- function(x,
                       save_args = list(),
                       draw_args = list())
 {
-  # Check padj_cutoff
-  if (padj_cutoff < 0 | padj_cutoff > 1)
-    stop("`padj_cutoff` must be between 0 and 1.")
+  scale_by <- match.arg(scale_by,
+                        choices = c("row", "column", "max"))
 
-  scale_by <- match.arg(scale_by, scale_by)
+  # Create statistic_mat, padj_mat
+  ls <- .enrichmap_prepare_x(
+    x = x,
+    n_top = n_top,
+    set_column = set_column,
+    statistic_column = statistic_column,
+    contrast_column = contrast_column,
+    padj_column = padj_column,
+    padj_aggregate_fun = padj_aggregate_fun,
+    padj_cutoff = padj_cutoff,
+    plot_sig_only = plot_sig_only
+  )
 
-  # n_top does not strictly have to be an integer, since it will be rounded
-  if (!is.numeric(n_top))
-    stop("`n_top` must be an integer.")
-
-  n_top <- max(round(n_top), 1L)
-
-  # Required columns
-  cols_to_keep <- c(set_column, padj_column,
-                    statistic_column, contrast_column)
-
-  # Check that all required columns are present
-  col_present <- cols_to_keep %in% colnames(x)
-  if (any(!col_present)) {
-    missing_cols <- cols_to_keep[!col_present]
-    stop(sprintf("Missing columns: %s", paste(missing_cols, collapse = ", ")))
-  }
-
-  x <- as.data.table(x)
-
-  # Identify sets that are significant in at least 1 contrast
-  x[, `:=`(any_sig = any(get(padj_column) < padj_cutoff)),
-    by = set_column]
-
-  # Filter to significant sets for plotting
-  if (plot_sig_only)
-    x <- subset(x, subset = any_sig == TRUE)
-
-  if (nrow(x) == 0L)
-    stop("No terms are significant at `padj_cutoff`. ",
-         "Consider setting plot_sig_only=FALSE.")
-
-  # Select n_top most significant terms
-  x[, `:=`(criteria = padj_aggregate_fun(get(padj_column))),
-    by = set_column]
-
-  setorderv(x,
-            cols = c(contrast_column, "criteria"),
-            order = c(1, -1))
-
-  # Avoid using utils::head - conflicts with Matrix::head
-  top_pathways <- unique(x[, get(set_column)])
-  top_pathways <- top_pathways[seq_len(min(n_top, length(top_pathways)))]
-
-  x <- subset(x, get(set_column) %in% top_pathways)
-
-  x <- unique(x[, cols_to_keep, with = FALSE]) # remove unnecessary columns
-
-  # All n should be 1 if there are no duplicates
-  n <- x[, .N, by = c(contrast_column, set_column)][["N"]]
-
-  # Multiple set_column entries per contrast
-  if (any(n != 1L))
-    stop("set_column=", sQuote(set_column),
-         " is not uniquely defined for each contrast.")
-
-  # Reshape data to wide format and convert to a matrix
-  x <- dcast(x,
-             formula = get(set_column) ~ get(contrast_column),
-             value.var = c(statistic_column, padj_column),
-             fill = NA)
-  x <- as.matrix(x, rownames = 1)
-
-  # Matrices of adjusted p-values and set statistics
-  padj_mat <- x[, grepl(paste0("^", padj_column), colnames(x)),
-                drop = FALSE]
-  statistic_mat <- x[, grepl(paste0("^", statistic_column), colnames(x)),
-                     drop = FALSE]
-
-  colnames(padj_mat) <- colnames(statistic_mat) <- contrasts <-
-    sub(paste0("^", padj_column, "_"), "", colnames(padj_mat))
+  statistic_mat <- ls[["statistic_mat"]]
+  padj_mat <- ls[["padj_mat"]]
 
   colorRamp2_args <- heatmap_color_fun(statistic_mat, colors)
 
-  # Create heatmap -------------------------------------------------------------
+  ## Create heatmap ------------------------------------------------------------
+  if (!is.unit(cell_size))
+    stop("`cell_size` must be a unit object.")
+
   # Arguments that will be passed to ComplexHeatmap::Heatmap
   base_heatmap_args <- list(
     matrix = statistic_mat,
     col = do.call(what = circlize::colorRamp2,
                   args = colorRamp2_args),
+    name = statistic_column,
     heatmap_legend_param = list(
-      title = statistic_column,
       at = colorRamp2_args$breaks,
       border = "black",
       legend_height = max(cell_size * 5, unit(21.1, "mm")),
       grid_width = max(cell_size, unit(4, "mm"))
     ),
     border = TRUE,
-    row_labels = rownames(x),
-    column_labels = contrasts,
+    row_labels = rownames(statistic_mat),
+    column_labels = colnames(statistic_mat),
     cluster_columns = FALSE,
     clustering_distance_rows = "euclidean",
     clustering_method_rows = ifelse(anyNA(x), "average", "complete"),
@@ -235,11 +211,10 @@ enrichmap <- function(x,
   heatmap_args[["column_names_max_height"]] <-
     max_text_width(heatmap_args[["column_labels"]])
 
-  # Color function for circles and statistic legend
+  # Color function for bubbles and statistic legend (used by .layer_fun)
   col_fun <- heatmap_args$col
 
-  # If layer_fun is specified, set the environment to be the environment of
-  # enrichmap. This allows it to access all objects created before this point.
+  # Allow layer_fun to access all objects created before this point.
   if (!is.null(heatmap_args[["layer_fun"]]))
     environment(heatmap_args$layer_fun) <- environment()
 
@@ -247,11 +222,10 @@ enrichmap <- function(x,
   ht <- do.call(what = Heatmap, args = heatmap_args)
 
   # Legend for background fill ----
-  # base args
-  lt_args <- list(
+  base_lt_args <- list(
     title = padj_legend_title,
     at = 1:2,
-    labels = paste(c("<", "\u2265"), padj_cutoff),
+    labels = paste(c("<", "\u2265"), padj_cutoff), # \u2265 = ">="
     legend_gp = gpar(fill = c(padj_fill, "white")),
     grid_height = heatmap_args$heatmap_legend_param$grid_width,
     grid_width = heatmap_args$heatmap_legend_param$grid_width,
@@ -259,12 +233,12 @@ enrichmap <- function(x,
     nrow = 2,
     direction = "horizontal"
   )
-  lt_args <- modifyList(x = lt_args, val = padj_args, keep.null = TRUE)
+  lt_args <- modifyList(x = base_lt_args, val = padj_args, keep.null = TRUE)
 
   lt <- do.call(what = Legend, args = lt_args)
 
   if (!missing(filename)) {
-    on.exit(dev.off())
+    on.exit(dev.off()) # close the device after writing the heatmap to a file
 
     base_save_args <- list(filename = filename,
                            height = height, width = width,
@@ -284,7 +258,8 @@ enrichmap <- function(x,
              legend_gap = unit(0.15, "in"),
              align_heatmap_legend = "heatmap_top",
              align_annotation_legend = "heatmap_top"),
-    val = draw_args, keep.null = TRUE
+    val = draw_args,
+    keep.null = TRUE
   )
 
   do.call(what = draw, args = draw_args)

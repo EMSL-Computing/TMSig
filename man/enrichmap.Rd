@@ -125,7 +125,39 @@ Nothing. Displays heatmap or saves the heatmap to a file (if
 }
 \description{
 Create a bubble heatmap summarizing molecular signature analysis
-results, such as those from \code{\link{cameraPR.matrix}}.
+results, such as those from \code{\link{cameraPR.matrix}}. May also be used
+to generate bubble heatmaps of differential analysis results.
+}
+\examples{
+## Simulate results of cameraPR.matrix
+set.seed(1)
+df <- 5000L
+x <- data.frame(
+    Contrast = rep(paste("Contrast", 1:3), each = 4),
+    GeneSet = rep(paste("GeneSet", 1:4), times = 3),
+    TwoSampleT = 5 * rt(n = 12L, df = df)
+)
+
+# Calculate z-statistics, two-sided p-values, and BH adjusted p-values
+x$ZScore <- limma::zscoreT(x = x$TwoSampleT, df = df)
+x$PValue <- 2 * pnorm(abs(x$ZScore), lower.tail = FALSE)
+x$FDR <- p.adjust(x$PValue, method = "BH")
+
+## Plot results
+# Same as enrichmap(x, statistic_column = "ZScore")
+enrichmap(x = x,
+          set_column = "GeneSet",
+          statistic_column = "ZScore",
+          contrast_column = "Contrast",
+          padj_column = "FDR",
+          padj_cutoff = 0.05)
+
+# Include gene sets with adjusted p-values above padj_cutoff (0.05). Also
+# update adjusted p-value legend title.
+enrichmap(x = x,
+          statistic_column = "ZScore",
+          plot_sig_only = FALSE,
+          padj_legend_title = "BH Adjusted\nP-Value")
 }
 \seealso{
 \code{\link[ComplexHeatmap]{ComplexHeatmap-package}}
