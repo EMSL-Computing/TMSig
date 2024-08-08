@@ -29,7 +29,7 @@ test_that("at least one pair must have overlap elements in common", {
 
   expect_error(
     decompose_sets(x, overlap = 2L),
-    "Fewer than 2 sets with at least `overlap` elements in common."
+    "No pairs of sets with at least `overlap` elements in common."
   )
 })
 
@@ -42,14 +42,14 @@ test_that("sets are properly decomposed", {
 
   object <- decompose_sets(x, overlap = 2L)
 
-  expected <- list("A NOT B" = "a",
-                   "B NOT A" = c("d", "e"),
-                   "A AND B" = c("b", "c"),
-                   "A NOT C" = "a",
-                   "C NOT A" = "d",
-                   "A AND C" = c("b", "c"),
-                   "B NOT C" = "e",
-                   "B AND C" = c("b", "c", "d"))
+  expected <- list("B ~NOT~ A" = c("d", "e"),
+                   "A ~NOT~ B" = "a",
+                   "A ~AND~ B" = c("b", "c"),
+                   "C ~NOT~ A" = "d",
+                   "A ~NOT~ C" = "a",
+                   "A ~AND~ C" = c("b", "c"),
+                   "B ~NOT~ C" = "e",
+                   "B ~AND~ C" = c("b", "c", "d"))
 
   expect_identical(object, expected)
 })

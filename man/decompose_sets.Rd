@@ -20,13 +20,23 @@ original results. (The same logic can be applied for set 2.)}
 }
 }
 \usage{
-decompose_sets(x, overlap = 1L)
+decompose_sets(x, overlap = 1L, AND = "~AND~", NOT = "~NOT~", verbose = TRUE)
 }
 \arguments{
 \item{x}{a named list of sets. Elements must be of type \code{"character"}.}
 
 \item{overlap}{integer; only pairs of sets with at least \code{overlap}
 elements in common will be decomposed.}
+
+\item{AND}{character; string used to denote the intersection of two sets.
+Defaut is "~AND~", which produces intersections of the form "A ~AND~ B"
+(i.e., elements in both A and B).}
+
+\item{NOT}{character; string used to denote the difference of two sets.
+Defualt is "~NOT~", which produces differences of the form "A ~NOT~ B"
+(i.e., elements in A and not in B).}
+
+\item{verbose}{logical; whether to print warnings and messages.}
 }
 \value{
 A named list of disjoint parts of sets. May contain aliases.

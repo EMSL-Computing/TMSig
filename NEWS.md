@@ -1,4 +1,9 @@
-# TMSig DEV (2024-07-25)
+# TMSig DEV (2024-08-08)
+
+**SIGNIFICANT USER-VISIBLE CHANGES**
+
+- `enrichmap`: heatmap rectangle fill and border color can now be changed via the `heatmap_args` parameter.
+- `decompose_sets`: added arguments `AND`, `NOT`, and `verbose`. Reduced computation time.
 
 **MINOR CHANGES**
 
@@ -9,7 +14,6 @@
 
 - Added Bioconductor packages to Remotes field of DESCRIPTION.
 - `cameraPR.matrix`: fixed integer overflow that could occur when testing very large sets with `use.ranks=TRUE`.
-- `enrichmap`: heatmap rectangle fill and border color can now be changed via the `heatmap_args` parameter.
 
 
 # TMSig 1.1.1 (2024-07-02)
@@ -21,7 +25,7 @@
 
 # TMSig 1.1.0 (2024-06-26)
 
-**NEW FEATURES**
+**SIGNIFICANT USER-VISIBLE CHANGES**
 
 - `cameraPR.matrix`: added `alternative` parameter to allow users to perform one-sided tests. A warning will be issued if attempting to use a one-sided test with the parametric version of CAMERA-PR, as this is generally not recommended.
 - `cameraPR.matrix`: added `min.size` parameter to allow users to specify a minimum set size for testing.
@@ -38,7 +42,7 @@
 
 # TMSig 1.0.0 (2024-05-06)
 
-**BREAKING CHANGES**
+**SIGNIFICANT USER-VISIBLE CHANGES**
 
 - Rename package from ostRich to TMSig: Tools for Molecular Signatures.
 - Rename `prepare_gene_sets` vignette to `GO_analysis`. Add example code for `cameraPR.matrix`.
