@@ -3,7 +3,7 @@
 **SIGNIFICANT USER-VISIBLE CHANGES**
 
 - `enrichmap`: heatmap rectangle fill and border color can now be changed via the `heatmap_args` parameter. Color legend title can now be changed via `heatmap_args = list(name = "new title")` instead of `heatmap_args = list(heatmap_legend_param = list(title = "new title"))`. Added examples to documentation.
-- `decompose_sets`: added arguments `AND`, `NOT`, and `verbose`. Reduced computation time.
+- `decompose_sets`: added arguments `AND`, `MINUS`, and `verbose`. Reduced computation time.
 
 **MINOR CHANGES**
 

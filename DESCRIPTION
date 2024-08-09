@@ -1,8 +1,8 @@
 Package: TMSig
 Type: Package
 Title: Tools for Molecular Signatures
-Version: 1.1.1.9006
-Date: 2024-08-08
+Version: 1.1.1.9007
+Date: 2024-08-09
 Authors@R: 
     c(
       person(given = "Tyler", family = "Sagendorf", 
@@ -15,6 +15,7 @@ Authors@R:
 Description: Tools to prepare and analyze lists of a priori molecular 
     signatures, such as gene sets.
 License: GPL (>= 3)
+URL: https://github.com/EMSL-Computing/TMSig
 Bugreports: https://github.com/EMSL-Computing/TMSig/issues
 Encoding: UTF-8
 RoxygenNote: 7.3.2
@@ -34,10 +35,12 @@ Imports:
     stats,
     utils
 Suggests: 
+    BiocStyle,
     knitr,
     rmarkdown,
     testthat (>= 3.0.0)
 Remotes:
+    bioc::release/BiocStyle,
     bioc::release/ComplexHeatmap,
     bioc::release/limma
 Config/testthat/edition: 3

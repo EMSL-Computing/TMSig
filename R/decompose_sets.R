@@ -13,8 +13,8 @@
 #' @param AND character; string used to denote the intersection of two sets.
 #'   Defaut is "~AND~", which produces intersections of the form "A ~AND~ B"
 #'   (i.e., elements in both A and B).
-#' @param NOT character; string used to denote the difference of two sets.
-#'   Defualt is "~NOT~", which produces differences of the form "A ~NOT~ B"
+#' @param MINUS character; string used to denote the difference of two sets.
+#'   Defualt is "~MINUS~", which produces differences of the form "A ~MINUS~ B"
 #'   (i.e., elements in A and not in B).
 #' @param verbose logical; whether to print warnings and messages.
 #'
@@ -67,16 +67,16 @@
 decompose_sets <- function(x,
                            overlap = 1L,
                            AND = "~AND~",
-                           NOT = "~NOT~",
+                           MINUS = "~MINUS~",
                            verbose = TRUE)
 {
   lifecycle::signal_stage("experimental", "decompose_sets()")
 
-  if (!is.character(AND) || !is.character(NOT))
-    stop("`AND` and `NOT` must be character strings.")
+  if (!is.character(AND) || !is.character(MINUS))
+    stop("`AND` and `MINUS` must be character strings.")
 
   AND <- paste0(AND, " ") # include trailing space for later
-  NOT <- paste0(NOT, " ")
+  MINUS <- paste0(MINUS, " ")
 
   if (!is.vector(overlap, mode = "numeric") ||
       isTRUE(is.infinite(overlap)) ||
@@ -119,7 +119,7 @@ decompose_sets <- function(x,
   outcomes <- rep(list(0:1), 2L) # 1 = in set; 0 = not in set
   outcomes <- expand.grid(outcomes)
   outcomes <- as.matrix(outcomes)[-1, ] # convert to matrix, remove null set
-  outcomes <- ifelse(outcomes, AND, NOT)
+  outcomes <- ifelse(outcomes, AND, MINUS)
 
   # Coefficients used to convert each disjoint component from binary to int.
   coefs <- matrix(seq_len(2L), nrow = 1L) # matrix: 2, 1
@@ -139,9 +139,9 @@ decompose_sets <- function(x,
     decomp_i <- split(x = elements_i, f = i_vec)
 
     ## For a pair of sets A and B, define names of disjoint components:
-    # "A NOT B" = elements in A and not in B,
-    # "B NOT A" = elements in B and not in A,
-    # "A AND B" = elements in A and B
+    # "A ~MINUS~ B" = elements in A and not in B,
+    # "B ~MINUS~ A" = elements in B and not in A,
+    # "A ~AND~ B" = elements in A and B
     outcomes_i <- outcomes[as.integer(names(decomp_i)), , drop = FALSE]
     names(decomp_i) <- apply(outcomes_i, 1, function(outcome_i) {
       paste(sort(paste0(outcome_i, sets_i)), collapse = " ")

@@ -42,13 +42,13 @@ test_that("sets are properly decomposed", {
 
   object <- decompose_sets(x, overlap = 2L)
 
-  expected <- list("B ~NOT~ A" = c("d", "e"),
-                   "A ~NOT~ B" = "a",
+  expected <- list("B ~MINUS~ A" = c("d", "e"),
+                   "A ~MINUS~ B" = "a",
                    "A ~AND~ B" = c("b", "c"),
-                   "C ~NOT~ A" = "d",
-                   "A ~NOT~ C" = "a",
+                   "C ~MINUS~ A" = "d",
+                   "A ~MINUS~ C" = "a",
                    "A ~AND~ C" = c("b", "c"),
-                   "B ~NOT~ C" = "e",
+                   "B ~MINUS~ C" = "e",
                    "B ~AND~ C" = c("b", "c", "d"))
 
   expect_identical(object, expected)
