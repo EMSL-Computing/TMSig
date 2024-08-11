@@ -185,8 +185,7 @@ cameraPR.matrix <- function(statistic,
                        min_size = min.size,
                        max_size = length(background) - 1L)
 
-  # Sparse incidence matrix
-  imat <- incidence(index)
+  imat <- incidence(index) # sparse incidence matrix
 
   genes_in_sets <- colnames(imat)
   all_set_names <- rownames(imat)
@@ -230,12 +229,9 @@ cameraPR.matrix <- function(statistic,
            "names of `index`.")
   }
 
-  # Number of genes not in each set
-  m2 <- t(G - t(m))
+  m2 <- t(G - t(m)) # number of genes not in each set
 
-  if (use.ranks) {
-    ## Based on limma::rankSumTestWithCorrelation
-
+  if (use.ranks) { ## Based on limma::rankSumTestWithCorrelation
     # Matrix of ranks of statistics by contrast. May include NA's
     rank_mat <- apply(statistic, 2, function(ci) frank(ci, na.last = "keep"))
     rownames(rank_mat) <- background # apply removes rownames
@@ -243,8 +239,6 @@ cameraPR.matrix <- function(statistic,
 
     sumRanksInSet <- as.matrix(imat %*% rank_mat[genes_in_sets, , drop = FALSE])
     m_prod <- m * m2 # used several times
-    U <- m_prod + m * (m + 1L) / 2L - sumRanksInSet
-    mu <- 0.5 * m_prod
 
     sigma2 <- asin(1) +
       (m2 - 1L) * (asin(0.5) + (m - 1L) * asin(inter.gene.cor / 2)) +
@@ -274,8 +268,9 @@ cameraPR.matrix <- function(statistic,
     sigma2 <- sigma2 * (1 - adjustment)
 
     # Two-sample z-statistics
-    zlowertail <- (U + 0.5 - mu) / sqrt(sigma2)
-    zuppertail <- (U - 0.5 - mu) / sqrt(sigma2)
+    U_minus_mu <- m / 2L * (m + 1L) - sumRanksInSet + m_prod / 2
+    zlowertail <- (U_minus_mu + 0.5) / sqrt(sigma2)
+    zuppertail <- (U_minus_mu - 0.5) / sqrt(sigma2)
 
     Down <- pt(zuppertail, df = Inf, lower.tail = FALSE)
     Up <- pt(zlowertail, df = Inf)
@@ -300,8 +295,6 @@ cameraPR.matrix <- function(statistic,
     # Difference between the means of statistics in a set and not in a set
     delta <- t(G / t(m2) * (t(meanStatInSet) - meanStat))
 
-    # The statistics are assumed to have been sampled from Normal distributions
-    # with the same variance, but potentially different means.
     varStatPooled <- t(
       ((G - 1L) * varStat - (t(delta^2 * m) * t(m2) / G)) / df.camera
     )
@@ -309,18 +302,14 @@ cameraPR.matrix <- function(statistic,
     # Two-sample t-statistics
     two.sample.t <- delta / sqrt(varStatPooled * (vif / m + 1 / m2))
 
-    # Convert to a matrix to have same size as set_stats
+    # Convert to a matrix to have same size as two.sample.t
     df.camera <- matrix(rep(df.camera, times = nsets),
-                        nrow = nsets,
-                        ncol = ncontrasts,
-                        byrow = TRUE,
+                        nrow = nsets, ncol = ncontrasts, byrow = TRUE,
                         dimnames = dimnames(two.sample.t))
 
     Up <- pt(two.sample.t, df = df.camera, lower.tail = FALSE)
     Down <- pt(two.sample.t, df = df.camera)
   }
-
-  D <- which(Down < Up)
 
   # Direction of change
   Direction <- matrix(data = "Up",
@@ -328,12 +317,11 @@ cameraPR.matrix <- function(statistic,
                       dimnames = list(all_set_names,
                                       contrast_names))
 
-  # Create matrix of p-values and update direction according to alternative
-  # hypothesis
+  # Create matrix of p-values, update direction according to alt. hypothesis
   switch(alternative,
          two.sided = {
            PValue <- 2 * pmin(Down, Up)
-           Direction[D] <- "Down"
+           Direction[Down < Up] <- "Down"
          },
          less = {
            PValue <- Down
