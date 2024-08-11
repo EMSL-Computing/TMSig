@@ -94,7 +94,8 @@ contrasts. May be abbreviated.}
 
 \item{cell_size}{\code{\link[grid]{unit}} object; the size of each heatmap
 cell (used for both height and width). Default is \code{unit(14,
-  "points")}.}
+  "points")}. This also controls the default text size, which defaults to 90\%
+the size of \code{cell_size}.}
 
 \item{filename}{character; the file name used to save the heatmap. If missing
 (default), the heatmap will be displayed instead.}

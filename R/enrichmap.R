@@ -51,7 +51,8 @@
 #'   contrasts. May be abbreviated.
 #' @param cell_size \code{\link[grid]{unit}} object; the size of each heatmap
 #'   cell (used for both height and width). Default is \code{unit(14,
-#'   "points")}.
+#'   "points")}. This also controls the default text size, which defaults to 90%
+#'   the size of \code{cell_size}.
 #' @param filename character; the file name used to save the heatmap. If missing
 #'   (default), the heatmap will be displayed instead.
 #' @param height numeric; height of the file in \code{units}.
@@ -72,7 +73,7 @@
 #'   \code{filename} is provided).
 #'
 #' @importFrom circlize colorRamp2
-#' @importFrom ComplexHeatmap max_text_width Heatmap Legend draw
+#' @importFrom ComplexHeatmap Heatmap Legend draw
 #' @importFrom grDevices dev.off
 #' @importFrom grid gpar unit is.unit
 #' @importFrom stats median
@@ -164,6 +165,8 @@ enrichmap <- function(x,
   if (!is.unit(cell_size))
     stop("`cell_size` must be a unit object.")
 
+  fontsize <- 0.9 * cell_size # default font size for all components
+
   # Arguments that will be passed to ComplexHeatmap::Heatmap
   base_heatmap_args <- list(
     matrix = statistic_mat,
@@ -171,6 +174,7 @@ enrichmap <- function(x,
                   args = colorRamp2_args),
     name = statistic_column,
     heatmap_legend_param = list(
+      title_gp = gpar(fontsize = fontsize, fontface = "bold"),
       at = colorRamp2_args$breaks,
       border = "black",
       legend_height = max(cell_size * 5, unit(21.1, "mm")),
@@ -179,6 +183,8 @@ enrichmap <- function(x,
     border = TRUE,
     row_labels = rownames(statistic_mat),
     column_labels = colnames(statistic_mat),
+    row_names_gp = gpar(fontsize = fontsize),
+    column_names_gp = gpar(fontsize = fontsize),
     cluster_columns = FALSE,
     clustering_distance_rows = "euclidean",
     clustering_method_rows = ifelse(anyNA(x), "average", "complete"),
@@ -188,28 +194,8 @@ enrichmap <- function(x,
     layer_fun = .layer_fun
   )
 
-  # Update with user-supplied arguments
-  heatmap_args <-  modifyList(x = base_heatmap_args,
-                              val = heatmap_args,
-                              keep.null = TRUE)
-
-  # Default rect_gp
-  if (is.null(heatmap_args[["rect_gp"]]))
-    heatmap_args[["rect_gp"]] <- gpar(col = NA, fill = "white")
-
-  if (is.null(heatmap_args[["rect_gp"]][["col"]]))
-    heatmap_args[["rect_gp"]][["col"]] <- NA
-
-  if (is.null(heatmap_args[["rect_gp"]][["fill"]]))
-    heatmap_args[["rect_gp"]][["fill"]] <- "white"
-
-  # If row or column labels were updated, use the new values to calculate max
-  # text width and height to avoid overlapping elements or unnecessary spacing
-  heatmap_args[["row_names_max_width"]] <-
-    max_text_width(heatmap_args[["row_labels"]])
-
-  heatmap_args[["column_names_max_height"]] <-
-    max_text_width(heatmap_args[["column_labels"]])
+  heatmap_args <- .update_heatmap_args(base_heatmap_args = base_heatmap_args,
+                                       heatmap_args = heatmap_args)
 
   # Color function for bubbles and statistic legend (used by .layer_fun)
   col_fun <- heatmap_args$col
@@ -223,14 +209,17 @@ enrichmap <- function(x,
 
   # Legend for background fill ----
   base_lt_args <- list(
+    at = seq_len(2L),
     title = padj_legend_title,
-    at = 1:2,
+    title_gp = gpar(fontsize = fontsize, fontface = "bold"),
     labels = paste(c("<", "\u2265"), padj_cutoff), # \u2265 = ">="
-    legend_gp = gpar(fill = c(padj_fill, "white")),
+    labels_gp = gpar(fontsize = fontsize),
+    legend_gp = gpar(fill = c(padj_fill,
+                              heatmap_args[["rect_gp"]][["fill"]])),
     grid_height = heatmap_args$heatmap_legend_param$grid_width,
     grid_width = heatmap_args$heatmap_legend_param$grid_width,
     border = "black",
-    nrow = 2,
+    nrow = 2L,
     direction = "horizontal"
   )
   lt_args <- modifyList(x = base_lt_args, val = padj_args, keep.null = TRUE)

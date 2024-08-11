@@ -138,6 +138,60 @@
 }
 
 
+#' @title Update enrichmap heatmap arguments
+#'
+#' @description Update rect_gp, row_names_max_width, and
+#'   column_names_max_height.
+#'
+#' @param base_heatmap_args list of base heatmap args.
+#' @param heatmap_args optional list of user-supplied arguments. Used to update
+#'   \code{base_heatmap_args}.
+#'
+#' @returns A list of arguments that will be passed to
+#'   \code{\link[ComplexHeatmap]{Heatmap}}.
+#'
+#' @importFrom ComplexHeatmap max_text_width
+#' @importFrom grid gpar
+#' @importFrom utils modifyList
+#'
+#' @noRd
+
+.update_heatmap_args <- function(base_heatmap_args = list(),
+                                 heatmap_args = list())
+{
+  if (!is.list(heatmap_args))
+    stop("`heatmap_args` must be a list of arguments that ",
+         "will be passed to ComplexHeatmap::Heatmap.")
+
+  # Update with user-supplied arguments
+  heatmap_args <-  modifyList(x = base_heatmap_args,
+                              val = heatmap_args,
+                              keep.null = TRUE)
+
+  # Default rect_gp
+  if (is.null(heatmap_args[["rect_gp"]]))
+    heatmap_args[["rect_gp"]] <- gpar(col = NA, fill = "white")
+
+  if (is.null(heatmap_args[["rect_gp"]][["col"]]))
+    heatmap_args[["rect_gp"]][["col"]] <- NA
+
+  if (is.null(heatmap_args[["rect_gp"]][["fill"]]))
+    heatmap_args[["rect_gp"]][["fill"]] <- "white"
+
+  # If row or column labels were updated, use the new values to calculate max
+  # text width and height to avoid overlapping elements or unnecessary spacing
+  heatmap_args[["row_names_max_width"]] <-
+    max_text_width(heatmap_args[["row_labels"]],
+                   gp = heatmap_args[["row_names_gp"]])
+
+  heatmap_args[["column_names_max_height"]] <-
+    max_text_width(heatmap_args[["column_labels"]],
+                   gp = heatmap_args[["column_names_gp"]])
+
+  return(heatmap_args)
+}
+
+
 #' @title Format the Cells of the Heatmap
 #'
 #' @param j integer; column index.
@@ -175,7 +229,7 @@
                       )
             ))
 
-  # Matrix of diameters (optionally scaled to row or column max)
+  # Matrix of bubble diameters (optionally scaled to row or column max)
   dmat <- -log10(padj_mat)
 
   if (scale_by != "max") {

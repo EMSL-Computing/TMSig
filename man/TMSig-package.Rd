@@ -8,6 +8,13 @@
 \description{
 Tools to prepare and analyze lists of a priori molecular signatures, such as gene sets.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/EMSL-Computing/TMSig}
+}
+
+}
 \author{
 \strong{Maintainer}: Tyler Sagendorf \email{tyler.sagendorf@pnnl.gov} (\href{https://orcid.org/0000-0003-1552-4870}{ORCID})
 
