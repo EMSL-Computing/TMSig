@@ -1,7 +1,7 @@
 Package: TMSig
 Type: Package
 Title: Tools for Molecular Signatures
-Version: 1.1.1.9010
+Version: 1.1.1.9011
 Date: 2024-08-11
 Authors@R: 
     c(
