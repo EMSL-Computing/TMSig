@@ -85,7 +85,6 @@
 #' @seealso \code{\link[limma]{cameraPR}},
 #'   \code{\link[limma]{rankSumTestWithCorrelation}}
 #'
-#' @import Matrix
 #' @importFrom data.table data.table `:=` setcolorder setorderv rbindlist setDF
 #'   frank
 #' @importFrom stats p.adjust pt var

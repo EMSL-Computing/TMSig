@@ -15,7 +15,7 @@
 #' @seealso \code{\link{incidence_to_list}}, \code{\link{similarity}},
 #'   \code{\link[Matrix]{sparseMatrix}}
 #'
-#' @import Matrix
+#' @importFrom Matrix sparseMatrix
 #'
 #' @export incidence
 #'

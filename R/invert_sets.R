@@ -12,8 +12,6 @@
 #'
 #' @returns A named list of sets.
 #'
-#' @import Matrix
-#'
 #' @export invert_sets
 #'
 #' @examples

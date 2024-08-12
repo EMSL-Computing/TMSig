@@ -26,9 +26,9 @@ test_that("similarity matrices are symmetric", {
             "C" = letters[4:8], # aliased with B
             "D" = letters[1:3]) # subset of A
 
-  expect_true(isSymmetric(similarity(x, type = "jaccard")))
+  expect_true(Matrix::isSymmetric(similarity(x, type = "jaccard")))
 
-  expect_true(isSymmetric(similarity(x, type = "overlap")))
+  expect_true(Matrix::isSymmetric(similarity(x, type = "overlap")))
 })
 
 

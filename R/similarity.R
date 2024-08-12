@@ -73,7 +73,7 @@
 #'
 #' @seealso \code{\link{incidence}}, \code{\link{cluster_sets}}
 #'
-#' @importFrom Matrix tril
+#' @importFrom Matrix tril diag which
 #'
 #' @export similarity
 #'
