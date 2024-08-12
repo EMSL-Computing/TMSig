@@ -32,67 +32,68 @@ filter_sets <- function(x,
                         min_size = 5L,
                         max_size = Inf)
 {
-  # Relax the type of min_size and max_size to allow doubles
-  if (!is.vector(min_size, mode = "numeric") || length(min_size) != 1L)
-    stop("`min_size` must be a single integer.")
+    # Relax the type of min_size and max_size to allow doubles
+    if (!is.vector(min_size, mode = "numeric") || length(min_size) != 1L)
+        stop("`min_size` must be a single integer.")
 
-  if (!is.vector(max_size, mode = "numeric") || length(max_size) != 1L)
-    stop("`max_size` must be a single integer or Inf.")
+    if (!is.vector(max_size, mode = "numeric") || length(max_size) != 1L)
+        stop("`max_size` must be a single integer or Inf.")
 
-  if (min_size > max_size)
-    stop("`min_size` cannot be greater than `max_size`.")
+    if (min_size > max_size)
+        stop("`min_size` cannot be greater than `max_size`.")
 
-  # Sets must contain at least 1 element
-  min_size <- max(1L, floor(min_size))
-  max_size <- max(1L, floor(max_size))
+    # Sets must contain at least 1 element
+    min_size <- max(1L, floor(min_size))
+    max_size <- max(1L, floor(max_size))
 
-  # Convert list of sets to a data.table with columns "sets" and "elements"
-  dt <- .prepare_sets(x)
-  elements <- dt[["elements"]]
-  sets <- dt[["sets"]]
+    # Convert list of sets to a data.table with columns "sets" and "elements"
+    dt <- .prepare_sets(x)
+    elements <- dt[["elements"]]
+    sets <- dt[["sets"]]
 
-  # Validate background
-  if (!missing(background)) {
-    if (!is.atomic(background))
-      stop("If provided, `background` must be an atomic vector, ",
-           "preferably of type \"character\".")
+    # Validate background
+    if (!missing(background)) {
+        if (!is.atomic(background))
+            stop("If provided, `background` must be an atomic vector, ",
+                 "preferably of type \"character\".")
 
-    background <- unique(as.character(background))
-    background <- background[!is.na(background)]
+        background <- unique(as.character(background))
+        background <- background[!is.na(background)]
 
-    if (length(background) == 0L)
-      stop("`background` must contain at least 1 unique, nonmissing element.")
+        if (length(background) == 0L)
+            stop("`background` must contain at least 1 unique, ",
+                 "nonmissing element.")
 
-    # Subset to elements in background
-    in_bg <- which(elements %in% background)
+        # Subset to elements in background
+        in_bg <- which(elements %in% background)
 
-    if (length(in_bg) == 0L)
-      stop("No elements of `x` are present in `background`.")
+        if (length(in_bg) == 0L)
+            stop("No elements of `x` are present in `background`.")
 
-    if (length(in_bg) != length(elements)) {
-      elements <- elements[in_bg]
-      sets <- sets[in_bg]
+        if (length(in_bg) != length(elements)) {
+            elements <- elements[in_bg]
+            sets <- sets[in_bg]
+        }
     }
-  }
 
-  sets <- factor(sets, levels = unique(sets))
+    sets <- factor(sets, levels = unique(sets))
 
-  x <- split(x = elements, f = sets)
-  ss <- lengths(x) # set sizes
+    x <- split(x = elements, f = sets)
+    ss <- lengths(x) # set sizes
 
-  if (all(ss < min_size))
-    stop("No sets contain at least `min_size` elements.")
+    if (all(ss < min_size))
+        stop("No sets contain at least `min_size` elements.")
 
-  if (all(ss > max_size))
-    stop("All sets contain more than `max_size` elements.")
+    if (all(ss > max_size))
+        stop("All sets contain more than `max_size` elements.")
 
-  keep_set <- which(ss >= min_size & ss <= max_size)
+    keep_set <- which(ss >= min_size & ss <= max_size)
 
-  if (length(keep_set) == 0L)
-    stop("No sets satisfy both `min_size` and `max_size` thresholds.")
+    if (length(keep_set) == 0L)
+        stop("No sets satisfy both `min_size` and `max_size` thresholds.")
 
-  x <- x[keep_set]
+    x <- x[keep_set]
 
-  return(x)
+    return(x)
 }
 

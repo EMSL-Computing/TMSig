@@ -73,7 +73,7 @@
 #'
 #' @seealso \code{\link{incidence}}, \code{\link{cluster_sets}}
 #'
-#' @import Matrix
+#' @importFrom Matrix tril
 #'
 #' @export similarity
 #'
@@ -92,50 +92,51 @@
 similarity <- function(x,
                        type = c("jaccard", "overlap", "otsuka"))
 {
-  type <- match.arg(type, choices = c("jaccard", "overlap", "otsuka"))
+    type <- match.arg(type, choices = c("jaccard", "overlap", "otsuka"))
 
-  # Incidence matrix with set identifiers as rows and elements as columns
-  # 1 if the element is a member of the set; 0 otherwise
-  incidence_mat <- incidence(x)
+    # Incidence matrix with set identifiers as rows and elements as columns
+    # 1 if the element is a member of the set; 0 otherwise
+    incidence_mat <- incidence(x)
 
-  if (nrow(incidence_mat) < 2L)
-    stop("`x` must contain 2 or more sets.")
+    if (nrow(incidence_mat) < 2L)
+        stop("`x` must contain 2 or more sets.")
 
-  # Sizes of all pairwise intersections: t(incidence_mat) %*% incidence_mat
-  mat <- tcrossprod(incidence_mat)
-  set_sizes <- diag(mat)
+    # Sizes of all pairwise intersections: t(incidence_mat) %*% incidence_mat
+    mat <- tcrossprod(incidence_mat)
+    set_sizes <- diag(mat)
 
-  # Since mat is symmetric, we only need to perform calculations using the
-  # lower triangular part
-  mat <- tril(mat, k = -1L)
+    # Since mat is symmetric, we only need to perform calculations using the
+    # lower triangular part
+    mat <- tril(mat, k = -1L)
 
-  # Positions of nonzero intersections
-  idx <- which(mat > 0, arr.ind = TRUE, useNames = FALSE)
+    # Positions of nonzero intersections
+    idx <- which(mat > 0, arr.ind = TRUE, useNames = FALSE)
 
-  # Array of set sizes
-  size_array <- array(set_sizes[idx], dim = dim(idx))
-  size_intersect <- mat[idx]
+    # Array of set sizes
+    size_array <- array(set_sizes[idx], dim = dim(idx))
+    size_intersect <- mat[idx]
 
-  switch(type,
-         jaccard = {
-           ## |A union B| = |A| + |B| - |A intersect B|
-           size_union <- size_array[, 1L] + size_array[, 2L] - size_intersect
-           ## |A intersect B| / |A union B|
-           sim <- size_intersect / size_union
-         },
-         overlap = {
-           ## |A intersect B| / min(|A|, |B|)
-           sim <- size_intersect / pmin(size_array[, 1L], size_array[, 2L])
-         },
-         otsuka = {
-           ## |A intersect B| / sqrt(|A| * |B|)
-           sim <- size_intersect / sqrt(size_array[, 1L] * size_array[, 2L])
-         })
+    switch(type,
+           jaccard = {
+               ## |A union B| = |A| + |B| - |A intersect B|
+               size_union <-
+                   size_array[, 1L] + size_array[, 2L] - size_intersect
+               ## |A intersect B| / |A union B|
+               sim <- size_intersect / size_union
+           },
+           overlap = {
+               ## |A intersect B| / min(|A|, |B|)
+               sim <- size_intersect / pmin(size_array[, 1L], size_array[, 2L])
+           },
+           otsuka = {
+               ## |A intersect B| / sqrt(|A| * |B|)
+               sim <- size_intersect / sqrt(size_array[, 1L] * size_array[, 2L])
+           })
 
-  # idx only covers the lower triangular part, so we flip the indices to fill
-  # in the upper triangular part
-  mat[idx] <- mat[idx[, 2:1, drop = FALSE]] <- sim
-  diag(mat) <- 1
+    # idx only covers the lower triangular part, so we flip the indices to fill
+    # in the upper triangular part
+    mat[idx] <- mat[idx[, 2:1, drop = FALSE]] <- sim
+    diag(mat) <- 1
 
-  return(mat)
+    return(mat)
 }

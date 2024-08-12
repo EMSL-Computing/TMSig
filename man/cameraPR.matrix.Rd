@@ -118,8 +118,8 @@ y <- matrix(data = rnorm(ngenes * nsamples),
             dimnames = list(paste0("gene", seq_len(ngenes)),
                             make.unique(group)))
 
-# First set of 20 genes are genuinely differentially expressed (trt1 and trt2
-# are lower than control)
+# First set of 20 genes are genuinely differentially expressed
+# (trt1 and trt2 are lower than control)
 index1 <- 1:20
 y[index1, 1:3] <- y[index1, 1:3] + 1
 

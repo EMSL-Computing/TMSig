@@ -33,7 +33,7 @@
 #' invert_sets(yc)
 
 invert_sets <- function(x) {
-  dt <- .prepare_sets(x)
+    dt <- .prepare_sets(x)
 
-  split(x = dt[["sets"]], f = dt[["elements"]])
+    split(x = dt[["sets"]], f = dt[["elements"]])
 }

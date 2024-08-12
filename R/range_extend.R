@@ -24,7 +24,7 @@
 #' range_extend(x, nearest = 0.1) # -4.7  8.2
 
 range_extend <- function(x, nearest = 1) {
-  r <- range(x, na.rm = TRUE) / nearest
+    r <- range(x, na.rm = TRUE) / nearest
 
-  c(floor(r[1]), ceiling(r[2])) * nearest
+    c(floor(r[1]), ceiling(r[2])) * nearest
 }

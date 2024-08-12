@@ -36,29 +36,29 @@
 gsea_color_fun <- function(statistics,
                            colors = c("#3366ff", "darkred"))
 {
-  r <- range(statistics, na.rm = TRUE)
+    r <- range(statistics, na.rm = TRUE)
 
-  # Extend range of values out to the nearest tenth
-  extended_range <- range_extend(r, nearest = 0.1)
+    # Extend range of values out to the nearest tenth
+    extended_range <- range_extend(r, nearest = 0.1)
 
-  # Due to how the NES is formulated, NES between -1 and 1 are never significant
-  # or otherwise interesting, so they are given a white color so as to not
-  # appear in the heatmap.
-  if (all(r >= -1)) {
-    # All NES are effectively positive
-    breaks <- c(-1, 1, extended_range[2])
-    colors <- c("white", "white", colors[2])
-  } else if (all(r <= +1)) {
-    # All NES are effectively negative
-    breaks <- c(extended_range[1], -1, 1)
-    colors <- c(colors[1], "white", "white")
-  } else {
-    # Mix of positive and negative NES
-    breaks <- c(extended_range[1], -1, 1, extended_range[2])
-    colors <- c(colors[1], rep("white", 2), colors[2])
-  }
+    # Due to how the NES is formulated, NES between -1 and 1 are never
+    # significant or otherwise interesting, so they are given a white color so
+    # as to not appear in the heatmap.
+    if (all(r >= -1)) {
+        # All NES are effectively positive
+        breaks <- c(-1, 1, extended_range[2])
+        colors <- c("white", "white", colors[2])
+    } else if (all(r <= +1)) {
+        # All NES are effectively negative
+        breaks <- c(extended_range[1], -1, 1)
+        colors <- c(colors[1], "white", "white")
+    } else {
+        # Mix of positive and negative NES
+        breaks <- c(extended_range[1], -1, 1, extended_range[2])
+        colors <- c(colors[1], rep("white", 2), colors[2])
+    }
 
-  return(list(breaks = breaks, colors = colors))
+    return(list(breaks = breaks, colors = colors))
 }
 
 
@@ -68,21 +68,21 @@ gsea_color_fun <- function(statistics,
 camera_color_fun <- function(statistics,
                              colors = c("#3366ff", "darkred"))
 {
-  r <- range(statistics, na.rm = TRUE)
+    r <- range(statistics, na.rm = TRUE)
 
-  # Extend range of values out to the nearest tenth
-  extended_range <- range_extend(r, nearest = 0.1)
+    # Extend range of values out to the nearest tenth
+    extended_range <- range_extend(r, nearest = 0.1)
 
-  if (all(r >= 0)) {
-    breaks <- c(0, extended_range[2])
-    colors <- c("white", colors[2])
-  } else if (all(r < 0)) {
-    breaks <- c(extended_range[1], 0)
-    colors <- c(colors[1], "white")
-  } else {
-    breaks <- c(extended_range[1], 0, extended_range[2])
-    colors <- c(colors[1], "white", colors[2])
-  }
+    if (all(r >= 0)) {
+        breaks <- c(0, extended_range[2])
+        colors <- c("white", colors[2])
+    } else if (all(r < 0)) {
+        breaks <- c(extended_range[1], 0)
+        colors <- c(colors[1], "white")
+    } else {
+        breaks <- c(extended_range[1], 0, extended_range[2])
+        colors <- c(colors[1], "white", colors[2])
+    }
 
-  return(list(breaks = breaks, colors = colors))
+    return(list(breaks = breaks, colors = colors))
 }

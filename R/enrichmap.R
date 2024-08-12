@@ -136,7 +136,7 @@ enrichmap <- function(x,
                       padj_column = "FDR",
                       padj_legend_title = padj_column,
                       padj_aggregate_fun = function(padj) {
-                        median(-log10(padj), na.rm = TRUE)
+                          median(-log10(padj), na.rm = TRUE)
                       },
                       padj_cutoff = 0.05,
                       plot_sig_only = TRUE,
@@ -154,123 +154,124 @@ enrichmap <- function(x,
                       save_args = list(),
                       draw_args = list())
 {
-  scale_by <- match.arg(scale_by,
-                        choices = c("row", "column", "max"))
+    scale_by <- match.arg(scale_by,
+                          choices = c("row", "column", "max"))
 
-  # Create statistic_mat, padj_mat
-  ls <- .enrichmap_prepare_x(
-    x = x,
-    n_top = n_top,
-    set_column = set_column,
-    statistic_column = statistic_column,
-    contrast_column = contrast_column,
-    padj_column = padj_column,
-    padj_aggregate_fun = padj_aggregate_fun,
-    padj_cutoff = padj_cutoff,
-    plot_sig_only = plot_sig_only
-  )
+    # Create statistic_mat, padj_mat
+    ls <- .enrichmap_prepare_x(
+        x = x,
+        n_top = n_top,
+        set_column = set_column,
+        statistic_column = statistic_column,
+        contrast_column = contrast_column,
+        padj_column = padj_column,
+        padj_aggregate_fun = padj_aggregate_fun,
+        padj_cutoff = padj_cutoff,
+        plot_sig_only = plot_sig_only
+    )
 
-  statistic_mat <- ls[["statistic_mat"]]
-  padj_mat <- ls[["padj_mat"]]
+    statistic_mat <- ls[["statistic_mat"]]
+    padj_mat <- ls[["padj_mat"]]
 
-  colorRamp2_args <- heatmap_color_fun(statistic_mat, colors)
+    colorRamp2_args <- heatmap_color_fun(statistic_mat, colors)
 
-  ## Create heatmap ------------------------------------------------------------
-  if (!is.unit(cell_size))
-    stop("`cell_size` must be a unit object.")
+    ## Create heatmap ----------------------------------------------------------
+    if (!is.unit(cell_size))
+        stop("`cell_size` must be a unit object.")
 
-  fontsize <- 0.9 * cell_size # default font size for all components
+    fontsize <- 0.9 * cell_size # default font size for all components
 
-  # Arguments that will be passed to ComplexHeatmap::Heatmap
-  base_heatmap_args <- list(
-    matrix = statistic_mat,
-    col = do.call(what = circlize::colorRamp2,
-                  args = colorRamp2_args),
-    name = statistic_column,
-    heatmap_legend_param = list(
-      title_gp = gpar(fontsize = fontsize, fontface = "bold"),
-      at = colorRamp2_args$breaks,
-      border = "black",
-      legend_height = max(cell_size * 5, unit(21.1, "mm")),
-      grid_width = max(cell_size, unit(4, "mm"))
-    ),
-    border = TRUE,
-    row_labels = rownames(statistic_mat),
-    column_labels = colnames(statistic_mat),
-    row_names_gp = gpar(fontsize = fontsize),
-    column_names_gp = gpar(fontsize = fontsize),
-    cluster_columns = FALSE,
-    clustering_distance_rows = "euclidean",
-    clustering_method_rows = ifelse(anyNA(x), "average", "complete"),
-    na_col = "black",
-    height = cell_size * nrow(statistic_mat),
-    width = cell_size * ncol(statistic_mat),
-    layer_fun = .layer_fun
-  )
+    # Arguments that will be passed to ComplexHeatmap::Heatmap
+    base_heatmap_args <- list(
+        matrix = statistic_mat,
+        col = do.call(what = circlize::colorRamp2,
+                      args = colorRamp2_args),
+        name = statistic_column,
+        heatmap_legend_param = list(
+            title_gp = gpar(fontsize = fontsize, fontface = "bold"),
+            at = colorRamp2_args$breaks,
+            border = "black",
+            legend_height = max(cell_size * 5, unit(21.1, "mm")),
+            grid_width = max(cell_size, unit(4, "mm"))
+        ),
+        border = TRUE,
+        row_labels = rownames(statistic_mat),
+        column_labels = colnames(statistic_mat),
+        row_names_gp = gpar(fontsize = fontsize),
+        column_names_gp = gpar(fontsize = fontsize),
+        cluster_columns = FALSE,
+        clustering_distance_rows = "euclidean",
+        clustering_method_rows = ifelse(anyNA(x), "average", "complete"),
+        na_col = "black",
+        height = cell_size * nrow(statistic_mat),
+        width = cell_size * ncol(statistic_mat),
+        layer_fun = .layer_fun
+    )
 
-  heatmap_args <- .update_heatmap_args(base_heatmap_args = base_heatmap_args,
-                                       heatmap_args = heatmap_args)
+    heatmap_args <- .update_heatmap_args(base_heatmap_args = base_heatmap_args,
+                                         heatmap_args = heatmap_args)
 
-  # Color function for bubbles and statistic legend (used by .layer_fun)
-  col_fun <- heatmap_args$col
+    # Color function for bubbles and statistic legend (used by .layer_fun)
+    col_fun <- heatmap_args$col
 
-  # Allow layer_fun to access all objects created before this point.
-  if (!is.null(heatmap_args[["layer_fun"]]))
-    environment(heatmap_args$layer_fun) <- environment()
+    # Allow layer_fun to access all objects created before this point.
+    if (!is.null(heatmap_args[["layer_fun"]]))
+        environment(heatmap_args$layer_fun) <- environment()
 
-  # Create heatmap
-  ht <- do.call(what = Heatmap, args = heatmap_args)
+    # Create heatmap
+    ht <- do.call(what = Heatmap, args = heatmap_args)
 
-  # Legend for background fill ----
-  padj_legend_labels <- paste(c("<", "\u2265"), padj_cutoff) # \u2265 = ">="
-  padj_legend_fill <- c(padj_fill, heatmap_args[["rect_gp"]][["fill"]])
+    # Legend for background fill ----
+    padj_legend_labels <- paste(c("<", "\u2265"), padj_cutoff) # \u2265 = ">="
+    padj_legend_fill <- c(padj_fill, heatmap_args[["rect_gp"]][["fill"]])
 
-  if (anyNA(statistic_mat)) {
-    padj_legend_labels[3] <- "N/A"
-    padj_legend_fill[3] <- heatmap_args[["na_col"]]
-  }
+    if (anyNA(statistic_mat)) {
+        padj_legend_labels[3] <- "N/A"
+        padj_legend_fill[3] <- heatmap_args[["na_col"]]
+    }
 
-  base_lt_args <- list(
-    at = seq_along(padj_legend_labels),
-    title = padj_legend_title,
-    title_gp = gpar(fontsize = fontsize, fontface = "bold"),
-    labels = padj_legend_labels, # \u2265 = ">="
-    labels_gp = gpar(fontsize = fontsize),
-    legend_gp = gpar(fill = padj_legend_fill),
-    grid_height = heatmap_args$heatmap_legend_param$grid_width,
-    grid_width = heatmap_args$heatmap_legend_param$grid_width,
-    border = "black",
-    nrow = length(padj_legend_labels),
-    direction = "horizontal"
-  )
-  lt_args <- modifyList(x = base_lt_args, val = padj_args, keep.null = TRUE)
+    base_lt_args <- list(
+        at = seq_along(padj_legend_labels),
+        title = padj_legend_title,
+        title_gp = gpar(fontsize = fontsize, fontface = "bold"),
+        labels = padj_legend_labels, # \u2265 = ">="
+        labels_gp = gpar(fontsize = fontsize),
+        legend_gp = gpar(fill = padj_legend_fill),
+        grid_height = heatmap_args$heatmap_legend_param$grid_width,
+        grid_width = heatmap_args$heatmap_legend_param$grid_width,
+        border = "black",
+        nrow = length(padj_legend_labels),
+        direction = "horizontal"
+    )
+    lt_args <- modifyList(x = base_lt_args, val = padj_args, keep.null = TRUE)
 
-  lt <- do.call(what = Legend, args = lt_args)
+    lt <- do.call(what = Legend, args = lt_args)
 
-  if (!missing(filename)) {
-    on.exit(dev.off()) # close the device after writing the heatmap to a file
+    if (!missing(filename)) {
+        # Close the device after writing the heatmap to a file
+        on.exit(dev.off())
 
-    base_save_args <- list(filename = filename,
-                           height = height, width = width,
-                           units = units)
-    save_args <- modifyList(x = base_save_args,
-                            val = save_args,
-                            keep.null = TRUE)
+        base_save_args <- list(filename = filename,
+                               height = height, width = width,
+                               units = units)
+        save_args <- modifyList(x = base_save_args,
+                                val = save_args,
+                                keep.null = TRUE)
 
-    do.call(what = .save_heatmap, args = save_args)
-  }
+        do.call(what = .save_heatmap, args = save_args)
+    }
 
-  # Draw heatmap ----
-  draw_args <- modifyList(
-    x = list(object = ht,
-             annotation_legend_list = list(lt),
-             merge_legends = TRUE,
-             legend_gap = unit(0.15, "in"),
-             align_heatmap_legend = "heatmap_top",
-             align_annotation_legend = "heatmap_top"),
-    val = draw_args,
-    keep.null = TRUE
-  )
+    # Draw heatmap ----
+    draw_args <- modifyList(
+        x = list(object = ht,
+                 annotation_legend_list = list(lt),
+                 merge_legends = TRUE,
+                 legend_gap = unit(0.15, "in"),
+                 align_heatmap_legend = "heatmap_top",
+                 align_annotation_legend = "heatmap_top"),
+        val = draw_args,
+        keep.null = TRUE
+    )
 
-  do.call(what = draw, args = draw_args)
+    do.call(what = draw, args = draw_args)
 }

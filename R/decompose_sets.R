@@ -50,7 +50,7 @@
 #' doi:\href{https://doi.org/10.1093/bioinformatics/btl599
 #' }{10.1093/bioinformatics/btl599}
 #'
-#' @import Matrix
+#' @importFrom Matrix tril
 #'
 #' @export decompose_sets
 #'
@@ -70,90 +70,90 @@ decompose_sets <- function(x,
                            MINUS = "~MINUS~",
                            verbose = TRUE)
 {
-  lifecycle::signal_stage("experimental", "decompose_sets()")
+    lifecycle::signal_stage("experimental", "decompose_sets()")
 
-  if (!is.character(AND) || !is.character(MINUS))
-    stop("`AND` and `MINUS` must be character strings.")
+    if (!is.character(AND) || !is.character(MINUS))
+        stop("`AND` and `MINUS` must be character strings.")
 
-  AND <- paste0(AND, " ") # include trailing space for later
-  MINUS <- paste0(MINUS, " ")
+    AND <- paste0(AND, " ") # include trailing space for later
+    MINUS <- paste0(MINUS, " ")
 
-  if (!is.vector(overlap, mode = "numeric") ||
-      isTRUE(is.infinite(overlap)) ||
-      length(overlap) != 1L)
-    stop("`overlap` must be a single integer specifying the minimum ",
-         "intersection size required to decompose pairs of sets.")
+    if (!is.vector(overlap, mode = "numeric") ||
+        isTRUE(is.infinite(overlap)) ||
+        length(overlap) != 1L)
+        stop("`overlap` must be a single integer specifying the minimum ",
+             "intersection size required to decompose pairs of sets.")
 
-  overlap <- max(1L, floor(overlap))
+    overlap <- max(1L, floor(overlap))
 
-  # Since the size of the intersection between a set and any other set is at
-  # most the size of that set, we can pre-filter to sets of size `overlap` or
-  # greater. This also validates x.
-  x <- filter_sets(x, min_size = overlap)
+    # Since the size of the intersection between a set and any other set is at
+    # most the size of that set, we can pre-filter to sets of size `overlap` or
+    # greater. This also validates x.
+    x <- filter_sets(x, min_size = overlap)
 
-  if (length(x) < 2L)
-    stop("Fewer than 2 sets with at least `overlap` elements.")
+    if (length(x) < 2L)
+        stop("Fewer than 2 sets with at least `overlap` elements.")
 
-  incidence <- incidence(x)
-  elements <- colnames(incidence)
+    incidence <- incidence(x)
+    elements <- colnames(incidence)
 
-  # Sparse lower triangular matrix of intersection sizes
-  imat <- tcrossprod(incidence)
-  imat <- tril(imat, k = -1L)
+    # Sparse lower triangular matrix of intersection sizes
+    imat <- tcrossprod(incidence)
+    imat <- tril(imat, k = -1L)
 
-  # Indices of sufficiently overlapping pairs of sets
-  idx <- which(imat >= overlap, arr.ind = TRUE, useNames = FALSE)
+    # Indices of sufficiently overlapping pairs of sets
+    idx <- which(imat >= overlap, arr.ind = TRUE, useNames = FALSE)
 
-  if (nrow(idx) == 0L)
-    stop("No pairs of sets with at least `overlap` elements in common.")
+    if (nrow(idx) == 0L)
+        stop("No pairs of sets with at least `overlap` elements in common.")
 
-  n_pairs <- nrow(idx)
+    n_pairs <- nrow(idx)
 
-  if (verbose)
-    message("Decomposing ", n_pairs, " pairs of sets.")
+    if (verbose)
+        message("Decomposing ", n_pairs, " pairs of sets.")
 
-  # Convert indices to set names
-  set_pairs <- array(rownames(imat)[idx], dim = dim(idx))
+    # Convert indices to set names
+    set_pairs <- array(rownames(imat)[idx], dim = dim(idx))
 
-  ## Set decomposition ----
-  outcomes <- rep(list(0:1), 2L) # 1 = in set; 0 = not in set
-  outcomes <- expand.grid(outcomes)
-  outcomes <- as.matrix(outcomes)[-1, ] # convert to matrix, remove null set
-  outcomes <- ifelse(outcomes, AND, MINUS)
+    ## Set decomposition ----
+    outcomes <- rep(list(0:1), 2L) # 1 = in set; 0 = not in set
+    outcomes <- expand.grid(outcomes)
+    outcomes <- as.matrix(outcomes)[-1, ] # convert to matrix, remove null set
+    outcomes <- ifelse(outcomes, AND, MINUS)
 
-  # Coefficients used to convert each disjoint component from binary to int.
-  coefs <- matrix(seq_len(2L), nrow = 1L) # matrix: 2, 1
+    # Coefficients used to convert each disjoint component from binary to int.
+    coefs <- matrix(seq_len(2L), nrow = 1L) # matrix: 2, 1
 
-  x_decomp <- vector(mode = "list", length = n_pairs)
+    x_decomp <- vector(mode = "list", length = n_pairs)
 
-  for (i in seq_len(n_pairs)) { # much faster than apply(set_pairs, 1, ...)
-    sets_i <- set_pairs[i, ]
-    # Convert incidence matrix columns from binary to integer
-    i_vec <- as.vector(coefs %*% incidence[sets_i, ])
+    for (i in seq_len(n_pairs)) { # much faster than apply(set_pairs, 1, ...)
+        sets_i <- set_pairs[i, ]
+        # Convert incidence matrix columns from binary to integer
+        i_vec <- as.vector(coefs %*% incidence[sets_i, ])
 
-    # Remove elements not in either set
-    keep_elements <- which(i_vec != 0L)
-    i_vec <- i_vec[keep_elements]
-    elements_i <- elements[keep_elements]
+        # Remove elements not in either set
+        keep_elements <- which(i_vec != 0L)
+        i_vec <- i_vec[keep_elements]
+        elements_i <- elements[keep_elements]
 
-    decomp_i <- split(x = elements_i, f = i_vec)
+        decomp_i <- split(x = elements_i, f = i_vec)
 
-    ## For a pair of sets A and B, define names of disjoint components:
-    # "A ~MINUS~ B" = elements in A and not in B,
-    # "B ~MINUS~ A" = elements in B and not in A,
-    # "A ~AND~ B" = elements in A and B
-    outcomes_i <- outcomes[as.integer(names(decomp_i)), , drop = FALSE]
-    names(decomp_i) <- apply(outcomes_i, 1, function(outcome_i) {
-      paste(sort(paste0(outcome_i, sets_i)), collapse = " ")
-    })
+        ## For a pair of sets A and B, define names of disjoint components:
+        # "A ~MINUS~ B" = elements in A and not in B,
+        # "B ~MINUS~ A" = elements in B and not in A,
+        # "A ~AND~ B" = elements in A and B
+        outcomes_i <- outcomes[as.integer(names(decomp_i)), , drop = FALSE]
+        names(decomp_i) <- apply(outcomes_i, 1, function(outcome_i) {
+            paste(sort(paste0(outcome_i, sets_i)), collapse = " ")
+        })
 
-    x_decomp[[i]] <- decomp_i
-  }
+        x_decomp[[i]] <- decomp_i
+    }
 
-  x_decomp <- unlist(x_decomp, recursive = FALSE)
+    x_decomp <- unlist(x_decomp, recursive = FALSE)
 
-  # Remove leading `AND` from names
-  names(x_decomp) <- sub(AND, "", names(x_decomp), fixed = TRUE)
+    # Remove leading `AND` from names
+    names(x_decomp) <- sub(AND, "", names(x_decomp), fixed = TRUE)
 
-  return(x_decomp)
+    return(x_decomp)
 }

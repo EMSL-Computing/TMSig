@@ -145,60 +145,60 @@ cluster_sets <- function(x,
                          method = "complete",
                          h = 0.9)
 {
-  if (cutoff < 0 | cutoff > 1)
-    stop("`cutoff` must be between 0 and 1.")
+    if (cutoff < 0 | cutoff > 1)
+        stop("`cutoff` must be between 0 and 1.")
 
-  # Needed to determine set sizes
-  dt <- .prepare_sets(x)
-  x <- split(x = dt[["elements"]], f = dt[["sets"]])
+    # Needed to determine set sizes
+    dt <- .prepare_sets(x)
+    x <- split(x = dt[["elements"]], f = dt[["sets"]])
 
-  ## Pairwise set similarity matrix
-  s <- similarity(x, type = type)
-  diag(s) <- 0
-  s[s < cutoff] <- 0
+    ## Pairwise set similarity matrix
+    s <- similarity(x, type = type)
+    diag(s) <- 0
+    s[s < cutoff] <- 0
 
-  set_sizes <- lengths(x)
+    set_sizes <- lengths(x)
 
-  # Cluster sets that are sufficiently similar to at least one other set. The
-  # remaining sets will be appended to the results at the end.
-  keep <- apply(s > 0, 1, any)
+    # Cluster sets that are sufficiently similar to at least one other set. The
+    # remaining sets will be appended to the results at the end.
+    keep <- apply(s > 0, 1, any)
 
-  if (sum(keep) == 0L) {
-    message("No pair of sets passes the similarity cutoff.")
+    if (sum(keep) == 0L) {
+        message("No pair of sets passes the similarity cutoff.")
 
-    dt <- data.table(set = names(set_sizes),
-                     cluster = seq_along(set_sizes),
-                     stringsAsFactors = FALSE)
-  } else {
-    s <- s[keep, keep] # at least a 2x2 matrix
+        dt <- data.table(set = names(set_sizes),
+                         cluster = seq_along(set_sizes),
+                         stringsAsFactors = FALSE)
+    } else {
+        s <- s[keep, keep] # at least a 2x2 matrix
 
-    # Convert sparse similarity matrix to dense dissimilarity matrix - may
-    # produce a warning
-    d <- as.dist(1 - s)
+        # Convert sparse similarity matrix to dense dissimilarity matrix - may
+        # produce a warning
+        d <- as.dist(1 - s)
 
-    # Hierarchical clustering
-    hc <- hclust(d, method = method)
-    clusters <- cutree(hc, h = h)
+        # Hierarchical clustering
+        hc <- hclust(d, method = method)
+        clusters <- cutree(hc, h = h)
 
-    dt <- data.table(set = names(clusters),
-                     cluster = clusters,
-                     stringsAsFactors = FALSE)
+        dt <- data.table(set = names(clusters),
+                         cluster = clusters,
+                         stringsAsFactors = FALSE)
 
-    # Append sets that were not similar to any others and place each in its own
-    # cluster
-    other_sets <- data.table(set = names(set_sizes)[!keep],
-                             stringsAsFactors = FALSE)
-    other_sets[, cluster := seq_along(set) + max(dt[["cluster"]])]
+        # Append sets that were not similar to any others and place each in its
+        # own cluster
+        other_sets <- data.table(set = names(set_sizes)[!keep],
+                                 stringsAsFactors = FALSE)
+        other_sets[, cluster := seq_along(set) + max(dt[["cluster"]])]
 
-    dt <- rbind(dt, other_sets)
-  }
+        dt <- rbind(dt, other_sets)
+    }
 
-  dt[, set_size := set_sizes[set]]
+    dt[, set_size := set_sizes[set]]
 
-  setorderv(dt, cols = c("cluster", "set_size", "set"),
-            order = c(1, -1, 1))
+    setorderv(dt, cols = c("cluster", "set_size", "set"),
+              order = c(1, -1, 1))
 
-  setDF(dt)
+    setDF(dt)
 
-  return(dt)
+    return(dt)
 }
