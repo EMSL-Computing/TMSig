@@ -6,12 +6,13 @@
 \alias{TMSig-package}
 \title{TMSig: Tools for Molecular Signatures}
 \description{
-Tools to prepare and analyze lists of a priori molecular signatures, such as gene sets.
+The TMSig package contains tools to prepare, analyze, and visualize named lists of mathematical sets, with an emphasis on molecular signatures (such as gene or kinase sets). It includes fast, memory efficient functions to construct sparse incidence and similarity matrices and filter, cluster, invert, and decompose sets. Additionally, bubble heatmaps can be created to visualize the results of any differential or molecular signatures analysis.
 }
 \seealso{
 Useful links:
 \itemize{
   \item \url{https://github.com/EMSL-Computing/TMSig}
+  \item Report bugs at \url{https://github.com/EMSL-Computing/TMSig/issues}
 }
 
 }

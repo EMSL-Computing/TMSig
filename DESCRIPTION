@@ -1,8 +1,8 @@
 Package: TMSig
 Type: Package
 Title: Tools for Molecular Signatures
-Version: 1.1.1.9013
-Date: 2024-08-13
+Version: 0.99.0
+Date: 2024-08-14
 Authors@R: 
     c(
       person(given = "Tyler", family = "Sagendorf", 
@@ -12,19 +12,23 @@ Authors@R:
       person(given = "Di", family = "Wu", role = "ctb"),
       person(given = "Gordon", family = "Smyth", role = "ctb")
     )
-Description: Tools to prepare and analyze lists of a priori molecular 
-    signatures, such as gene sets.
+Description: The TMSig package contains tools to prepare, analyze, and visualize
+    named lists of mathematical sets, with an emphasis on molecular signatures
+    (such as gene or kinase sets). It includes fast, memory efficient functions
+    to construct sparse incidence and similarity matrices and filter, cluster, 
+    invert, and decompose sets. Additionally, bubble heatmaps can be created to 
+    visualize the results of any differential or molecular signatures analysis.
 License: GPL (>= 3)
 URL: https://github.com/EMSL-Computing/TMSig
-Bugreports: https://github.com/EMSL-Computing/TMSig/issues
+BugReports: https://github.com/EMSL-Computing/TMSig/issues
 Encoding: UTF-8
 RoxygenNote: 7.3.2
 Roxygen: list(markdown = TRUE)
 VignetteBuilder: knitr
+biocViews: Clustering, GeneSetEnrichment, Pathways, Visualization
 Depends:
-    R (>= 3.6.0),
-    limma,
-    Matrix
+    R (>= 4.4.0),
+    limma
 Imports:
     circlize,
     ComplexHeatmap,
@@ -32,6 +36,7 @@ Imports:
     grDevices,
     grid,
     lifecycle,
+    Matrix,
     stats,
     utils
 Suggests: 
@@ -39,8 +44,4 @@ Suggests:
     knitr,
     rmarkdown,
     testthat (>= 3.0.0)
-Remotes:
-    bioc::release/BiocStyle,
-    bioc::release/ComplexHeatmap,
-    bioc::release/limma
 Config/testthat/edition: 3
