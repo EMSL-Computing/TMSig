@@ -83,9 +83,11 @@
 #'           "C" = c("d", "e", "f", "g"), # aliased with B
 #'           "D" = c("a", "b", "c")) # subset of A
 #'
-#' (j <- similarity(x)) # Jaccard coefficients
-#' (o <- similarity(x, type = "overlap")) # overlap coefficients
-#' (ot <- similarity(x, type = "otsuka")) # Ōtsuka coefficients
+#' similarity(x) # Jaccard coefficients
+#'
+#' similarity(x, type = "overlap") # overlap coefficients
+#'
+#' similarity(x, type = "otsuka") # Ōtsuka coefficients
 
 similarity <- function(x,
                        type = c("jaccard", "overlap", "otsuka"))

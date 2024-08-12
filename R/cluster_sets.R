@@ -126,11 +126,11 @@
 #' (df <- cluster_sets(x, cutoff = 0.5))
 #'
 #' # Keep the first (largest) set from each cluster
-#' subset(df, subset = !duplicated(cluster))[["set"]] # A, G, E, F
+#' with(df, set[!duplicated(cluster)]) # A, G, E, F
 #'
 #' # Keep the smallest set from each cluster
 #' df <- df[order(df$set_size), ]
-#' subset(df, subset = !duplicated(cluster))[["set"]] # E, D, F, G
+#' with(df, set[!duplicated(cluster)]) # E, D, F, G
 #'
 #' # Cluster aliased sets (type = "otsuka" would produce
 #' # identical results)

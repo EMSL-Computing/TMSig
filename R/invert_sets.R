@@ -25,6 +25,9 @@
 #' # Invert sets
 #' (y <- invert_sets(x))
 #'
+#' # Jaccard similarity of pairs of elements
+#' similarity(y)
+#'
 #' # Decompose sets into disjoint parts
 #' yc <- lapply(y, paste, collapse = ", ")
 #' invert_sets(yc)

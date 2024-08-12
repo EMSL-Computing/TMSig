@@ -21,7 +21,7 @@
 #'   \code{x[[rownames_colum]]} must be uniquely defined for each contrast
 #'   group.
 #' @param padj_column character; the name of a column in \code{x} containing the
-#'   adjusted p-values. Determines the area of each bubble in the heatmap.
+#'   adjusted p-values. Determines the diameter of each bubble in the heatmap.
 #' @param padj_legend_title character; title of the background fill legend.
 #'   Defaults to \code{padj_column}.
 #' @param padj_aggregate_fun function; a function used to aggregate the adjusted
@@ -44,11 +44,11 @@
 #'   "darkred".
 #' @param heatmap_color_fun function; used to create the legend for the heatmap
 #'   bubble fill. See \code{\link{enrichmap_color_functions}} for details.
-#' @param scale_by character; whether to scale the bubbles such that the
-#'   most-significant term in each row (\code{scale_by="row"}), column
-#'   (\code{scale_by="column"}), or overall (\code{scale_by="max"}) is of
-#'   maximum area. Default is "row" to better visualize patterns across
-#'   contrasts. May be abbreviated.
+#' @param scale_by character; whether to scale the bubbles such that the term
+#'   with the largest \eqn{-log_{10}} adjusted p-value in each row
+#'   (\code{scale_by="row"}), column (\code{scale_by="column"}), or overall
+#'   (\code{scale_by="max"}) is of maximum diameter. Default is "row" to better
+#'   visualize patterns across contrasts. May be abbreviated.
 #' @param cell_size \code{\link[grid]{unit}} object; the size of each heatmap
 #'   cell (used for both height and width). Default is \code{unit(14,
 #'   "points")}. This also controls the default text size, which defaults to 90%
@@ -71,6 +71,20 @@
 #'
 #' @returns Nothing. Displays heatmap or saves the heatmap to a file (if
 #'   \code{filename} is provided).
+#'
+#' @details The diameter of each bubble is determined by the \eqn{-log_{10}}
+#'   adjusted p-values. By default, the bubbles are scaled such that the
+#'   contrast with the largest \eqn{-log_{10}} adjusted p-value per row
+#'   (\code{scale_by="row"}) has a bubble diameter of \code{0.95 * cell_size},
+#'   and all other bubbles in that row are scaled relative to this maximum
+#'   diameter; this is to better visualize patterns across contrasts. Bubbles
+#'   can also be scaled so that largest \eqn{-log_{10}} adjusted p-value by
+#'   column (\code{scale_by="column"}) or in the entire heatmap
+#'   (\code{scale_by="max"}) has the maximum diameter. If the adjusted p-value
+#'   is below \code{padj_cutoff}, the bubble diameter will be no smaller than
+#'   \code{0.2 * cell_size}. If the adjusted p-value is greater than or equal to
+#'   \code{padj_cutoff}, there is no limit on how small the diameter can be, so
+#'   it may seem as if the bubbles have disappeared, leaving a blank cell.
 #'
 #' @importFrom circlize colorRamp2
 #' @importFrom ComplexHeatmap Heatmap Legend draw

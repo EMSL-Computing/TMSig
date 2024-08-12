@@ -23,7 +23,7 @@
 #'
 #' (imat <- incidence(x)) # incidence matrix
 #'
-#' incidence_to_list(imat)
+#' incidence_to_list(incidence = imat)
 
 incidence_to_list <- function(incidence) {
   # The incidence matrix is assumed to be in the correct form with sets as rows

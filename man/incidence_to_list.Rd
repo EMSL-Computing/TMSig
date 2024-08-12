@@ -31,5 +31,5 @@ x <- list("A" = c("a", "b", "c"),
 
 (imat <- incidence(x)) # incidence matrix
 
-incidence_to_list(imat)
+incidence_to_list(incidence = imat)
 }
