@@ -13,7 +13,7 @@
 **BUG FIXES**
 
 - Added Bioconductor packages to Remotes field of DESCRIPTION.
-- `cameraPR.matrix`: fixed integer overflow that could occur when testing very large sets with `use.ranks=TRUE`.
+- `cameraPR.matrix`: fixed integer overflow that could occur when testing very large sets with `use.ranks=TRUE`. Fixed negative variance caused by improper adjustment for ties in ranks when `use.ranks=TRUE`.
 
 
 # TMSig 1.1.1 (2024-07-02)

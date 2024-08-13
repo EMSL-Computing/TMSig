@@ -154,6 +154,8 @@ test_that("parametric results are correct", {
 
 
 test_that("nonparametric results are correct", {
+  statistic[2, ] <- statistic[1, ] # introduce ties in ranks
+
   object <- cameraPR.matrix(statistic,
                             index = list("A" = paste0("gene", 1:200)),
                             use.ranks = TRUE)
@@ -165,7 +167,7 @@ test_that("nonparametric results are correct", {
     GeneSet = "A",
     NGenes = c(100L, 199L, 200L, 200L),
     Direction = c(rep("Down", 3), "Up"),
-    PValue = c(0.38398249, 0.75411183, 0.21929056, 0.85131802)
+    PValue = c(0.38398249, 0.77902378, 0.21212502, 0.82771353)
   )
 
   expect_equal(object, expected)

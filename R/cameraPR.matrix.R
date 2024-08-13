@@ -264,8 +264,8 @@ cameraPR.matrix <- function(statistic,
       NTIES <- table(r[r != 0]) # remove 0's (formerly NA's)
       sum(NTIES * (NTIES + 1L) * (NTIES - 1L)) # 0, if there are no ties
     })
-    adjustment <- t(adjustment / t(m) / t(m + 1L) / t(m - 1L))
-    sigma2 <- sigma2 * (1 - adjustment)
+    adjustment <- adjustment / G / (G + 1L) / (G - 1L)
+    sigma2 <- t((1 - adjustment) * t(sigma2))
 
     # Two-sample z-statistics
     U_minus_mu <- m / 2L * (m + 1L) - sumRanksInSet + m_prod / 2
