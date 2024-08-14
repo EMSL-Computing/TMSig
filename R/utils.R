@@ -221,11 +221,11 @@
   grid.rect(x = x, y = y, width = w, height = h,
             gp = gpar(col = heatmap_args$rect_gp$col,
                       fill = ifelse(
-                        pindex(padj_mat, i, j) < padj_cutoff,
-                        padj_fill, # grey, default
-                        ifelse(is.na(pindex(padj_mat, i, j)),
-                               heatmap_args$na_col, # black, default
-                               heatmap_args$rect_gp$fill) # white, default
+                        is.na(pindex(padj_mat, i, j)),
+                        heatmap_args[["na_col"]],
+                        ifelse(pindex(padj_mat, i, j) < padj_cutoff,
+                               padj_fill, # grey
+                               heatmap_args[["rect_gp"]][["fill"]]) # white
                       )
             ))
 

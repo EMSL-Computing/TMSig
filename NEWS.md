@@ -1,8 +1,8 @@
-# TMSig DEV (2024-08-08)
+# TMSig DEV (2024-08-13)
 
 **SIGNIFICANT USER-VISIBLE CHANGES**
 
-- `enrichmap`: heatmap rectangle fill and border color can now be changed via the `heatmap_args` parameter. Color legend title can now be changed via `heatmap_args = list(name = "new title")` instead of `heatmap_args = list(heatmap_legend_param = list(title = "new title"))`. Added examples to documentation. Default text size is now controlled by the `cell_size` argument.
+- `enrichmap`: heatmap rectangle fill and border color can now be changed via the `heatmap_args` parameter. Color legend title can now be changed via `heatmap_args = list(name = "new title")` instead of `heatmap_args = list(heatmap_legend_param = list(title = "new title"))`. Added examples to documentation. Default text size is now controlled by the `cell_size` argument. Missing values in the heatmap are now indicated in the adjusted p-value legend with the label "N/A".
 - `decompose_sets`: added arguments `AND`, `MINUS`, and `verbose`. Reduced computation time.
 
 **MINOR CHANGES**

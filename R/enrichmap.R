@@ -222,18 +222,25 @@ enrichmap <- function(x,
   ht <- do.call(what = Heatmap, args = heatmap_args)
 
   # Legend for background fill ----
+  padj_legend_labels <- paste(c("<", "\u2265"), padj_cutoff) # \u2265 = ">="
+  padj_legend_fill <- c(padj_fill, heatmap_args[["rect_gp"]][["fill"]])
+
+  if (anyNA(statistic_mat)) {
+    padj_legend_labels[3] <- "N/A"
+    padj_legend_fill[3] <- heatmap_args[["na_col"]]
+  }
+
   base_lt_args <- list(
-    at = seq_len(2L),
+    at = seq_along(padj_legend_labels),
     title = padj_legend_title,
     title_gp = gpar(fontsize = fontsize, fontface = "bold"),
-    labels = paste(c("<", "\u2265"), padj_cutoff), # \u2265 = ">="
+    labels = padj_legend_labels, # \u2265 = ">="
     labels_gp = gpar(fontsize = fontsize),
-    legend_gp = gpar(fill = c(padj_fill,
-                              heatmap_args[["rect_gp"]][["fill"]])),
+    legend_gp = gpar(fill = padj_legend_fill),
     grid_height = heatmap_args$heatmap_legend_param$grid_width,
     grid_width = heatmap_args$heatmap_legend_param$grid_width,
     border = "black",
-    nrow = 2L,
+    nrow = length(padj_legend_labels),
     direction = "horizontal"
   )
   lt_args <- modifyList(x = base_lt_args, val = padj_args, keep.null = TRUE)
