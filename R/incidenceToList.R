@@ -13,7 +13,7 @@
 #' @note Currently, there are no checks to ensure \code{incidence} is a valid
 #'   incidence matrix.
 #'
-#' @export incidence_to_list
+#' @export incidenceToList
 #'
 #' @examples
 #' x <- list("A" = c("a", "b", "c"),
@@ -23,9 +23,9 @@
 #'
 #' (imat <- incidence(x)) # incidence matrix
 #'
-#' incidence_to_list(incidence = imat)
+#' incidenceToList(incidence = imat)
 
-incidence_to_list <- function(incidence) {
+incidenceToList <- function(incidence) {
     # The incidence matrix is assumed to be in the correct form with sets as
     # rows and elements as columns.
     idx <- which(incidence == 1, arr.ind = TRUE, useNames = FALSE)

@@ -54,7 +54,7 @@ suppressPackageStartupMessages({
 
 GMT files, such as those available through the Molecular Signatures Database
 (MSigDB)[@liberzon_molecular_2011; @liberzon_molecular_2015], can be read as
-named lists with `gmt_to_list`:
+named lists with `readGMT`:
 
 ```{r read-gmt}
 # Path to GMT file - MSigDB Gene Ontology sets
@@ -63,7 +63,7 @@ pathToGMT <- system.file(
     package = "TMSig"
 )
 
-geneSets <- gmt_to_list(path = pathToGMT)
+geneSets <- readGMT(path = pathToGMT)
 
 length(geneSets) # 10461 gene sets
 
@@ -74,15 +74,15 @@ geneSets[[1]] # genes in first set
 
 # Filter Sets
 
-`filter_sets` keeps sets that satisfy minimum and maximum size constraints.
+`filterSets` keeps sets that satisfy minimum and maximum size constraints.
 Optionally, sets can be restricted to a smaller background of genes before
 filtering by size.
 
 ```{r filter-sets}
 # Filter by size - no background
-filt <- filter_sets(x = geneSets, 
-                    min_size = 10L, 
-                    max_size = 500L)
+filt <- filterSets(x = geneSets, 
+                   min_size = 10L, 
+                   max_size = 500L)
 length(filt) # 7096 gene sets remain (down from 10461)
 ```
 
@@ -105,7 +105,7 @@ by size.
 
 ```{r filter-sets-bg}
 # Restrict genes sets to background of genes
-geneSetsFilt <- filter_sets(
+geneSetsFilt <- filterSets(
     x = geneSets, 
     background = background, 
     min_size = 10L # min. overlap of each set with background
@@ -144,7 +144,7 @@ An incidence matrix is a representation of a graph. For a named list of sets,
 the set names form the rows of the matrix, and all unique elements are columns.
 A value of 1 indicates that the element is a member of the set, while a value of
 0 indicates otherwise. The incidence matrix forms the basis for many of the
-functions in TMSig, including `similarity`, `cluster_sets`, `decompose_sets`,
+functions in TMSig, including `similarity`, `clusterSets`, `decomposeSets`,
 and `cameraPR.matrix`.
 
 ```{r incidence-matrix}
@@ -234,18 +234,18 @@ otsuka[idx, "GOBP_CARDIAC_ATRIUM_DEVELOPMENT", drop = FALSE]
 
 # Cluster Similar Sets
 
-`cluster_sets` employs hierarchical clustering to identify groups of highly
+`clusterSets` employs hierarchical clustering to identify groups of highly
 similar sets. This procedure was developed for the removal of redundant Gene
 Ontology and Reactome gene sets for the MSigDB. See
-`help(topic = "cluster_sets", package = "TMSig")` for details.
+`help(topic = "clusterSets", package = "TMSig")` for details.
 
 ```{r cluster-sets}
-# cluster_sets with default arguments
-clusterDF <- cluster_sets(x = geneSetsFilt, 
-                          type = "jaccard", 
-                          cutoff = 0.85, 
-                          method = "complete",
-                          h = 0.9)
+# clusterSets with default arguments
+clusterDF <- clusterSets(x = geneSetsFilt, 
+                         type = "jaccard", 
+                         cutoff = 0.85, 
+                         method = "complete",
+                         h = 0.9)
 
 # First 4 clusters with 2 or more sets
 subset(clusterDF, subset = cluster <= 4L)
@@ -256,7 +256,7 @@ of criteria such as set size, overlap proportion, or length of the description
 (shorter descriptions tend to be more general terms).
 
 ```{r add-clusterDF-columns}
-## Use cluster_sets output to select sets to retain for analysis
+## Use clusterSets output to select sets to retain for analysis
 clusterDF$overlap_prop <- overlapProp[clusterDF$set] # overlap proportion
 clusterDF$n_char <- nchar(clusterDF$set) # length of set description
 
@@ -306,10 +306,10 @@ gene set testing results.
 
 ```{r decompose-sets}
 # Limit maximum set size for this example
-geneSetsFilt2 <- filter_sets(geneSetsFilt, max_size = 50L)
+geneSetsFilt2 <- filterSets(geneSetsFilt, max_size = 50L)
 
 # Decompose all pairs of sets with at least 10 genes in common
-decompSets <- decompose_sets(x = geneSetsFilt2, overlap = 10L)
+decompSets <- decomposeSets(x = geneSetsFilt2, overlap = 10L)
 
 # Last 3 components
 tail(decompSets, 3L)
@@ -323,7 +323,7 @@ become elements. This is primarily used to identify all sets to which a
 particular element belongs.
 
 ```{r invert-sets}
-invertedSets <- invert_sets(x = geneSetsFilt)
+invertedSets <- invertSets(x = geneSetsFilt)
 
 length(invertedSets) # 1914 genes
 

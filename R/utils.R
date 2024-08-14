@@ -4,6 +4,7 @@
 #'   create a \code{data.table}.
 #'
 #' @inheritParams incidence
+#' @inheritParams filterSets
 #'
 #' @returns A \code{data.table} with columns \code{sets} and \code{elements}.
 #'
@@ -11,7 +12,7 @@
 #'
 #' @noRd
 
-.prepare_sets <- function(x) {
+.prepare_sets <- function(x, background = NULL) {
     if (!is.list(x) | is.null(names(x)))
         stop("`x` must be a named list of character vectors.")
 
@@ -34,6 +35,30 @@
         sets <- sets[keep]
     }
 
+    if (!is.null(background)) {
+        if (!is.atomic(background))
+            stop("If provided, `background` must be an atomic vector, ",
+                 "preferably of type \"character\".")
+
+        background <- unique(as.character(background))
+        background <- background[!is.na(background)]
+
+        if (length(background) == 0L)
+            stop("`background` must contain at least 1 unique, ",
+                 "nonmissing element.")
+
+        # Subset to elements in background
+        in_bg <- which(elements %in% background)
+
+        if (length(in_bg) == 0L)
+            stop("No elements of `x` are present in `background`.")
+
+        if (length(in_bg) != length(elements)) {
+            elements <- elements[in_bg]
+            sets <- sets[in_bg]
+        }
+    }
+
     dt <- data.table(sets = sets,
                      elements = elements,
                      stringsAsFactors = FALSE)
@@ -42,6 +67,36 @@
     dt <- unique(dt)
 
     return(dt)
+}
+
+
+#' @title Validate min_size and max_size for filterSets
+#'
+#' @inheritParams filterSets
+#'
+#' @returns A length 2 numeric vector of the set size limits. May include
+#'   \code{Inf}.
+#'
+#' @noRd
+
+.checkSizeRange <- function(min_size = 1L, max_size = Inf) {
+    # Relax the type of min_size and max_size to allow doubles
+    if (!is.vector(min_size, mode = "numeric") || length(min_size) != 1L)
+        stop("`min_size` must be a single integer.")
+
+    if (!is.vector(max_size, mode = "numeric") || length(max_size) != 1L)
+        stop("`max_size` must be a single integer or Inf.")
+
+    if (min_size > max_size)
+        stop("`min_size` cannot be greater than `max_size`.")
+
+    # Sets must contain at least 1 element
+    min_size <- max(1L, floor(min_size))
+    max_size <- max(1L, floor(max_size))
+    sizeRange <- floor(c(min_size, max_size))
+    sizeRange <- pmax(sizeRange, 1)
+
+    return(sizeRange)
 }
 
 
@@ -61,12 +116,10 @@
                                  statistic_column = "TwoSampleT",
                                  contrast_column = "Contrast",
                                  padj_column = "FDR",
-                                 padj_aggregate_fun = function(padj) {
-                                     median(-log10(padj), na.rm = TRUE)
-                                 },
+                                 padj_aggregate_fun = function(padj)
+                                     median(-log10(padj), na.rm = TRUE),
                                  padj_cutoff = 0.05,
-                                 plot_sig_only = TRUE)
-{
+                                 plot_sig_only = TRUE) {
     if (padj_cutoff < 0 | padj_cutoff > 1)
         stop("`padj_cutoff` must be between 0 and 1.")
 
@@ -80,7 +133,6 @@
                        statistic_column, contrast_column)
 
     x <- as.data.table(x)
-    # This catches missing columns
     x <- unique(x[, required_cols, with = FALSE, drop = FALSE])
 
     # Identify sets that are significant in at least 1 contrast
@@ -96,17 +148,13 @@
              "Consider setting plot_sig_only=FALSE.")
 
     # Select n_top most significant terms
-    x[, criteria := padj_aggregate_fun(get(padj_column)),
-      by = set_column]
+    x[, criteria := padj_aggregate_fun(get(padj_column)), by = set_column]
 
-    setorderv(x,
-              cols = c(contrast_column, "criteria"),
-              order = c(1, -1))
+    setorderv(x, cols = c(contrast_column, "criteria"), order = c(1, -1))
 
     # Filter to top pathways
     top_pathways <- unique(x[[set_column]])
     top_pathways <- top_pathways[seq_len(min(n_top, length(top_pathways)))]
-
     x <- subset(x, subset = get(set_column) %in% top_pathways)
 
     # All n should be 1 if there are no duplicates
@@ -125,14 +173,13 @@
 
     # Split into matrices of adjusted p-values and set statistics
     padjColumnIndices <- grep(paste0("^", padj_column, "_"), colnames(x))
-    padj_mat <- x[, padjColumnIndices, drop = FALSE]
-    statistic_mat <- x[, -padjColumnIndices, drop = FALSE]
+    out <- list("statistic_mat" = x[, -padjColumnIndices, drop = FALSE],
+                "padj_mat" = x[, padjColumnIndices, drop = FALSE])
 
-    colnames(padj_mat) <- colnames(statistic_mat) <-
-        sub(paste0("^", padj_column, "_"), "", colnames(padj_mat))
-
-    out <- list("statistic_mat" = statistic_mat,
-                "padj_mat" = padj_mat)
+    out <- lapply(out, function(mat) {
+        colnames(mat) <- sub(paste0("^", padj_column, "_"), "", colnames(mat))
+        return(mat)
+    })
 
     return(out)
 }
@@ -157,8 +204,7 @@
 #' @noRd
 
 .update_heatmap_args <- function(base_heatmap_args = list(),
-                                 heatmap_args = list())
-{
+                                 heatmap_args = list()) {
     if (!is.list(heatmap_args))
         stop("`heatmap_args` must be a list of arguments that ",
              "will be passed to ComplexHeatmap::Heatmap.")
@@ -287,8 +333,7 @@
                           height = 480,
                           units = "px",
                           res = 500,
-                          ...)
-{
+                          ...) {
     # see tools::file_ext
     file_ext <- sub(".*\\.([[:alnum:]]+)$", "\\1", filename)
 

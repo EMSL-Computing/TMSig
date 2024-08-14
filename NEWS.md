@@ -1,9 +1,10 @@
-# TMSig DEV (2024-08-13)
+# TMSig DEV (2024-08-14)
 
 **SIGNIFICANT USER-VISIBLE CHANGES**
 
-- `enrichmap`: heatmap rectangle fill and border color can now be changed via the `heatmap_args` parameter. Color legend title can now be changed via `heatmap_args = list(name = "new title")` instead of `heatmap_args = list(heatmap_legend_param = list(title = "new title"))`. Added examples to documentation. Default text size is now controlled by the `cell_size` argument. Missing values in the heatmap are now indicated in the adjusted p-value legend with the label "N/A".
-- `decompose_sets`: added arguments `AND`, `MINUS`, and `verbose`. Reduced computation time.
+- Rename functions to adhere to Bioconductor style: `cluster_sets` --> `clusterSets`, `decompose_sets` --> `decomposeSets`, `filter_sets` --> `filterSets`, `gmt_to_list` --> `readGMT`, `incidence_to_list` --> `incidenceToList`, `invert_sets` --> `invertSets`, `range_extend` --> `extendRangeNum`, `camera_color_fun` --> `gseaColorFun`, `gsea_color_fun` --> `gseaColorFun`.
+- `enrichmap`: heatmap rectangle fill and border color can now be changed via the `heatmap_args` parameter. Color legend title can now be changed via `heatmap_args = list(name = "new title")` instead of `heatmap_args = list(heatmap_legend_param = list(title = "new title"))`. Added examples to documentation. Default text size is now controlled by the `cell_size` argument.
+- `decomposeSets`: added arguments `AND`, `MINUS`, and `verbose`. Reduced computation time.
 
 **MINOR CHANGES**
 

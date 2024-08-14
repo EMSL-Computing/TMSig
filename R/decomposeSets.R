@@ -1,11 +1,10 @@
 #' @title Decompose Pairs of Overlapping Sets Into 3 Disjoint Parts
 #'
-#' @description `r lifecycle::badge("experimental")`
-#'
-#'   Decompose all pairs of sufficiently overlapping sets into 3 disjoint parts:
-#'   the elements unique to the first set, the elements unique to the second
-#'   set, and the elements found in both sets. See the examples section in
-#'   \code{\link{invert_sets}} for a method to decompose an entire list of sets.
+#' @description Decompose all pairs of sufficiently overlapping sets into 3
+#'   disjoint parts: the elements unique to the first set, the elements unique
+#'   to the second set, and the elements found in both sets. See the examples
+#'   section in \code{\link{invertSets}} for a method to decompose an entire
+#'   list of sets.
 #'
 #' @inheritParams incidence
 #' @param overlap integer; only pairs of sets with at least \code{overlap}
@@ -41,7 +40,7 @@
 #'
 #' @returns A named list of disjoint parts of sets. May contain aliases.
 #'
-#' @seealso \code{\link{filter_sets}}
+#' @seealso \code{\link{filterSets}}
 #'
 #' @references
 #'
@@ -52,7 +51,7 @@
 #'
 #' @importFrom Matrix tril
 #'
-#' @export decompose_sets
+#' @export decomposeSets
 #'
 #' @examples
 #' x <- list("A" = letters[1:10],
@@ -60,18 +59,15 @@
 #'           "C" = letters[1:4],
 #'           "D" = letters[6:12])
 #'
-#' decompose_sets(x)
+#' decomposeSets(x)
 #'
-#' decompose_sets(x, overlap = 5L)
+#' decomposeSets(x, overlap = 5L)
 
-decompose_sets <- function(x,
-                           overlap = 1L,
-                           AND = "~AND~",
-                           MINUS = "~MINUS~",
-                           verbose = TRUE)
-{
-    lifecycle::signal_stage("experimental", "decompose_sets()")
-
+decomposeSets <- function(x,
+                          overlap = 1L,
+                          AND = "~AND~",
+                          MINUS = "~MINUS~",
+                          verbose = TRUE) {
     if (!is.character(AND) || !is.character(MINUS))
         stop("`AND` and `MINUS` must be character strings.")
 
@@ -89,7 +85,7 @@ decompose_sets <- function(x,
     # Since the size of the intersection between a set and any other set is at
     # most the size of that set, we can pre-filter to sets of size `overlap` or
     # greater. This also validates x.
-    x <- filter_sets(x, min_size = overlap)
+    x <- filterSets(x, min_size = overlap)
 
     if (length(x) < 2L)
         stop("Fewer than 2 sets with at least `overlap` elements.")
@@ -103,11 +99,10 @@ decompose_sets <- function(x,
 
     # Indices of sufficiently overlapping pairs of sets
     idx <- which(imat >= overlap, arr.ind = TRUE, useNames = FALSE)
-
-    if (nrow(idx) == 0L)
-        stop("No pairs of sets with at least `overlap` elements in common.")
-
     n_pairs <- nrow(idx)
+
+    if (n_pairs == 0L)
+        stop("No pairs of sets with at least `overlap` elements in common.")
 
     if (verbose)
         message("Decomposing ", n_pairs, " pairs of sets.")
@@ -116,27 +111,22 @@ decompose_sets <- function(x,
     set_pairs <- array(rownames(imat)[idx], dim = dim(idx))
 
     ## Set decomposition ----
-    outcomes <- rep(list(0:1), 2L) # 1 = in set; 0 = not in set
+    outcomes <- rep(list(c(MINUS, AND)), 2L) # 1 = in set; 0 = not in set
     outcomes <- expand.grid(outcomes)
     outcomes <- as.matrix(outcomes)[-1, ] # convert to matrix, remove null set
-    outcomes <- ifelse(outcomes, AND, MINUS)
 
     # Coefficients used to convert each disjoint component from binary to int.
     coefs <- matrix(seq_len(2L), nrow = 1L) # matrix: 2, 1
 
     x_decomp <- vector(mode = "list", length = n_pairs)
-
     for (i in seq_len(n_pairs)) { # much faster than apply(set_pairs, 1, ...)
         sets_i <- set_pairs[i, ]
-        # Convert incidence matrix columns from binary to integer
         i_vec <- as.vector(coefs %*% incidence[sets_i, ])
 
         # Remove elements not in either set
         keep_elements <- which(i_vec != 0L)
-        i_vec <- i_vec[keep_elements]
-        elements_i <- elements[keep_elements]
-
-        decomp_i <- split(x = elements_i, f = i_vec)
+        decomp_i <- split(x = elements[keep_elements],
+                          f = i_vec[keep_elements])
 
         ## For a pair of sets A and B, define names of disjoint components:
         # "A ~MINUS~ B" = elements in A and not in B,

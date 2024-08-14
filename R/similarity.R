@@ -71,7 +71,7 @@
 #'   coefficients of faunal similarity. \emph{Journal of Paleontology, 53}(4),
 #'   1029–1034. \url{http://www.jstor.org/stable/1304126}
 #'
-#' @seealso \code{\link{incidence}}, \code{\link{cluster_sets}}
+#' @seealso \code{\link{incidence}}, \code{\link{clusterSets}}
 #'
 #' @importFrom Matrix tril diag which
 #'
@@ -101,7 +101,7 @@ similarity <- function(x,
     if (nrow(incidence_mat) < 2L)
         stop("`x` must contain 2 or more sets.")
 
-    # Sizes of all pairwise intersections: t(incidence_mat) %*% incidence_mat
+    # Sizes of all pairwise intersections: incidence_mat %*% t(incidence_mat)
     mat <- tcrossprod(incidence_mat)
     set_sizes <- diag(mat)
 

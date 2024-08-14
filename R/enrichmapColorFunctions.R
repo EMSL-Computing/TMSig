@@ -10,36 +10,36 @@
 #'
 #' @returns a named list of breaks and colors for the heatmap legend.
 #'
-#' @details For \code{gsea_color_fun}, the \code{statistics} are expected to be
+#' @details For \code{gseaColorFun}, the \code{statistics} are expected to be
 #'   normalized enrichment scores (NES). Due to how the NES is formulated,
 #'   values between -1 and 1 are never significant or otherwise interesting, so
 #'   they are given a white fill so as to not appear in the heatmap (see
 #'   examples).
 #'
-#' @seealso \code{\link{range_extend}}
+#' @seealso \code{\link{extendRangeNum}}
 #'
-#' @name enrichmap_color_functions
+#' @name enrichmapColorFunctions
 #'
 #' @examples
 #' set.seed(0)
 #' x <- rnorm(10, mean = 0, sd = 2)
 #'
-#' camera_color_fun(x)
-#' camera_color_fun(x[x >= 0]) # positive only
+#' cameraColorFun(x)
+#' cameraColorFun(x[x >= 0]) # positive only
 #'
-#' gsea_color_fun(x)
-#' gsea_color_fun(x[x >= 0]) # positive only
+#' gseaColorFun(x)
+#' gseaColorFun(x[x >= 0]) # positive only
 
 
-#' @rdname enrichmap_color_functions
-#' @export gsea_color_fun
-gsea_color_fun <- function(statistics,
-                           colors = c("#3366ff", "darkred"))
+#' @rdname enrichmapColorFunctions
+#' @export gseaColorFun
+gseaColorFun <- function(statistics,
+                         colors = c("#3366ff", "darkred"))
 {
     r <- range(statistics, na.rm = TRUE)
 
     # Extend range of values out to the nearest tenth
-    extended_range <- range_extend(r, nearest = 0.1)
+    extended_range <- extendRangeNum(r, nearest = 0.1)
 
     # Due to how the NES is formulated, NES between -1 and 1 are never
     # significant or otherwise interesting, so they are given a white color so
@@ -63,15 +63,15 @@ gsea_color_fun <- function(statistics,
 
 
 
-#' @rdname enrichmap_color_functions
-#' @export camera_color_fun
-camera_color_fun <- function(statistics,
-                             colors = c("#3366ff", "darkred"))
+#' @rdname enrichmapColorFunctions
+#' @export cameraColorFun
+cameraColorFun <- function(statistics,
+                           colors = c("#3366ff", "darkred"))
 {
     r <- range(statistics, na.rm = TRUE)
 
     # Extend range of values out to the nearest tenth
-    extended_range <- range_extend(r, nearest = 0.1)
+    extended_range <- extendRangeNum(r, nearest = 0.1)
 
     if (all(r >= 0)) {
         breaks <- c(0, extended_range[2])

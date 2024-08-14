@@ -10,7 +10,12 @@ version](https://img.shields.io/github/r-package/v/EMSL-Computing/TMSig?label=R%
 <!-- badges: end -->
 
 The `TMSig` **R** package contains tools to prepare, analyze, and
-visualize *a priori* molecular signatures, such as gene sets.
+visualize named lists of mathematical sets, with an emphasis on
+molecular signatures (such as gene or kinase sets). It includes fast,
+memory efficient functions to construct sparse incidence and similarity
+matrices and filter, cluster, invert, and decompose sets. Additionally,
+bubble heatmaps can be created to visualize the results of any
+differential or molecular signatures analysis.
 
 We define a molecular signature as any collection of genes, proteins,
 post-translational modifications (PTMs), metabolites, lipids, or other
@@ -36,7 +41,7 @@ devtools::install_github("EMSL-Computing/TMSig", build_vignettes = TRUE)
 
 Below is an overview of some of the core functions.
 
-- `gmt_to_list`: create a named list of sets from a GMT file.
+- `readGMT`: create a named list of sets from a GMT file.
 
 - `incidence`: compute a sparse incidence matrix with unique sets as
   rows and unique elements as columns. A value of 1 indicates that a
@@ -51,12 +56,12 @@ Below is an overview of some of the core functions.
   - Overlap(A, B) = $\frac{|A \cap B|}{\min(|A|, |B|)}$
   - Ōtsuka(A, B) = $\frac{|A \cap B|}{\sqrt{|A| \times |B|}}$
 
-- `filter_sets`: restrict sets to only those elements in a
-  pre-determined background, if provided, and only keep those that pass
-  minimum and maximum size thresholds.
+- `filterSets`: restrict sets to only those elements in a pre-determined
+  background, if provided, and only keep those that pass minimum and
+  maximum size thresholds.
 
-- `cluster_sets`: hierarchical clustering of highly similar sets. Used
-  to reduce redundancy prior to analysis.
+- `clusterSets`: hierarchical clustering of highly similar sets. Used to
+  reduce redundancy prior to analysis.
 
 - `cameraPR.matrix`: a fast matrix method for `limma::cameraPR` for
   testing molecular signatures in one or more contrasts. Pre-Ranked
@@ -73,7 +78,6 @@ Below is an overview of some of the core functions.
 ``` r
 library(TMSig)
 #> Loading required package: limma
-#> Loading required package: Matrix
 
 # Named list of sets
 x <- list("Set1" = letters[1:5],
@@ -183,7 +187,7 @@ similarity(x, type = "otsuka") # Ōtsuka
 ## Cluster sets based on their similarity
 
 # Cluster aliased sets
-cluster_sets(x, cutoff = 1)
+clusterSets(x, cutoff = 1)
 #>    set cluster set_size
 #> 1 Set2       1        4
 #> 2 Set3       1        4
@@ -194,7 +198,7 @@ cluster_sets(x, cutoff = 1)
 #> 7 Set7       6        4
 
 # Cluster subsets
-cluster_sets(x, cutoff = 1, type = "overlap")
+clusterSets(x, cutoff = 1, type = "overlap")
 #>    set cluster set_size
 #> 1 Set1       1        5
 #> 2 Set2       1        4

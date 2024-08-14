@@ -12,18 +12,18 @@
 #'
 #' @seealso \code{\link[base]{range}}, \code{\link[grDevices]{extendrange}}
 #'
-#' @export range_extend
+#' @export extendRangeNum
 #'
 #' @examples
 #' set.seed(0)
 #' x <- runif(5, min = -10, max = 10)
 #' range(x) # -4.689827  8.164156
 #'
-#' range_extend(x) # -5  9
-#' range_extend(x, nearest = 2) # -6  10
-#' range_extend(x, nearest = 0.1) # -4.7  8.2
+#' extendRangeNum(x) # -5  9
+#' extendRangeNum(x, nearest = 2) # -6  10
+#' extendRangeNum(x, nearest = 0.1) # -4.7  8.2
 
-range_extend <- function(x, nearest = 1) {
+extendRangeNum <- function(x, nearest = 1) {
     r <- range(x, na.rm = TRUE) / nearest
 
     c(floor(r[1]), ceiling(r[2])) * nearest

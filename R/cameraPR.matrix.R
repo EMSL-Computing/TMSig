@@ -23,15 +23,15 @@
 #'   \code{index}.
 #' @param sort logical; should the results of each contrast be sorted by
 #'   p-value? Default is \code{TRUE}.
+#' @param alternative character; the alternative hypothesis. Must be one of
+#'   "\code{two.sided}" (default), "\code{greater}", or "\code{less}". May be
+#'   abbreviated. A warning will be issued if anything other than
+#'   "\code{two.sided}" is specified when \code{use.ranks=FALSE}.
 #' @param adjust.globally logical; whether p-values from different contrasts
 #'   should be adjusted together. It is recommended to set this to \code{TRUE}
 #'   when testing a set of closely related contrasts. See Section 13.3 of the
 #'   LIMMA User's Guide (\code{\link[limma]{limmaUsersGuide}}) for details.
 #'   Default is \code{FALSE}.
-#' @param alternative character; the alternative hypothesis. Must be one of
-#'   "\code{two.sided}" (default), "\code{greater}", or "\code{less}". May be
-#'   abbreviated. A warning will be issued if anything other than
-#'   "\code{two.sided}" is specified when \code{use.ranks=FALSE}.
 #' @param min.size integer; the minimum set size. To be considered for testing,
 #'   sets must have at least \code{min.size} elements with non-missing values in
 #'   all contrasts. The default value of 2 is the minimum possible set size
@@ -143,8 +143,8 @@ cameraPR.matrix <- function(statistic,
                             use.ranks = FALSE,
                             inter.gene.cor = 0.01,
                             sort = TRUE,
-                            adjust.globally = FALSE,
                             alternative = c("two.sided", "less", "greater"),
+                            adjust.globally = FALSE,
                             min.size = 2L,
                             ...)
 {
@@ -180,10 +180,10 @@ cameraPR.matrix <- function(statistic,
              "values in each contrast column of the `statistic` matrix.")
 
     # Restrict each set to only those elements in the `statistic` matrix
-    index <- filter_sets(x = index,
-                         background = background,
-                         min_size = min.size,
-                         max_size = length(background) - 1L)
+    index <- filterSets(x = index,
+                        background = background,
+                        min_size = min.size,
+                        max_size = length(background) - 1L)
 
     imat <- incidence(index) # sparse incidence matrix
 

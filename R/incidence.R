@@ -12,7 +12,7 @@
 #' @returns An object of class \code{\link[Matrix:dgCMatrix-class]{dgCMatrix}}
 #'   with unique set names as rows and unique elements as columns.
 #'
-#' @seealso \code{\link{incidence_to_list}}, \code{\link{similarity}},
+#' @seealso \code{\link{incidenceToList}}, \code{\link{similarity}},
 #'   \code{\link[Matrix]{sparseMatrix}}
 #'
 #' @importFrom Matrix sparseMatrix

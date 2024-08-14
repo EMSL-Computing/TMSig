@@ -19,7 +19,12 @@ knitr::opts_chunk$set(
 ![R package version](https://img.shields.io/github/r-package/v/EMSL-Computing/TMSig?label=R%20package)
 <!-- badges: end -->
 
-The `TMSig` **R** package contains tools to prepare, analyze, and visualize _a priori_ molecular signatures, such as gene sets.
+The `TMSig` **R** package contains tools to prepare, analyze, and visualize
+named lists of mathematical sets, with an emphasis on molecular signatures (such
+as gene or kinase sets). It includes fast, memory efficient functions to
+construct sparse incidence and similarity matrices and filter, cluster, invert,
+and decompose sets. Additionally, bubble heatmaps can be created to visualize
+the results of any differential or molecular signatures analysis.
 
 We define a molecular signature as any collection of genes, proteins, post-translational modifications (PTMs), metabolites, lipids, or other molecules with an associated biological interpretation. Most molecular signatures databases are gene-centric, such as the Molecular Signatures Database (MSigDB; Liberzon et al., 2011, 2015), though there are others like the Metabolomics Workbench Reference List of Metabolite Names (RefMet) database (Fahy & Subramaniam, 2020).
 
@@ -41,7 +46,7 @@ devtools::install_github("EMSL-Computing/TMSig", build_vignettes = TRUE)
 
 Below is an overview of some of the core functions.
 
-- `gmt_to_list`: create a named list of sets from a GMT file.
+- `readGMT`: create a named list of sets from a GMT file.
 
 - `incidence`: compute a sparse incidence matrix with unique sets as rows and unique elements as columns. A value of 1 indicates that a particular element is a member of that set, while a value of 0 indicates that it is not.
 
@@ -50,9 +55,9 @@ Below is an overview of some of the core functions.
   - Overlap(A, B) = $\frac{|A \cap B|}{\min(|A|, |B|)}$
   - Ōtsuka(A, B) = $\frac{|A \cap B|}{\sqrt{|A| \times |B|}}$
 
-- `filter_sets`: restrict sets to only those elements in a pre-determined background, if provided, and only keep those that pass minimum and maximum size thresholds.
+- `filterSets`: restrict sets to only those elements in a pre-determined background, if provided, and only keep those that pass minimum and maximum size thresholds.
 
-- `cluster_sets`: hierarchical clustering of highly similar sets. Used to reduce redundancy prior to analysis.
+- `clusterSets`: hierarchical clustering of highly similar sets. Used to reduce redundancy prior to analysis.
 
 - `cameraPR.matrix`: a fast matrix method for `limma::cameraPR` for testing molecular signatures in one or more contrasts. Pre-Ranked Correlation Adjusted MEan RAnk gene set testing (CAMERA-PR) accounts for inter-gene correlation to control the type I error rate (Wu & Smyth, 2012).
 
@@ -96,10 +101,10 @@ similarity(x, type = "otsuka") # Ōtsuka
 ## Cluster sets based on their similarity
 
 # Cluster aliased sets
-cluster_sets(x, cutoff = 1)
+clusterSets(x, cutoff = 1)
 
 # Cluster subsets
-cluster_sets(x, cutoff = 1, type = "overlap")
+clusterSets(x, cutoff = 1, type = "overlap")
 ```
 
 
