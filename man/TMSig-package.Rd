@@ -6,7 +6,7 @@
 \alias{TMSig-package}
 \title{TMSig: Tools for Molecular Signatures}
 \description{
-The TMSig package contains tools to prepare, analyze, and visualize named lists of mathematical sets, with an emphasis on molecular signatures (such as gene or kinase sets). It includes fast, memory efficient functions to construct sparse incidence and similarity matrices and filter, cluster, invert, and decompose sets. Additionally, bubble heatmaps can be created to visualize the results of any differential or molecular signatures analysis.
+The TMSig package contains tools to prepare, analyze, and visualize named lists of sets, with an emphasis on molecular signatures (such as gene or kinase sets). It includes fast, memory efficient functions to construct sparse incidence and similarity matrices and filter, cluster, invert, and decompose sets. Additionally, bubble heatmaps can be created to visualize the results of any differential or molecular signatures analysis.
 }
 \seealso{
 Useful links:

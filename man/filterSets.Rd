@@ -10,8 +10,7 @@ filterSets(x, background = NULL, min_size = 5L, max_size = Inf)
 \item{x}{a named list of sets. Elements must be of type \code{"character"}.}
 
 \item{background}{character; optional character vector. \code{x} will be
-filtered to only those elements of \code{background}. If \code{background}
-is any other atomic vector, it will be coerced to type \code{character}.}
+filtered to only those elements of \code{background}.}
 
 \item{min_size}{integer (\eqn{\geq 1}); the minimum allowable set size.}
 
@@ -31,7 +30,8 @@ x <- list("A" = c("a", "b", "c"),
           "B" = c("a", "a", "d", "e", NA), # duplicates and NA
           "C" = c("f", "g"))
 
-# All sets have at least 2 elements, so this just removes duplicates and NA
+# All sets have at least 2 elements,
+# so this just removes duplicates and NA
 filterSets(x, min_size = 2L)
 
 # Limit scope of sets before filtering

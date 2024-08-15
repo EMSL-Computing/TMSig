@@ -89,14 +89,10 @@
 #'
 #' similarity(x, type = "otsuka") # Ōtsuka coefficients
 
-similarity <- function(x,
-                       type = c("jaccard", "overlap", "otsuka"))
-{
+similarity <- function(x, type = c("jaccard", "overlap", "otsuka")) {
     type <- match.arg(type, choices = c("jaccard", "overlap", "otsuka"))
 
-    # Incidence matrix with set identifiers as rows and elements as columns
-    # 1 if the element is a member of the set; 0 otherwise
-    incidence_mat <- incidence(x)
+    incidence_mat <- incidence(x) # sparse incidence matrix
 
     if (nrow(incidence_mat) < 2L)
         stop("`x` must contain 2 or more sets.")
@@ -109,10 +105,8 @@ similarity <- function(x,
     # lower triangular part
     mat <- tril(mat, k = -1L)
 
-    # Positions of nonzero intersections
     idx <- which(mat > 0, arr.ind = TRUE, useNames = FALSE)
 
-    # Array of set sizes
     size_array <- array(set_sizes[idx], dim = dim(idx))
     size_intersect <- mat[idx]
 

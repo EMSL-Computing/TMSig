@@ -2,7 +2,7 @@ Package: TMSig
 Type: Package
 Title: Tools for Molecular Signatures
 Version: 0.99.0
-Date: 2024-08-14
+Date: 2024-08-23
 Authors@R: 
     c(
       person(given = "Tyler", family = "Sagendorf", 
@@ -13,11 +13,11 @@ Authors@R:
       person(given = "Gordon", family = "Smyth", role = "ctb")
     )
 Description: The TMSig package contains tools to prepare, analyze, and visualize
-    named lists of mathematical sets, with an emphasis on molecular signatures
-    (such as gene or kinase sets). It includes fast, memory efficient functions
-    to construct sparse incidence and similarity matrices and filter, cluster, 
-    invert, and decompose sets. Additionally, bubble heatmaps can be created to 
-    visualize the results of any differential or molecular signatures analysis.
+    named lists of sets, with an emphasis on molecular signatures (such as gene
+    or kinase sets). It includes fast, memory efficient functions to construct
+    sparse incidence and similarity matrices and filter, cluster, invert, and 
+    decompose sets. Additionally, bubble heatmaps can be created to visualize 
+    the results of any differential or molecular signatures analysis.
 License: GPL (>= 3)
 URL: https://github.com/EMSL-Computing/TMSig
 BugReports: https://github.com/EMSL-Computing/TMSig/issues
@@ -25,7 +25,7 @@ Encoding: UTF-8
 RoxygenNote: 7.3.2
 Roxygen: list(markdown = TRUE)
 VignetteBuilder: knitr
-biocViews: Clustering, GeneSetEnrichment, Pathways, Visualization
+biocViews: Clustering, GeneSetEnrichment, GraphAndNetwork, Pathways, Visualization
 Depends:
     R (>= 4.4.0),
     limma

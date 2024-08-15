@@ -19,5 +19,8 @@ utils::globalVariables(
       "PValue",
       "df",
       "heatmap_args",
-      "criteria")
+      "criteria",
+      "Down",
+      "TwoSampleT",
+      "Up")
 )

@@ -166,8 +166,8 @@ enrichmap(x = x,
           padj_column = "FDR",
           padj_cutoff = 0.05)
 
-# Include gene sets with adjusted p-values above padj_cutoff (0.05). Also
-# update adjusted p-value legend title.
+# Include gene sets with adjusted p-values above padj_cutoff (0.05).
+# Also update adjusted p-value legend title.
 enrichmap(x = x,
           statistic_column = "ZScore",
           plot_sig_only = FALSE,

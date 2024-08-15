@@ -27,6 +27,15 @@ like the Metabolomics Workbench Reference List of Metabolite Names
 
 ## Installation
 
+To install this package, start R (\>= 4.4.0) and enter:
+
+``` r
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("TMSig")
+```
+
 You can install the development version of `TMSig` like so:
 
 ``` r
@@ -74,6 +83,9 @@ Below is an overview of some of the core functions.
   rows and contrasts as columns.
 
 ## Examples
+
+Please refer to `vignette(topic = "TMSig", package = "TMSig")` for
+examples of how to use this package.
 
 ``` r
 library(TMSig)

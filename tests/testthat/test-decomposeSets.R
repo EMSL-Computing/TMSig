@@ -1,15 +1,6 @@
-test_that("x must contain at least 2 sets", {
-    x <- list("A" = c("a", "b"))
-
-    expect_error(
-        decomposeSets(x, overlap = 2L),
-        "Fewer than 2 sets with at least `overlap` elements."
-    )
-})
-
-
 test_that("overlap must be a length 1 integer", {
-    x <- list("A" = 1:2, "B" = 1:2)
+    x <- list("A" = c("a", "b"),
+              "B" = c("a", "b"))
 
     expect_error(
         decomposeSets(x, overlap = NULL),

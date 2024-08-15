@@ -97,8 +97,8 @@ test_that("inter.gene.cor is valid", {
     expect_identical(
         err1,
         paste0("Length of `inter.gene.cor` must be 1 or the same length as ",
-               "index. If the latter, names of `inter.gene.cor` should match ",
-               "names of `index`.")
+               "`index`. If the latter, names of `inter.gene.cor` should ",
+               "match names of `index`.")
     )
 
     # Length of inter.gene.cor is correct, but names do not match names of
@@ -151,6 +151,7 @@ test_that("parametric results are correct", {
     expected$PValue[4] <- 2 * pt(expected$TwoSampleT[4],
                                  df = expected$df[4],
                                  lower.tail = FALSE)
+    expected$FDR <- expected$PValue
 
     expect_equal(object, expected)
 })
@@ -172,6 +173,7 @@ test_that("nonparametric results are correct", {
         Direction = c(rep("Down", 3), "Up"),
         PValue = c(0.38398249, 0.77902378, 0.21212502, 0.82771353)
     )
+    expected$FDR <- expected$PValue
 
     expect_equal(object, expected)
 })

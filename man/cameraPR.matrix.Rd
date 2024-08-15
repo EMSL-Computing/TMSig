@@ -70,11 +70,9 @@ A \code{data.frame} with the following columns:
 \item{df}{integer; degrees of freedom (only included if
 \code{use.ranks=FALSE}). Two less than the number of non-missing values in
 each column of the \code{statistic} matrix.}
-\item{PValue}{numeric; one- or two-tailed (if
+\item{PValue}{numeric; one- or two-sided (if
 \code{alternative="two.sided"}) p-value.}
-\item{FDR}{numeric; Benjamini and Hochberg FDR adjusted p-value. Only
-included if multiple sets were tested, or if there are multiple contrasts
-and \code{adjust.globally=TRUE}.}
+\item{FDR}{numeric; Benjamini and Hochberg FDR adjusted p-value.}
 }
 \description{
 Pre-ranked Correlation-Adjusted MEan RAnk gene set testing

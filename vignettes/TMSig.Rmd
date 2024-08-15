@@ -7,14 +7,14 @@ author:
 date: "`r BiocStyle::doc_date()`"
 abstract: >
   The `r BiocStyle::Biocpkg('TMSig')` package contains tools to prepare,
-  analyze, and visualize named lists of mathematical sets, with an emphasis on
-  molecular signatures (such as gene or kinase sets). It includes fast, memory
-  efficient functions to construct sparse incidence and similarity matrices;
-  filter, cluster, invert, and decompose sets; perform pre-ranked Correlation
-  Adjusted MEan RAnk (CAMERA-PR) gene set testing via a flexible matrix method
-  (see `r BiocStyle::Biocpkg('limma')` for the original implementation); and
-  create bubble heatmaps to visualize the results of any differential or
-  molecular signatures analysis.
+  analyze, and visualize named lists of sets, with an emphasis on molecular
+  signatures (such as gene or kinase sets). It includes fast, memory efficient
+  functions to construct sparse incidence and similarity matrices; filter,
+  cluster, invert, and decompose sets; perform pre-ranked Correlation Adjusted
+  MEan RAnk (CAMERA-PR) gene set testing via a flexible matrix method (see 
+  `r BiocStyle::Biocpkg('limma')` for the original implementation); and create
+  bubble heatmaps to visualize the results of any differential or molecular
+  signatures analysis.
 package: |
     `r BiocStyle::pkg_ver('TMSig')`
     
@@ -466,12 +466,16 @@ version of CAMERA-PR is also available by specifying `use.ranks=TRUE`. See
 `help(topic = "cameraPR.matrix", package = "TMSig")` for details. See 
 `help(topic = "cameraPR", package = "limma")` for the original implementation.
 
+The main benefits of using `cameraPR.matrix` over `cameraPR.default` are
+significantly faster execution times and the ability to perform simultaneous
+inference of multiple contrasts or coefficients.
+
 ```{r camera-PR}
 # CAMERA-PR (matrix method)
 res <- cameraPR(statistic = modz, 
                 index = geneSetsFilt)
 
-# Add z-score column to results
+# Add z-score column to results (used for bubble heatmaps later)
 res$ZScore <- with(res, zscoreT(x = TwoSampleT, df = df))
 
 head(res)

@@ -87,7 +87,7 @@
 #'   it may seem as if the bubbles have disappeared, leaving a blank cell.
 #'
 #' @importFrom circlize colorRamp2
-#' @importFrom ComplexHeatmap Heatmap Legend draw
+#' @importFrom ComplexHeatmap Heatmap Legend draw max_text_width
 #' @importFrom grDevices dev.off
 #' @importFrom grid gpar unit is.unit
 #' @importFrom stats median
@@ -121,8 +121,8 @@
 #'           padj_column = "FDR",
 #'           padj_cutoff = 0.05)
 #'
-#' # Include gene sets with adjusted p-values above padj_cutoff (0.05). Also
-#' # update adjusted p-value legend title.
+#' # Include gene sets with adjusted p-values above padj_cutoff (0.05).
+#' # Also update adjusted p-value legend title.
 #' enrichmap(x = x,
 #'           statistic_column = "ZScore",
 #'           plot_sig_only = FALSE,
@@ -152,11 +152,10 @@ enrichmap <- function(x,
                       padj_args = list(),
                       save_args = list(),
                       draw_args = list()) {
-    scale_by <- match.arg(scale_by,
-                          choices = c("row", "column", "max"))
+    scale_by <- match.arg(scale_by, choices = c("row", "column", "max"))
 
-    # Create statistic_mat, padj_mat
-    ls <- .enrichmap_prepare_x(
+    # Create matrices statistic_mat, padj_mat
+    mat_list <- .enrichmap_prepare_x(
         x = x,
         n_top = n_top,
         set_column = set_column,
@@ -168,16 +167,16 @@ enrichmap <- function(x,
         plot_sig_only = plot_sig_only
     )
 
-    statistic_mat <- ls[["statistic_mat"]]
-    padj_mat <- ls[["padj_mat"]]
-
-    colorRamp2_args <- heatmap_color_fun(statistic_mat, colors)
+    statistic_mat <- mat_list[["statistic_mat"]]
+    padj_mat <- mat_list[["padj_mat"]]
 
     ## Create heatmap ----------------------------------------------------------
     if (!is.unit(cell_size))
         stop("`cell_size` must be a unit object.")
 
     fontsize <- 0.9 * cell_size # default font size for all components
+
+    colorRamp2_args <- heatmap_color_fun(statistic_mat, colors)
 
     # Arguments that will be passed to ComplexHeatmap::Heatmap
     base_heatmap_args <- list(
@@ -187,10 +186,11 @@ enrichmap <- function(x,
         name = statistic_column,
         heatmap_legend_param = list(
             title_gp = gpar(fontsize = fontsize, fontface = "bold"),
-            at = colorRamp2_args$breaks,
+            labels_gp = gpar(fontsize = fontsize),
+            at = colorRamp2_args[["breaks"]],
             border = "black",
             legend_height = max(cell_size * 5, unit(21.1, "mm")),
-            grid_width = max(cell_size, unit(4, "mm"))
+            grid_width = cell_size
         ),
         border = TRUE,
         row_labels = rownames(statistic_mat),
@@ -206,15 +206,33 @@ enrichmap <- function(x,
         layer_fun = .layer_fun
     )
 
-    heatmap_args <- .update_heatmap_args(base_heatmap_args = base_heatmap_args,
-                                         heatmap_args = heatmap_args)
+    # Update with user-supplied arguments
+    heatmap_args <-  modifyList(x = base_heatmap_args,
+                                val = heatmap_args,
+                                keep.null = TRUE)
 
-    # Color function for bubbles and statistic legend (used by .layer_fun)
-    col_fun <- heatmap_args$col
+    if (is.null(heatmap_args[["rect_gp"]]))
+        heatmap_args[["rect_gp"]] <- gpar(col = NA, fill = "white")
 
-    # Allow layer_fun to access all objects created before this point.
+    if (is.null(heatmap_args[["rect_gp"]][["col"]]))
+        heatmap_args[["rect_gp"]][["col"]] <- NA
+
+    if (is.null(heatmap_args[["rect_gp"]][["fill"]]))
+        heatmap_args[["rect_gp"]][["fill"]] <- "white"
+
+    # If row or column labels were updated, use the new values to calculate max
+    # text width and height to avoid overlapping elements or unnecessary spacing
+    heatmap_args[["row_names_max_width"]] <- 1.5 * cell_size +
+        max_text_width(heatmap_args[["row_labels"]],
+                       gp = heatmap_args[["row_names_gp"]])
+
+    heatmap_args[["column_names_max_height"]] <- 1.5 * cell_size +
+        max_text_width(heatmap_args[["column_labels"]],
+                       gp = heatmap_args[["column_names_gp"]])
+
+    # Allow layer_fun to access all objects created before this point
     if (!is.null(heatmap_args[["layer_fun"]]))
-        environment(heatmap_args$layer_fun) <- environment()
+        environment(heatmap_args[["layer_fun"]]) <- environment()
 
     # Create heatmap
     ht <- do.call(what = Heatmap, args = heatmap_args)
@@ -228,25 +246,26 @@ enrichmap <- function(x,
         padj_legend_fill[3] <- heatmap_args[["na_col"]]
     }
 
-    base_lt_args <- list(
+    base_padj_args <- list(
         at = seq_along(padj_legend_labels),
         title = padj_legend_title,
         title_gp = gpar(fontsize = fontsize, fontface = "bold"),
-        labels = padj_legend_labels, # \u2265 = ">="
+        labels = padj_legend_labels,
         labels_gp = gpar(fontsize = fontsize),
         legend_gp = gpar(fill = padj_legend_fill),
-        grid_height = heatmap_args$heatmap_legend_param$grid_width,
-        grid_width = heatmap_args$heatmap_legend_param$grid_width,
+        grid_height = cell_size,
+        grid_width = cell_size,
         border = "black",
         nrow = length(padj_legend_labels),
         direction = "horizontal"
     )
-    lt_args <- modifyList(x = base_lt_args, val = padj_args, keep.null = TRUE)
+    padj_legend_args <- modifyList(x = base_padj_args,
+                                   val = padj_args, keep.null = TRUE)
 
-    lt <- do.call(what = Legend, args = lt_args)
+    padj_legend <- do.call(what = Legend, args = padj_legend_args)
 
     if (!missing(filename)) {
-        # Close the device after writing the heatmap to a file
+        # Close the device after drawing the heatmap to a file
         on.exit(dev.off())
 
         base_save_args <- list(filename = filename,
@@ -262,9 +281,9 @@ enrichmap <- function(x,
     # Draw heatmap ----
     draw_args <- modifyList(
         x = list(object = ht,
-                 annotation_legend_list = list(lt),
+                 annotation_legend_list = list(padj_legend),
                  merge_legends = TRUE,
-                 legend_gap = unit(0.15, "in"),
+                 legend_gap = 1.2 * cell_size,
                  align_heatmap_legend = "heatmap_top",
                  align_annotation_legend = "heatmap_top"),
         val = draw_args,

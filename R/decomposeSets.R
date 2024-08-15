@@ -75,20 +75,11 @@ decomposeSets <- function(x,
     MINUS <- paste0(MINUS, " ")
 
     if (!is.vector(overlap, mode = "numeric") ||
-        isTRUE(is.infinite(overlap)) ||
-        length(overlap) != 1L)
+        isTRUE(is.infinite(overlap)) || length(overlap) != 1L)
         stop("`overlap` must be a single integer specifying the minimum ",
              "intersection size required to decompose pairs of sets.")
 
-    overlap <- max(1L, floor(overlap))
-
-    # Since the size of the intersection between a set and any other set is at
-    # most the size of that set, we can pre-filter to sets of size `overlap` or
-    # greater. This also validates x.
     x <- filterSets(x, min_size = overlap)
-
-    if (length(x) < 2L)
-        stop("Fewer than 2 sets with at least `overlap` elements.")
 
     incidence <- incidence(x)
     elements <- colnames(incidence)
@@ -125,8 +116,7 @@ decomposeSets <- function(x,
 
         # Remove elements not in either set
         keep_elements <- which(i_vec != 0L)
-        decomp_i <- split(x = elements[keep_elements],
-                          f = i_vec[keep_elements])
+        decomp_i <- split(x = elements[keep_elements], f = i_vec[keep_elements])
 
         ## For a pair of sets A and B, define names of disjoint components:
         # "A ~MINUS~ B" = elements in A and not in B,

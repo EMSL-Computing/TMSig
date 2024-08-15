@@ -29,7 +29,7 @@
 #' x[1] # first set
 
 readGMT <- function(path, check = TRUE) {
-    if (check & !grepl("\\.gmt(\\.[^\\.]+)?$", path))
+    if (check && !grepl("\\.gmt(\\.[^\\.]+)?$", path))
         stop("`path` is not a path to a GMT file.")
 
     gmt <- readLines(path)

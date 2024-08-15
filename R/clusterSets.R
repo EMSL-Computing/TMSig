@@ -145,15 +145,12 @@ clusterSets <- function(x,
                         cutoff = 0.85,
                         method = "complete",
                         h = 0.9) {
-    if (cutoff < 0 | cutoff > 1)
+    if (cutoff < 0 || cutoff > 1)
         stop("`cutoff` must be between 0 and 1.")
 
-    # Prepare x to determine set sizes
-    dt <- .prepare_sets(x)
-    x <- split(x = dt[["elements"]], f = dt[["sets"]])
+    x <- filterSets(x = x, min_size = 1L) # needed for set_sizes
     set_sizes <- lengths(x)
 
-    ## Pairwise set similarity matrix
     s <- similarity(x, type = type)
     diag(s) <- 0
     s[s < cutoff] <- 0
@@ -170,10 +167,7 @@ clusterSets <- function(x,
     } else {
         s <- s[keep, keep] # at least a 2x2 matrix
 
-        # Convert sparse similarity matrix to dense dissimilarity matrix
-        d <- as.dist(1 - s) # may produce a warning
-
-        # Hierarchical clustering
+        d <- as.dist(1 - s) # sparse to dense conversion may produce a warning
         hc <- hclust(d, method = method)
         clusters <- cutree(hc, h = h)
 
@@ -185,14 +179,11 @@ clusterSets <- function(x,
         other_sets <- data.table(set = names(set_sizes)[!keep],
                                  stringsAsFactors = FALSE)
         other_sets[, cluster := seq_along(set) + max(dt[["cluster"]])]
-
         dt <- rbind(dt, other_sets)
     }
 
     dt[, set_size := set_sizes[set]]
-
     setorderv(dt, cols = c("cluster", "set_size", "set"), order = c(1, -1, 1))
-
     setDF(dt)
 
     return(dt)
