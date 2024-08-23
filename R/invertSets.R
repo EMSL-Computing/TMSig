@@ -12,9 +12,7 @@
 #'
 #' @returns A named list of sets.
 #'
-#' @import Matrix
-#'
-#' @export invert_sets
+#' @export invertSets
 #'
 #' @examples
 #' x <- list("A" = c("a", "b", "c"),
@@ -23,17 +21,17 @@
 #'           "D" = c("a", "c", "d"))
 #'
 #' # Invert sets
-#' (y <- invert_sets(x))
+#' (y <- invertSets(x))
 #'
 #' # Jaccard similarity of pairs of elements
 #' similarity(y)
 #'
 #' # Decompose sets into disjoint parts
 #' yc <- lapply(y, paste, collapse = ", ")
-#' invert_sets(yc)
+#' invertSets(yc)
 
-invert_sets <- function(x) {
-  dt <- .prepare_sets(x)
+invertSets <- function(x) {
+    dt <- .prepare_sets(x)
 
-  split(x = dt[["sets"]], f = dt[["elements"]])
+    split(x = dt[["sets"]], f = dt[["elements"]])
 }

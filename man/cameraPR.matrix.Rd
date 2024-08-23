@@ -10,8 +10,8 @@
   use.ranks = FALSE,
   inter.gene.cor = 0.01,
   sort = TRUE,
-  adjust.globally = FALSE,
   alternative = c("two.sided", "less", "greater"),
+  adjust.globally = FALSE,
   min.size = 2L,
   ...
 )
@@ -36,16 +36,16 @@ May be a single value or a named vector with names matching those of
 \item{sort}{logical; should the results of each contrast be sorted by
 p-value? Default is \code{TRUE}.}
 
+\item{alternative}{character; the alternative hypothesis. Must be one of
+"\code{two.sided}" (default), "\code{greater}", or "\code{less}". May be
+abbreviated. A warning will be issued if anything other than
+"\code{two.sided}" is specified when \code{use.ranks=FALSE}.}
+
 \item{adjust.globally}{logical; whether p-values from different contrasts
 should be adjusted together. It is recommended to set this to \code{TRUE}
 when testing a set of closely related contrasts. See Section 13.3 of the
 LIMMA User's Guide (\code{\link[limma]{limmaUsersGuide}}) for details.
 Default is \code{FALSE}.}
-
-\item{alternative}{character; the alternative hypothesis. Must be one of
-"\code{two.sided}" (default), "\code{greater}", or "\code{less}". May be
-abbreviated. A warning will be issued if anything other than
-"\code{two.sided}" is specified when \code{use.ranks=FALSE}.}
 
 \item{min.size}{integer; the minimum set size. To be considered for testing,
 sets must have at least \code{min.size} elements with non-missing values in
@@ -70,11 +70,9 @@ A \code{data.frame} with the following columns:
 \item{df}{integer; degrees of freedom (only included if
 \code{use.ranks=FALSE}). Two less than the number of non-missing values in
 each column of the \code{statistic} matrix.}
-\item{PValue}{numeric; one- or two-tailed (if
+\item{PValue}{numeric; one- or two-sided (if
 \code{alternative="two.sided"}) p-value.}
-\item{FDR}{numeric; Benjamini and Hochberg FDR adjusted p-value. Only
-included if multiple sets were tested, or if there are multiple contrasts
-and \code{adjust.globally=TRUE}.}
+\item{FDR}{numeric; Benjamini and Hochberg FDR adjusted p-value.}
 }
 \description{
 Pre-ranked Correlation-Adjusted MEan RAnk gene set testing
@@ -118,8 +116,8 @@ y <- matrix(data = rnorm(ngenes * nsamples),
             dimnames = list(paste0("gene", seq_len(ngenes)),
                             make.unique(group)))
 
-# First set of 20 genes are genuinely differentially expressed (trt1 and trt2
-# are lower than control)
+# First set of 20 genes are genuinely differentially expressed
+# (trt1 and trt2 are lower than control)
 index1 <- 1:20
 y[index1, 1:3] <- y[index1, 1:3] + 1
 

@@ -23,15 +23,15 @@
 #'   \code{index}.
 #' @param sort logical; should the results of each contrast be sorted by
 #'   p-value? Default is \code{TRUE}.
+#' @param alternative character; the alternative hypothesis. Must be one of
+#'   "\code{two.sided}" (default), "\code{greater}", or "\code{less}". May be
+#'   abbreviated. A warning will be issued if anything other than
+#'   "\code{two.sided}" is specified when \code{use.ranks=FALSE}.
 #' @param adjust.globally logical; whether p-values from different contrasts
 #'   should be adjusted together. It is recommended to set this to \code{TRUE}
 #'   when testing a set of closely related contrasts. See Section 13.3 of the
 #'   LIMMA User's Guide (\code{\link[limma]{limmaUsersGuide}}) for details.
 #'   Default is \code{FALSE}.
-#' @param alternative character; the alternative hypothesis. Must be one of
-#'   "\code{two.sided}" (default), "\code{greater}", or "\code{less}". May be
-#'   abbreviated. A warning will be issued if anything other than
-#'   "\code{two.sided}" is specified when \code{use.ranks=FALSE}.
 #' @param min.size integer; the minimum set size. To be considered for testing,
 #'   sets must have at least \code{min.size} elements with non-missing values in
 #'   all contrasts. The default value of 2 is the minimum possible set size
@@ -53,11 +53,9 @@
 #'   \item{df}{integer; degrees of freedom (only included if
 #'   \code{use.ranks=FALSE}). Two less than the number of non-missing values in
 #'   each column of the \code{statistic} matrix.}
-#'   \item{PValue}{numeric; one- or two-tailed (if
+#'   \item{PValue}{numeric; one- or two-sided (if
 #'   \code{alternative="two.sided"}) p-value.}
-#'   \item{FDR}{numeric; Benjamini and Hochberg FDR adjusted p-value. Only
-#'   included if multiple sets were tested, or if there are multiple contrasts
-#'   and \code{adjust.globally=TRUE}.}
+#'   \item{FDR}{numeric; Benjamini and Hochberg FDR adjusted p-value.}
 #'
 #' @section Test Assumptions:
 #'
@@ -85,11 +83,10 @@
 #' @seealso \code{\link[limma]{cameraPR}},
 #'   \code{\link[limma]{rankSumTestWithCorrelation}}
 #'
-#' @import Matrix
-#' @importFrom data.table data.table `:=` setcolorder setorderv rbindlist setDF
-#'   frank
-#' @importFrom stats p.adjust pt var
+#' @importFrom data.table frank data.table `:=` rbindlist setcolorder setorderv
+#'   setDF
 #' @importFrom limma cameraPR
+#' @importFrom stats p.adjust pt var
 #'
 #' @export cameraPR.matrix
 #' @exportS3Method limma::cameraPR
@@ -113,8 +110,8 @@
 #'             dimnames = list(paste0("gene", seq_len(ngenes)),
 #'                             make.unique(group)))
 #'
-#' # First set of 20 genes are genuinely differentially expressed (trt1 and trt2
-#' # are lower than control)
+#' # First set of 20 genes are genuinely differentially expressed
+#' # (trt1 and trt2 are lower than control)
 #' index1 <- 1:20
 #' y[index1, 1:3] <- y[index1, 1:3] + 1
 #'
@@ -144,240 +141,200 @@ cameraPR.matrix <- function(statistic,
                             use.ranks = FALSE,
                             inter.gene.cor = 0.01,
                             sort = TRUE,
-                            adjust.globally = FALSE,
                             alternative = c("two.sided", "less", "greater"),
+                            adjust.globally = FALSE,
                             min.size = 2L,
-                            ...)
-{
-  dots <- names(list(...))
-  if (length(dots))
-    warning("Extra arguments disregarded: ", sQuote(dots))
+                            ...) {
+    dots <- names(list(...))
+    if (length(dots))
+        warning("Extra arguments disregarded: ", sQuote(dots))
 
-  # Alternative hypothesis
-  alternative <- match.arg(alternative,
-                           choices = c("two.sided", "less", "greater"))
+    alternative <- match.arg(alternative, c("two.sided", "less", "greater"))
 
-  background <- rownames(statistic)
-  contrast_names <- colnames(statistic)
-  ncontrasts <- length(contrast_names)
+    if (any(!is.numeric(statistic)))
+        stop("`statistic` must be a numeric matrix.")
 
-  if (any(!is.numeric(statistic)))
-    stop("`statistic` must be a numeric matrix.")
+    background <- rownames(statistic)
+    contr.cols <- colnames(statistic)
 
-  if (is.null(background) | is.null(contrast_names))
-    stop("`statistic` matrix must have row and column names.")
+    if (is.null(background) || is.null(contr.cols))
+        stop("`statistic` matrix must have row and column names.")
 
-  # Number of non-NA statistics (number of genes) in each contrast
-  G <- apply(!is.na(statistic), 2, sum)
+    G <- colSums(!is.na(statistic))
 
-  if (any(G < 3L))
-    stop("Each column of `statistic` must have at least 3 nonmissing values.")
+    if (any(G < 3L))
+        stop("Each column of `statistic` must have ",
+             "at least 3 nonmissing values.")
 
-  min.size <- max(2L, min.size)
+    min.size <- max(2L, floor(min.size))
 
-  if (any(min.size >= G))
-    stop("`min.size` must be smaller than the number of non-missing values ",
-         "in each contrast column of the `statistic` matrix.")
+    if (any(min.size >= G))
+        stop("`min.size` must be smaller than the number of non-missing ",
+             "values in each contrast column of the `statistic` matrix.")
 
-  # Restrict each set to only those elements in the `statistic` matrix
-  index <- filter_sets(x = index,
-                       background = background,
-                       min_size = min.size,
-                       max_size = length(background) - 1L)
+    index <- filterSets(x = index,
+                        background = background,
+                        min_size = min.size,
+                        max_size = length(background) - 1L)
 
-  imat <- incidence(index) # sparse incidence matrix
+    imat <- incidence(index) # sparse incidence matrix
+    sets <- rownames(imat)
+    elements <- colnames(imat)
 
-  genes_in_sets <- colnames(imat)
-  all_set_names <- rownames(imat)
-  nsets <- length(all_set_names)
+    # Number of genes in each set
+    m <- as.matrix(imat %*% !is.na(statistic[elements, , drop = FALSE]))
 
-  # Number of genes in each set
-  m <- as.matrix(imat %*% !is.na(statistic[genes_in_sets, , drop = FALSE]))
+    # Remove sets that are too small or too large in at least one contrast
+    extreme.sets <-
+        which(apply(m, 1, function(mi) any(mi < min.size | mi == G)))
+    if (length(extreme.sets)) {
+        # If all sets will be dropped, throw an error
+        if (length(extreme.sets) == nrow(imat))
+            stop("No sets in `index` have at least `min.size` and fewer than ",
+                 "min(apply(!is.na(statistic), 2, sum)) genes with nonmissing ",
+                 "values in `statistic`.")
 
-  # Identify sets that are too small or too large in at least one contrast
-  extreme_sets <- which(apply(m, 1, function(mi) any(mi < min.size | mi == G)))
-  if (length(extreme_sets)) {
-    # If all sets will be dropped, throw an error
-    if (length(extreme_sets) == nsets)
-      stop("No sets in `index` have at least `min.size` and fewer than ",
-           "min(apply(!is.na(statistic), 2, sum)) genes with nonmissing ",
-           "values in `statistic`.")
-
-    # Drop sets that are too small or too large
-    m <- m[-extreme_sets, , drop = FALSE]
-    imat <- imat[-extreme_sets, , drop = FALSE]
-
-    genes_in_sets <- colnames(imat)
-    all_set_names <- rownames(imat)
-    nsets <- length(all_set_names)
-  }
-
-  # Check inter.gene.cor
-  if (anyNA(inter.gene.cor) | is.null(inter.gene.cor))
-    stop("NA or NULL `inter.gene.cor` not allowed.")
-
-  if (any(abs(inter.gene.cor) >= 1))
-    stop("`inter.gene.cor` must be between -1 and 1.")
-
-  fixed.cor <- length(inter.gene.cor) == 1L
-  if (!fixed.cor) {
-    inter.gene.cor <- inter.gene.cor[all_set_names]
-
-    if (anyNA(inter.gene.cor))
-      stop("Length of `inter.gene.cor` must be 1 or the same length as ",
-           "index. If the latter, names of `inter.gene.cor` should match ",
-           "names of `index`.")
-  }
-
-  m2 <- t(G - t(m)) # number of genes not in each set
-
-  if (use.ranks) { ## Based on limma::rankSumTestWithCorrelation
-    # Matrix of ranks of statistics by contrast. May include NA's
-    rank_mat <- apply(statistic, 2, function(ci) frank(ci, na.last = "keep"))
-    rownames(rank_mat) <- background # apply removes rownames
-    rank_mat[is.na(rank_mat)] <- 0L # avoid propagating NA's in the sum
-
-    sumRanksInSet <- as.matrix(imat %*% rank_mat[genes_in_sets, , drop = FALSE])
-    m_prod <- m * m2 # used several times
-
-    sigma2 <- asin(1) +
-      (m2 - 1L) * (asin(0.5) + (m - 1L) * asin(inter.gene.cor / 2)) +
-      (m - 1L) * asin((inter.gene.cor + 1) / 2)
-    sigma2 <- sigma2 / 2 / pi * m_prod
-
-    # Different calculation for sigma2 if the correlation is zero
-    zero.cor.idx <- which(inter.gene.cor == 0)
-    if (length(zero.cor.idx)) {
-      sigma2.zero.cor <- t(t(m_prod) / 12 * (G + 1L))
-
-      # If inter.gene.cor is 0 and scalar, update all sigma2
-      if (fixed.cor) {
-        sigma2 <- sigma2.zero.cor
-      } else {
-        sigma2[zero.cor.idx, , drop = FALSE] <-
-          sigma2.zero.cor[zero.cor.idx, , drop = FALSE]
-      }
+        m <- m[-extreme.sets, , drop = FALSE]
+        imat <- imat[-extreme.sets, , drop = FALSE]
+        sets <- sets[-extreme.sets]
     }
 
-    # Adjust sigma2 for ties in ranks
-    adjustment <- apply(rank_mat, 2, function(r) {
-      NTIES <- table(r[r != 0]) # remove 0's (formerly NA's)
-      sum(NTIES * (NTIES + 1L) * (NTIES - 1L)) # 0, if there are no ties
+    # Check inter.gene.cor
+    if (is.null(inter.gene.cor) || anyNA(inter.gene.cor))
+        stop("NA or NULL `inter.gene.cor` not allowed.")
+
+    if (any(abs(inter.gene.cor) >= 1))
+        stop("`inter.gene.cor` must be between -1 and 1.")
+
+    fixed.cor <- length(inter.gene.cor) == 1L
+    if (!fixed.cor) {
+        inter.gene.cor <- inter.gene.cor[sets]
+
+        if (anyNA(inter.gene.cor))
+            stop("Length of `inter.gene.cor` must be 1 or the same length as ",
+                 "`index`. If the latter, names of `inter.gene.cor` should ",
+                 "match names of `index`.")
+    }
+
+    m2 <- t(G - t(m)) # number of genes not in each set
+
+    if (use.ranks) {
+        rankMat <- apply(statistic, 2, function(ci) frank(ci, na.last = "keep"))
+        dimnames(rankMat) <- dimnames(statistic) # apply() removes attributes
+
+        rankMat[is.na(rankMat)] <- 0L # avoid propagating NA's
+        sumRanksInSet <-
+            as.matrix(imat %*% rankMat[elements, , drop = FALSE])
+
+        sigma2 <- asin(1) + (m - 1L) * asin((inter.gene.cor + 1) / 2) +
+            (m2 - 1L) * (asin(0.5) + (m - 1L) * asin(inter.gene.cor / 2))
+        sigma2 <- sigma2 / 2 / pi * m * m2
+
+        # Different calculation for sigma2 if the correlation is zero
+        zero.cor.idx <- which(inter.gene.cor == 0)
+        if (length(zero.cor.idx)) {
+            sigma2.zero.cor <- t(t(m / 12 * m2) * (G + 1L))
+
+            if (fixed.cor)
+                sigma2 <- sigma2.zero.cor
+            else
+                sigma2[zero.cor.idx, , drop = FALSE] <-
+                    sigma2.zero.cor[zero.cor.idx, , drop = FALSE]
+        }
+
+        # Adjust sigma2 for ties in ranks
+        adjustment <- apply(rankMat, 2, function(r) {
+            NTIES <- table(r[r != 0]) # remove 0's (formerly NA's)
+            sum(NTIES * (NTIES + 1L) * (NTIES - 1L)) # 0, if there are no ties
+        })
+        adjustment <- adjustment / G / (G + 1L) / (G - 1L)
+        sigma <- sqrt(t((1 - adjustment) * t(sigma2)))
+
+        U_minus_mu <- t((G + 1L) / 2L * t(m)) - sumRanksInSet
+        zlowertail <- (U_minus_mu + 0.5) / sigma
+        zuppertail <- (U_minus_mu - 0.5) / sigma
+
+        Down <- pt(zuppertail, df = Inf, lower.tail = FALSE)
+        Up <- pt(zlowertail, df = Inf)
+    } else {
+        # Degrees of freedom for each contrast
+        df <- matrix(data = rep(G - 2L, each = nrow(m)),
+                     nrow = nrow(m), ncol = ncol(m), dimnames = dimnames(m))
+
+        meanStat <- colMeans(statistic, na.rm = TRUE)
+        varStat <- apply(statistic, 2, var, na.rm = TRUE)
+
+        # imat %*% statistic results in the sum of statistics in each set, so
+        # divide by m (set size) to get the means
+        statistic[is.na(statistic)] <- 0 # avoid propagating NA's
+        meanStatInSet <-
+            as.matrix(imat %*% statistic[elements, , drop = FALSE] / m)
+
+        # Difference between the means of statistics in a set and not in a set
+        delta <- t(G / t(m2) * (t(meanStatInSet) - meanStat))
+
+        varStatPooled <-
+            t((G - 1L) * varStat - (t(delta^2 * m) * t(m2) / G)) / df
+
+        vif <- 1L + (m - 1L) * inter.gene.cor # variance inflation factor
+        TwoSampleT <- delta / sqrt(varStatPooled * (vif / m + 1 / m2))
+
+        Up <- pt(TwoSampleT, df = df, lower.tail = FALSE)
+        Down <- pt(TwoSampleT, df = df)
+    }
+
+    Direction <- matrix(data = "Up", nrow = nrow(m), ncol = ncol(m),
+                        dimnames = dimnames(m))
+
+    switch(alternative,
+           two.sided = {
+               PValue <- 2 * pmin(Down, Up)
+               Direction[Down < Up] <- "Down"
+           },
+           less = {
+               PValue <- Down
+               Direction[] <- "Down"
+           },
+           greater = {
+               PValue <- Up
+           })
+
+    tab <- lapply(contr.cols, function(contrast_i) {
+        tab_i <- data.table(
+            GeneSet = sets,
+            NGenes = m[, contrast_i],
+            Direction = Direction[, contrast_i],
+            PValue = PValue[, contrast_i],
+            stringsAsFactors = FALSE
+        )
+
+        if (!use.ranks) {
+            tab_i[, `:=`(TwoSampleT = TwoSampleT[, contrast_i],
+                         df = df[, contrast_i])]
+            setcolorder(tab_i, c("TwoSampleT", "df"), before = "PValue")
+        }
+
+        return(tab_i)
     })
-    adjustment <- adjustment / G / (G + 1L) / (G - 1L)
-    sigma2 <- t((1 - adjustment) * t(sigma2))
 
-    # Two-sample z-statistics
-    U_minus_mu <- m / 2L * (m + 1L) - sumRanksInSet + m_prod / 2
-    zlowertail <- (U_minus_mu + 0.5) / sqrt(sigma2)
-    zuppertail <- (U_minus_mu - 0.5) / sqrt(sigma2)
+    names(tab) <- contr.cols
+    tab <- rbindlist(tab, idcol = "Contrast")
+    tab[, Contrast := factor(Contrast, levels = contr.cols)]
 
-    Down <- pt(zuppertail, df = Inf, lower.tail = FALSE)
-    Up <- pt(zlowertail, df = Inf)
-  } else {
-    if (alternative != "two.sided")
-      warning("One-sided tests are not recommended when use.ranks=FALSE.")
-
-    # Global mean and variance of statistics in each contrast
-    meanStat <- apply(statistic, 2, mean, na.rm = TRUE)
-    varStat <- apply(statistic, 2, var, na.rm = TRUE)
-
-    df.camera <- G - 2L
-    vif <- 1L + (m - 1L) * inter.gene.cor
-
-    # Replace missing values with 0 to calculate meanStatInSet
-    statistic[is.na(statistic)] <- 0
-
-    # imat %*% statistic results in the sum of statistics in each set, so divide
-    # by m (set size) to get the mean
-    meanStatInSet <- as.matrix(imat %*% statistic[genes_in_sets, ] / m)
-
-    # Difference between the means of statistics in a set and not in a set
-    delta <- t(G / t(m2) * (t(meanStatInSet) - meanStat))
-
-    varStatPooled <- t(
-      ((G - 1L) * varStat - (t(delta^2 * m) * t(m2) / G)) / df.camera
-    )
-
-    # Two-sample t-statistics
-    two.sample.t <- delta / sqrt(varStatPooled * (vif / m + 1 / m2))
-
-    # Convert to a matrix to have same size as two.sample.t
-    df.camera <- matrix(rep(df.camera, times = nsets),
-                        nrow = nsets, ncol = ncontrasts, byrow = TRUE,
-                        dimnames = dimnames(two.sample.t))
-
-    Up <- pt(two.sample.t, df = df.camera, lower.tail = FALSE)
-    Down <- pt(two.sample.t, df = df.camera)
-  }
-
-  # Direction of change
-  Direction <- matrix(data = "Up",
-                      nrow = nsets, ncol = ncontrasts,
-                      dimnames = list(all_set_names,
-                                      contrast_names))
-
-  # Create matrix of p-values, update direction according to alt. hypothesis
-  switch(alternative,
-         two.sided = {
-           PValue <- 2 * pmin(Down, Up)
-           Direction[Down < Up] <- "Down"
-         },
-         less = {
-           PValue <- Down
-           Direction[] <- "Down"
-         },
-         greater = {
-           PValue <- Up
-         })
-
-  ## Assemble into list of data tables for each contrast
-  tab <- lapply(colnames(statistic), function(contrast_i) {
-    tab_i <- data.table(
-      GeneSet = all_set_names,
-      NGenes = m[, contrast_i],
-      Direction = Direction[, contrast_i],
-      PValue = PValue[, contrast_i],
-      stringsAsFactors = FALSE
-    )
-
-    if (!use.ranks)
-      tab_i[, `:=`(TwoSampleT = two.sample.t[, contrast_i],
-                   df = df.camera[, contrast_i])]
-
-    return(tab_i)
-  })
-
-  names(tab) <- colnames(statistic)
-  tab <- rbindlist(tab, idcol = "Contrast")
-  tab[, Contrast := factor(Contrast, levels = contrast_names)]
-
-  # Include column for inter-gene correlation
-  if (!fixed.cor)
-    tab[, Correlation := inter.gene.cor[GeneSet]]
-
-  if (nrow(tab) > 1L) { # more than 1 gene set and/or contrast
-    if (adjust.globally) {
-      # Adjust p-values across related contrasts
-      tab[, FDR := p.adjust(PValue, method = "BH")]
-    } else if (nsets > 1L) {
-      # Adjust p-values separately by contrast
-      tab[, FDR := p.adjust(PValue, method = "BH"), by = Contrast]
+    if (!fixed.cor) {
+        tab[, Correlation := inter.gene.cor[GeneSet]]
+        setcolorder(tab, "Correlation", before = "Direction")
     }
 
-    # Sort by p-value
+    if (adjust.globally) # adjust p-values across related contrasts
+        tab[, FDR := p.adjust(PValue, method = "BH")]
+    else # adjust p-values separately by contrast
+        tab[, FDR := p.adjust(PValue, method = "BH"), by = Contrast]
+
     if (sort)
-      setorderv(tab, cols = c("Contrast", "PValue"), order = c(1, 1))
-  }
+        setorderv(tab, cols = c("Contrast", "PValue"), order = c(1, 1))
 
-  # Reorder columns
-  neworder <- c("Contrast", "GeneSet", "NGenes", "Correlation",
-                "Direction", "TwoSampleT", "df", "PValue", "FDR")
-  neworder <- intersect(neworder, colnames(tab))
-  setcolorder(tab, neworder = neworder)
+    setDF(tab) # convert to data.frame to match cameraPR.default
 
-  setDF(tab) # convert to data.frame to match cameraPR.default
-
-  return(tab)
+    return(tab)
 }
-

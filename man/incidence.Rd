@@ -41,6 +41,6 @@ keep <- apply(imat, 2, sum) == 1
 apply(imat[, keep], 1, sum)
 }
 \seealso{
-\code{\link{incidence_to_list}}, \code{\link{similarity}},
+\code{\link{incidenceToList}}, \code{\link{similarity}},
 \code{\link[Matrix]{sparseMatrix}}
 }

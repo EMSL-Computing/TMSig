@@ -24,7 +24,7 @@
 #'
 #' @section Function Details:
 #'
-#'   Given a named list of sets, \code{cluster_sets} calculates all pairwise
+#'   Given a named list of sets, \code{clusterSets} calculates all pairwise
 #'   Jaccard, overlap, or Ōtsuka similarity coefficients (see
 #'   \code{\link{similarity}} for details). Any coefficients below \code{cutoff}
 #'   are set to 0 and complete-linkage hierarchical clustering is performed on
@@ -38,7 +38,7 @@
 #'   sufficiently similar (value of \code{similarity} below \code{cutoff}) to
 #'   any other set, as they will always be placed in their own cluster. By
 #'   excluding these sets during the hierarchical clustering step, the speed of
-#'   \code{cluster_sets} will increase as the value of \code{cutoff} approaches
+#'   \code{clusterSets} will increase as the value of \code{cutoff} approaches
 #'   1 (as the size of the dissimilarity matrix decreases).
 #'
 #' @section Minimum Set Size:
@@ -101,12 +101,13 @@
 #' doi:\href{https://doi.org/10.1016/j.cels.2015.12.004
 #' }{10.1016/j.cels.2015.12.004}
 #'
-#' @seealso \code{\link{filter_sets}}, \code{\link{similarity}}
+#' @seealso \code{\link{filterSets}}, \code{\link{similarity}}
 #'
 #' @importFrom data.table data.table := setorderv setDF
+#' @importFrom Matrix diag
 #' @importFrom stats as.dist hclust cutree
 #'
-#' @export cluster_sets
+#' @export clusterSets
 #'
 #' @examples
 #' x <- list("A" = letters[1:5],
@@ -118,12 +119,12 @@
 #'           "G" = letters[3:6]) # overlaps with A-E
 #'
 #' # Default clustering based on Jaccard similarity
-#' cluster_sets(x)
-#' cluster_sets(x, type = "overlap") # overlap similarity
-#' cluster_sets(x, type = "otsuka") # Ōtsuka similarity
+#' clusterSets(x)
+#' clusterSets(x, type = "overlap") # overlap similarity
+#' clusterSets(x, type = "otsuka") # Ōtsuka similarity
 #'
 #' # Relax Jaccard similarity cutoff
-#' (df <- cluster_sets(x, cutoff = 0.5))
+#' (df <- clusterSets(x, cutoff = 0.5))
 #'
 #' # Keep the first (largest) set from each cluster
 #' with(df, set[!duplicated(cluster)]) # A, G, E, F
@@ -134,71 +135,56 @@
 #'
 #' # Cluster aliased sets (type = "otsuka" would produce
 #' # identical results)
-#' cluster_sets(x, type = "jaccard", cutoff = 1)
+#' clusterSets(x, type = "jaccard", cutoff = 1)
 #'
 #' # Cluster subsets and aliased sets
-#' cluster_sets(x, type = "overlap", cutoff = 1)
+#' clusterSets(x, type = "overlap", cutoff = 1)
 
-cluster_sets <- function(x,
-                         type = c("jaccard", "overlap", "otsuka"),
-                         cutoff = 0.85,
-                         method = "complete",
-                         h = 0.9)
-{
-  if (cutoff < 0 | cutoff > 1)
-    stop("`cutoff` must be between 0 and 1.")
+clusterSets <- function(x,
+                        type = c("jaccard", "overlap", "otsuka"),
+                        cutoff = 0.85,
+                        method = "complete",
+                        h = 0.9) {
+    if (cutoff < 0 || cutoff > 1)
+        stop("`cutoff` must be between 0 and 1.")
 
-  # Needed to determine set sizes
-  dt <- .prepare_sets(x)
-  x <- split(x = dt[["elements"]], f = dt[["sets"]])
+    x <- filterSets(x = x, min_size = 1L) # needed for set_sizes
+    set_sizes <- lengths(x)
 
-  ## Pairwise set similarity matrix
-  s <- similarity(x, type = type)
-  diag(s) <- 0
-  s[s < cutoff] <- 0
+    s <- similarity(x, type = type)
+    diag(s) <- 0
+    s[s < cutoff] <- 0
 
-  set_sizes <- lengths(x)
+    # Cluster sets that are sufficiently similar to at least one other set
+    keep <- apply(s != 0, 1, any)
 
-  # Cluster sets that are sufficiently similar to at least one other set. The
-  # remaining sets will be appended to the results at the end.
-  keep <- apply(s > 0, 1, any)
+    if (sum(keep) == 0L) {
+        message("No pair of sets passes the similarity cutoff.")
 
-  if (sum(keep) == 0L) {
-    message("No pair of sets passes the similarity cutoff.")
+        dt <- data.table(set = names(set_sizes),
+                         cluster = seq_along(set_sizes),
+                         stringsAsFactors = FALSE)
+    } else {
+        s <- s[keep, keep] # at least a 2x2 matrix
 
-    dt <- data.table(set = names(set_sizes),
-                     cluster = seq_along(set_sizes),
-                     stringsAsFactors = FALSE)
-  } else {
-    s <- s[keep, keep] # at least a 2x2 matrix
+        d <- as.dist(1 - s) # sparse to dense conversion may produce a warning
+        hc <- hclust(d, method = method)
+        clusters <- cutree(hc, h = h)
 
-    # Convert sparse similarity matrix to dense dissimilarity matrix - may
-    # produce a warning
-    d <- as.dist(1 - s)
+        dt <- data.table(set = names(clusters),
+                         cluster = clusters,
+                         stringsAsFactors = FALSE)
 
-    # Hierarchical clustering
-    hc <- hclust(d, method = method)
-    clusters <- cutree(hc, h = h)
+        # Sets not similar to any others are placed in their own clusters
+        other_sets <- data.table(set = names(set_sizes)[!keep],
+                                 stringsAsFactors = FALSE)
+        other_sets[, cluster := seq_along(set) + max(dt[["cluster"]])]
+        dt <- rbind(dt, other_sets)
+    }
 
-    dt <- data.table(set = names(clusters),
-                     cluster = clusters,
-                     stringsAsFactors = FALSE)
+    dt[, set_size := set_sizes[set]]
+    setorderv(dt, cols = c("cluster", "set_size", "set"), order = c(1, -1, 1))
+    setDF(dt)
 
-    # Append sets that were not similar to any others and place each in its own
-    # cluster
-    other_sets <- data.table(set = names(set_sizes)[!keep],
-                             stringsAsFactors = FALSE)
-    other_sets[, cluster := seq_along(set) + max(dt[["cluster"]])]
-
-    dt <- rbind(dt, other_sets)
-  }
-
-  dt[, set_size := set_sizes[set]]
-
-  setorderv(dt, cols = c("cluster", "set_size", "set"),
-            order = c(1, -1, 1))
-
-  setDF(dt)
-
-  return(dt)
+    return(dt)
 }

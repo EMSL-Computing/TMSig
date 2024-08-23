@@ -12,10 +12,10 @@
 #' @returns An object of class \code{\link[Matrix:dgCMatrix-class]{dgCMatrix}}
 #'   with unique set names as rows and unique elements as columns.
 #'
-#' @seealso \code{\link{incidence_to_list}}, \code{\link{similarity}},
+#' @seealso \code{\link{incidenceToList}}, \code{\link{similarity}},
 #'   \code{\link[Matrix]{sparseMatrix}}
 #'
-#' @import Matrix
+#' @importFrom Matrix sparseMatrix
 #'
 #' @export incidence
 #'
@@ -38,25 +38,25 @@
 #' apply(imat[, keep], 1, sum)
 
 incidence <- function(x) {
-  # Validate x, remove missing values, remove duplicate set-element pairs
-  dt <- .prepare_sets(x)
-  sets <- dt[["sets"]]
-  elements <- dt[["elements"]]
+    # Validate x, remove missing values, remove duplicate set-element pairs
+    dt <- .prepare_sets(x)
+    sets <- dt[["sets"]]
+    elements <- dt[["elements"]]
 
-  # Unique sets and elements
-  sets_unique <- unique(sets)
-  elements_unique <- unique(elements)
+    # Unique sets and elements
+    sets_unique <- unique(sets)
+    elements_unique <- unique(elements)
 
-  # Convert identifiers to positions of 1's
-  i <- match(sets, sets_unique)         # row idx
-  j <- match(elements, elements_unique) # column idx
+    # Convert identifiers to positions of 1's
+    i <- match(sets, sets_unique)         # row idx
+    j <- match(elements, elements_unique) # column idx
 
-  mat_dimnames <- list(sets_unique, elements_unique)
+    mat_dimnames <- list(sets_unique, elements_unique)
 
-  # Note: sparseMatrix converts integers to numeric
-  mat <- sparseMatrix(i = i, j = j, x = 1,
-                      dimnames = mat_dimnames)
+    # Note: sparseMatrix converts integers to numeric
+    mat <- sparseMatrix(i = i, j = j, x = 1,
+                        dimnames = mat_dimnames)
 
-  return(mat)
+    return(mat)
 }
 

@@ -13,7 +13,7 @@
 #' @note Currently, there are no checks to ensure \code{incidence} is a valid
 #'   incidence matrix.
 #'
-#' @export incidence_to_list
+#' @export incidenceToList
 #'
 #' @examples
 #' x <- list("A" = c("a", "b", "c"),
@@ -23,21 +23,21 @@
 #'
 #' (imat <- incidence(x)) # incidence matrix
 #'
-#' incidence_to_list(incidence = imat)
+#' incidenceToList(incidence = imat)
 
-incidence_to_list <- function(incidence) {
-  # The incidence matrix is assumed to be in the correct form with sets as rows
-  # and elements as columns.
-  idx <- which(incidence == 1, arr.ind = TRUE, useNames = FALSE)
+incidenceToList <- function(incidence) {
+    # The incidence matrix is assumed to be in the correct form with sets as
+    # rows and elements as columns.
+    idx <- which(incidence == 1, arr.ind = TRUE, useNames = FALSE)
 
-  # Convert indices to names of sets and elements
-  elements <- colnames(incidence)[idx[, 2L]]
-  sets <- rownames(incidence)[idx[, 1L]]
+    # Convert indices to names of sets and elements
+    elements <- colnames(incidence)[idx[, 2L]]
+    sets <- rownames(incidence)[idx[, 1L]]
 
-  # Convert to factor to prevent ordering by set name when splitting
-  sets <- factor(sets, levels = unique(sets))
+    # Convert to factor to prevent ordering by set name when splitting
+    sets <- factor(sets, levels = unique(sets))
 
-  x <- split(x = elements, f = sets)
+    x <- split(x = elements, f = sets)
 
-  return(x)
+    return(x)
 }

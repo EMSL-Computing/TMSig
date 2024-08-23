@@ -12,14 +12,12 @@ enrichmap(
   contrast_column = "Contrast",
   padj_column = "FDR",
   padj_legend_title = padj_column,
-  padj_aggregate_fun = function(padj) {
-     median(-log10(padj), na.rm = TRUE)
- },
+  padj_aggregate_fun = function(padj) median(-log10(padj), na.rm = TRUE),
   padj_cutoff = 0.05,
   plot_sig_only = TRUE,
   padj_fill = "grey",
   colors = c("#3366ff", "darkred"),
-  heatmap_color_fun = camera_color_fun,
+  heatmap_color_fun = cameraColorFun,
   scale_by = c("row", "column", "max"),
   cell_size = unit(14, "points"),
   filename,
@@ -84,7 +82,7 @@ largest negative and largest positive values of
 "darkred".}
 
 \item{heatmap_color_fun}{function; used to create the legend for the heatmap
-bubble fill. See \code{\link{enrichmap_color_functions}} for details.}
+bubble fill. See \code{\link{enrichmapColorFunctions}} for details.}
 
 \item{scale_by}{character; whether to scale the bubbles such that the term
 with the largest \eqn{-log_{10}} adjusted p-value in each row
@@ -168,8 +166,8 @@ enrichmap(x = x,
           padj_column = "FDR",
           padj_cutoff = 0.05)
 
-# Include gene sets with adjusted p-values above padj_cutoff (0.05). Also
-# update adjusted p-value legend title.
+# Include gene sets with adjusted p-values above padj_cutoff (0.05).
+# Also update adjusted p-value legend title.
 enrichmap(x = x,
           statistic_column = "ZScore",
           plot_sig_only = FALSE,

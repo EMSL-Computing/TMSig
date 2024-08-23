@@ -1,4 +1,5 @@
 .Rcache
+TMSig.Rproj
 .Rproj.user
 .Rhistory
 .Ruserdata
@@ -6,3 +7,4 @@ sandbox
 inst/doc
 /doc/
 /Meta/
+*.log

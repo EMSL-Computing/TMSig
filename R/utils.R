@@ -4,6 +4,7 @@
 #'   create a \code{data.table}.
 #'
 #' @inheritParams incidence
+#' @inheritParams filterSets
 #'
 #' @returns A \code{data.table} with columns \code{sets} and \code{elements}.
 #'
@@ -11,37 +12,55 @@
 #'
 #' @noRd
 
-.prepare_sets <- function(x) {
-  if (!is.list(x) | is.null(names(x)))
-    stop("`x` must be a named list of character vectors.")
+.prepare_sets <- function(x, background = NULL) {
+    if (!is.list(x) || is.null(names(x)))
+        stop("`x` must be a named list of character vectors.")
 
-  sets <- rep(names(x), lengths(x))
+    # All genes (may include duplicates from the same set and NA's)
+    elements <- unlist(x, recursive = FALSE, use.names = FALSE)
 
-  # All genes (may include duplicates from the same set)
-  elements <- unlist(x, recursive = FALSE, use.names = FALSE)
+    if (!is.vector(elements, mode = "character"))
+        stop("`x` must be a named list of character vectors.")
 
-  if (!is.vector(elements, mode = "character"))
-    stop("`x` must be a named list of character vectors.")
+    # Remove missing elements and check type
+    keep <- which(!is.na(elements))
 
-  # Remove missing elements and check type
-  keep <- which(!is.na(elements))
+    if (length(keep) == 0L)
+        stop("All sets in `x` are empty or only contain missing values.")
 
-  if (length(keep) == 0L)
-    stop("All sets in `x` are empty or only contain missing values.")
+    sets <- rep(names(x), lengths(x))
 
-  if (length(keep) != length(elements)) {
-    elements <- elements[keep]
-    sets <- sets[keep]
-  }
+    if (length(keep) != length(elements)) {
+        elements <- elements[keep]
+        sets <- sets[keep]
+    }
 
-  dt <- data.table(sets = sets,
-                   elements = elements,
-                   stringsAsFactors = FALSE)
+    if (!is.null(background)) {
+        if (!is.vector(background, mode = "character"))
+            stop("If provided, `background` must be a character vector.")
 
-  # Remove duplicate set-element pairs
-  dt <- unique(dt)
+        background <- unique(background[!is.na(background)])
 
-  return(dt)
+        if (length(background) == 0L)
+            stop("`background` must contain at least 1 unique, ",
+                 "nonmissing element.")
+
+        in.background <- which(elements %in% background)
+
+        if (length(in.background) == 0L)
+            stop("No elements of `x` are present in `background`.")
+
+        if (length(in.background) != length(elements)) {
+            elements <- elements[in.background]
+            sets <- sets[in.background]
+        }
+    }
+
+    dt <- data.table(sets = sets, elements = elements,
+                     stringsAsFactors = FALSE)
+    dt <- unique(dt)
+
+    return(dt)
 }
 
 
@@ -61,134 +80,67 @@
                                  statistic_column = "TwoSampleT",
                                  contrast_column = "Contrast",
                                  padj_column = "FDR",
-                                 padj_aggregate_fun = function(padj) {
-                                   median(-log10(padj), na.rm = TRUE)
-                                 },
+                                 padj_aggregate_fun = function(padj)
+                                     median(-log10(padj), na.rm = TRUE),
                                  padj_cutoff = 0.05,
-                                 plot_sig_only = TRUE)
-{
-  if (padj_cutoff < 0 | padj_cutoff > 1)
-    stop("`padj_cutoff` must be between 0 and 1.")
+                                 plot_sig_only = TRUE) {
+    if (padj_cutoff < 0 || padj_cutoff > 1)
+        stop("`padj_cutoff` must be between 0 and 1.")
 
-  if (!is.vector(n_top, mode = "numeric"))
-    stop("`n_top` must be an integer.")
+    if (!is.vector(n_top, mode = "numeric"))
+        stop("`n_top` must be an integer.")
 
-  n_top <- max(floor(n_top), 1L)
+    n_top <- max(floor(n_top), 1L)
 
-  # Required columns
-  required_cols <- c(set_column, padj_column,
-                     statistic_column, contrast_column)
+    x <- as.data.table(x)
+    x <- unique(x[, c(set_column, padj_column,
+                      statistic_column, contrast_column),
+                  with = FALSE, drop = FALSE])
 
-  x <- as.data.table(x)
-  # This catches missing columns
-  x <- unique(x[, required_cols, with = FALSE, drop = FALSE])
+    # Identify sets that are significant in at least 1 contrast
+    x[, `:=`(any_sig = any(get(padj_column) < padj_cutoff)), by = set_column]
 
-  # Identify sets that are significant in at least 1 contrast
-  x[, `:=`(any_sig = any(get(padj_column) < padj_cutoff)),
-    by = set_column]
+    if (plot_sig_only)
+        x <- subset(x, subset = any_sig)
 
-  # Filter to significant sets for plotting
-  if (plot_sig_only)
-    x <- subset(x, subset = any_sig)
+    if (nrow(x) == 0L)
+        stop("No terms are significant at `padj_cutoff`. ",
+             "Consider setting plot_sig_only=FALSE.")
 
-  if (nrow(x) == 0L)
-    stop("No terms are significant at `padj_cutoff`. ",
-         "Consider setting plot_sig_only=FALSE.")
+    # Select n_top most significant terms
+    x[, criteria := padj_aggregate_fun(get(padj_column)), by = set_column]
+    setorderv(x, cols = c(contrast_column, "criteria"), order = c(1, -1))
 
-  # Select n_top most significant terms
-  x[, criteria := padj_aggregate_fun(get(padj_column)),
-    by = set_column]
+    # Filter to top pathways
+    top_pathways <- unique(x[[set_column]])
+    top_pathways <- top_pathways[seq_len(min(n_top, length(top_pathways)))]
+    x <- subset(x, subset = get(set_column) %in% top_pathways)
 
-  setorderv(x,
-            cols = c(contrast_column, "criteria"),
-            order = c(1, -1))
+    # All n should be 1 if there are no duplicates
+    n <- x[, .N, by = c(contrast_column, set_column)][["N"]]
 
-  # Filter to top pathways
-  top_pathways <- unique(x[[set_column]])
-  top_pathways <- top_pathways[seq_len(min(n_top, length(top_pathways)))]
+    if (any(n != 1L))
+        stop("set_column=", sQuote(set_column),
+             " is not uniquely defined for each contrast.")
 
-  x <- subset(x, subset = get(set_column) %in% top_pathways)
+    x <- dcast(data = x,
+               formula = get(set_column) ~ get(contrast_column),
+               value.var = c(statistic_column, padj_column),
+               fill = NA)
+    x <- as.matrix(x, rownames = 1)
 
-  # All n should be 1 if there are no duplicates
-  n <- x[, .N, by = c(contrast_column, set_column)][["N"]]
+    # Split into matrices of adjusted p-values and set statistics
+    padj_column_idx <- grep(paste0("^", padj_column, "_"), colnames(x))
+    statistic_mat <- x[, -padj_column_idx, drop = FALSE]
+    padj_mat <- x[, padj_column_idx, drop = FALSE]
 
-  if (any(n != 1L))
-    stop("set_column=", sQuote(set_column),
-         " is not uniquely defined for each contrast.")
+    colnames(statistic_mat) <- colnames(padj_mat) <-
+        sub(paste0("^", padj_column, "_"), "", colnames(padj_mat))
 
-  # Reshape data to wide format and convert to a matrix
-  x <- dcast(x,
-             formula = get(set_column) ~ get(contrast_column),
-             value.var = c(statistic_column, padj_column),
-             fill = NA)
-  x <- as.matrix(x, rownames = 1)
+    out <- list("statistic_mat" = statistic_mat,
+                "padj_mat" = padj_mat)
 
-  # Split into matrices of adjusted p-values and set statistics
-  padj_cols <- grep(paste0("^", padj_column, "_"), colnames(x)) # column indices
-  padj_mat <- x[, padj_cols, drop = FALSE]
-  statistic_mat <- x[, -padj_cols, drop = FALSE]
-
-  colnames(padj_mat) <- colnames(statistic_mat) <-
-    sub(paste0("^", padj_column, "_"), "", colnames(padj_mat))
-
-  out <- list("statistic_mat" = statistic_mat,
-              "padj_mat" = padj_mat)
-
-  return(out)
-}
-
-
-#' @title Update enrichmap heatmap arguments
-#'
-#' @description Update rect_gp, row_names_max_width, and
-#'   column_names_max_height.
-#'
-#' @param base_heatmap_args list of base heatmap args.
-#' @param heatmap_args optional list of user-supplied arguments. Used to update
-#'   \code{base_heatmap_args}.
-#'
-#' @returns A list of arguments that will be passed to
-#'   \code{\link[ComplexHeatmap]{Heatmap}}.
-#'
-#' @importFrom ComplexHeatmap max_text_width
-#' @importFrom grid gpar
-#' @importFrom utils modifyList
-#'
-#' @noRd
-
-.update_heatmap_args <- function(base_heatmap_args = list(),
-                                 heatmap_args = list())
-{
-  if (!is.list(heatmap_args))
-    stop("`heatmap_args` must be a list of arguments that ",
-         "will be passed to ComplexHeatmap::Heatmap.")
-
-  # Update with user-supplied arguments
-  heatmap_args <-  modifyList(x = base_heatmap_args,
-                              val = heatmap_args,
-                              keep.null = TRUE)
-
-  # Default rect_gp
-  if (is.null(heatmap_args[["rect_gp"]]))
-    heatmap_args[["rect_gp"]] <- gpar(col = NA, fill = "white")
-
-  if (is.null(heatmap_args[["rect_gp"]][["col"]]))
-    heatmap_args[["rect_gp"]][["col"]] <- NA
-
-  if (is.null(heatmap_args[["rect_gp"]][["fill"]]))
-    heatmap_args[["rect_gp"]][["fill"]] <- "white"
-
-  # If row or column labels were updated, use the new values to calculate max
-  # text width and height to avoid overlapping elements or unnecessary spacing
-  heatmap_args[["row_names_max_width"]] <-
-    max_text_width(heatmap_args[["row_labels"]],
-                   gp = heatmap_args[["row_names_gp"]])
-
-  heatmap_args[["column_names_max_height"]] <-
-    max_text_width(heatmap_args[["column_labels"]],
-                   gp = heatmap_args[["column_names_gp"]])
-
-  return(heatmap_args)
+    return(out)
 }
 
 
@@ -217,48 +169,48 @@
 # cell_size exist in the enrichmap function environment. See enrichmap code for
 # how this is handled.
 .layer_fun <- function(j, i, x, y, w, h, f) {
-  # Cell background
-  grid.rect(x = x, y = y, width = w, height = h,
-            gp = gpar(col = heatmap_args$rect_gp$col,
-                      fill = ifelse(
-                        is.na(pindex(padj_mat, i, j)),
-                        heatmap_args[["na_col"]],
-                        ifelse(pindex(padj_mat, i, j) < padj_cutoff,
-                               padj_fill, # grey
-                               heatmap_args[["rect_gp"]][["fill"]]) # white
-                      )
-            ))
+    # Cell background
+    grid.rect(x = x, y = y, width = w, height = h,
+              gp = gpar(col = heatmap_args[["rect_gp"]][["col"]],
+                        fill = ifelse(
+                            is.na(pindex(padj_mat, i, j)),
+                            heatmap_args[["na_col"]], # black
+                            ifelse(pindex(padj_mat, i, j) < padj_cutoff,
+                                   padj_fill, # grey
+                                   heatmap_args[["rect_gp"]][["fill"]]) # white
+                        )
+              ))
 
-  # Matrix of bubble diameters (optionally scaled to row or column max)
-  dmat <- -log10(padj_mat)
+    # Matrix of bubble diameters (optionally scaled to row or column max)
+    dmat <- -log10(padj_mat)
 
-  if (scale_by != "max") {
-    # Scale bubbles relative to row or column max
-    margin <- 1L + (scale_by == "column")
-    dmat <- sweep(dmat, MARGIN = margin,
-                  apply(dmat, MARGIN = margin, max, na.rm = TRUE),
-                  FUN = "/")
-  } else {
-    # Scale bubbles relative to global max
-    dmat <- dmat / max(dmat, na.rm = TRUE)
-  }
+    if (scale_by == "max") {
+        # Scale bubbles relative to global max
+        dmat <- dmat / max(dmat, na.rm = TRUE)
+    } else {
+        # Scale bubbles relative to row or column max
+        margin <- 1L + (scale_by == "column")
+        dmat <- sweep(dmat, MARGIN = margin,
+                      apply(dmat, MARGIN = margin, max, na.rm = TRUE),
+                      FUN = "/")
+    }
 
-  # Limits on bubble diameters for significant adjusted p-values
-  r_min <- 0.20
-  r_max <- 0.95 # upper limit because a black border is added to the bubbles
-  dmat <- ifelse(padj_mat < padj_cutoff,
-                 dmat * (r_max - r_min) + r_min,
-                 dmat * r_max)
+    # Limits on bubble diameters
+    r_min <- 0.20 # only applies to significant adjusted p-values
+    r_max <- 0.95 # upper limit because a black border is added to the bubbles
+    dmat <- ifelse(padj_mat < padj_cutoff,
+                   dmat * (r_max - r_min) + r_min,
+                   dmat * r_max)
 
-  # Draw bubbles. col_fun is taken from heatmap_color_fun.
-  grid.circle(
-    x = x, y = y,
-    r = pindex(dmat, i, j) / 2 * cell_size,
-    # Significant bubbles get a black outline to separate from padj_fill
-    gp = gpar(col = ifelse(pindex(padj_mat, i, j) < padj_cutoff,
-                           "black", NA),
-              fill = col_fun(pindex(statistic_mat, i, j)))
-  )
+    # Draw bubbles
+    grid.circle(
+        x = x, y = y,
+        r = pindex(dmat, i, j) / 2 * cell_size,
+        # Significant bubbles get a black outline to separate from padj_fill
+        gp = gpar(col = ifelse(pindex(padj_mat, i, j) < padj_cutoff,
+                               "black", NA),
+                  fill = f)
+    )
 }
 
 
@@ -287,32 +239,31 @@
                           height = 480,
                           units = "px",
                           res = 500,
-                          ...)
-{
-  # see tools::file_ext
-  file_ext <- sub(".*\\.([[:alnum:]]+)$", "\\1", filename)
+                          ...) {
+    # see tools::file_ext
+    file_ext <- sub(".*\\.([[:alnum:]]+)$", "\\1", filename)
 
-  save_fun <- switch(
-    file_ext,
-    "bmp" = bmp,
-    "jpg" = jpeg,
-    "pdf" = pdf,
-    "png" = png,
-    "tiff" = tiff,
-    stop("`filename` must have one of the following extensions: ",
-         "bmp, jpg, pdf, png, or tiff.")
-  )
+    save_fun <- switch(
+        file_ext,
+        "bmp" = bmp,
+        "jpg" = jpeg,
+        "pdf" = pdf,
+        "png" = png,
+        "tiff" = tiff,
+        stop("`filename` must have one of the following extensions: ",
+             "bmp, jpg, pdf, png, or tiff.")
+    )
 
-  default_args <- list(filename = filename,
-                       file = filename,
-                       width = width,
-                       height = height,
-                       units = units,
-                       quality = 100,
-                       res = res,
-                       compression = "lzw")
-  save_args <- modifyList(default_args, val = list(...))
-  save_args <- save_args[names(save_args) %in% names(formals(save_fun))]
+    default_args <- list(filename = filename,
+                         file = filename,
+                         width = width,
+                         height = height,
+                         units = units,
+                         quality = 100,
+                         res = res,
+                         compression = "lzw")
+    save_args <- modifyList(default_args, val = list(...))
+    save_args <- save_args[names(save_args) %in% names(formals(save_fun))]
 
-  do.call(what = save_fun, args = save_args)
+    do.call(what = save_fun, args = save_args)
 }
