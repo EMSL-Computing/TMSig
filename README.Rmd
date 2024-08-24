@@ -9,7 +9,8 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   fig.path = "man/figures/README-",
-  out.width = "100%"
+  out.width = "70%",
+  out.height = "70%"
 )
 ```
 
@@ -60,17 +61,29 @@ Below is an overview of some of the core functions.
 - `incidence`: compute a sparse incidence matrix with unique sets as rows and unique elements as columns. A value of 1 indicates that a particular element is a member of that set, while a value of 0 indicates that it is not.
 
 - `similarity`: compute the matrix of pairwise Jaccard, overlap, or Ōtsuka similarity coefficients for all pairs of sets $A$ and $B$, where
-  - Jaccard(A, B) = $\frac{|A \cap B|}{|A \cup B|}$
-  - Overlap(A, B) = $\frac{|A \cap B|}{\min(|A|, |B|)}$
-  - Ōtsuka(A, B) = $\frac{|A \cap B|}{\sqrt{|A| \times |B|}}$
+    - Jaccard(A, B) = $\frac{|A \cap B|}{|A \cup B|}$
+    - Overlap(A, B) = $\frac{|A \cap B|}{\min(|A|, |B|)}$
+    - Ōtsuka(A, B) = $\frac{|A \cap B|}{\sqrt{|A| \times |B|}}$
 
 - `filterSets`: restrict sets to only those elements in a pre-determined background, if provided, and only keep those that pass minimum and maximum size thresholds.
 
 - `clusterSets`: hierarchical clustering of highly similar sets. Used to reduce redundancy prior to analysis.
 
+- `decomposeSets`: decompose all pairs of sufficiently overlapping sets, $A$ and $B$, into 3 disjoint parts.
+    1. The elements unique to $A$: $A \setminus B$ ("A minus B")
+    2. The elements unique to $B$: $B \setminus A$ ("B minus A")
+    3. The elements common to both $A$ and $B$: $A \cap B$ ("A and B")
+
+- `invertSets`: swap positions of sets and elements so that elements become set names and set names become elements.
+
 - `cameraPR.matrix`: a fast matrix method for `limma::cameraPR` for testing molecular signatures in one or more contrasts. Pre-Ranked Correlation Adjusted MEan RAnk gene set testing (CAMERA-PR) accounts for inter-gene correlation to control the type I error rate (Wu & Smyth, 2012).
 
 - `enrichmap`: visualize molecular signature analysis results, such as those from `cameraPR.matrix`, as a bubble heatmap with signatures as rows and contrasts as columns.
+
+```{r bubble-heatmap, echo=FALSE, fig.alt="Example bubble heatmap."}
+knitr::include_graphics("figures/bubble_heatmap.png")
+```
+
 
 
 ## Examples

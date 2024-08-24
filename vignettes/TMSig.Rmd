@@ -530,7 +530,7 @@ enrichmap(x = resDA,
           padj_column = "adj.P.Val", 
           padj_legend_title = "BH Adjusted\nP-Value", 
           padj_cutoff = 0.05,
-          cell_size = grid::unit(12, "pt"),
+          cell_size = grid::unit(20, "pt"),
           # Additional arguments passed to ComplexHeatmap::Heatmap. Used to
           # modify default appearance.
           heatmap_args = list(
@@ -554,7 +554,7 @@ enrichmap(x = res,
           padj_column = "FDR",
           padj_legend_title = "BH Adjusted\nP-Value",
           padj_cutoff = 0.05,
-          cell_size = grid::unit(12, "pt"),
+          cell_size = grid::unit(13, "pt"),
           # Additional arguments passed to ComplexHeatmap::Heatmap. Used to
           # modify default appearance.
           heatmap_args = list(

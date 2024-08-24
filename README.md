@@ -72,6 +72,16 @@ Below is an overview of some of the core functions.
 - `clusterSets`: hierarchical clustering of highly similar sets. Used to
   reduce redundancy prior to analysis.
 
+- `decomposeSets`: decompose all pairs of sufficiently overlapping sets,
+  $A$ and $B$, into 3 disjoint parts.
+
+  1.  The elements unique to $A$: $A \setminus B$ (“A minus B”)
+  2.  The elements unique to $B$: $B \setminus A$ (“B minus A”)
+  3.  The elements common to both $A$ and $B$: $A \cap B$ (“A and B”)
+
+- `invertSets`: swap positions of sets and elements so that elements
+  become set names and set names become elements.
+
 - `cameraPR.matrix`: a fast matrix method for `limma::cameraPR` for
   testing molecular signatures in one or more contrasts. Pre-Ranked
   Correlation Adjusted MEan RAnk gene set testing (CAMERA-PR) accounts
@@ -81,6 +91,8 @@ Below is an overview of some of the core functions.
 - `enrichmap`: visualize molecular signature analysis results, such as
   those from `cameraPR.matrix`, as a bubble heatmap with signatures as
   rows and contrasts as columns.
+
+<img src="figures/bubble_heatmap.png" alt="Example bubble heatmap." width="70%" height="70%" />
 
 ## Examples
 
