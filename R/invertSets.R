@@ -1,9 +1,7 @@
 #' @title Invert a List of Sets, Transposing Sets and Elements
 #'
-#' @description `r lifecycle::badge("experimental")`
-#'
-#'   Invert a list of sets so that elements become set names and set names
-#'   become elements.
+#' @description Invert a list of sets so that elements become set names and set
+#'   names become elements.
 #'
 #' @inheritParams incidence
 #'

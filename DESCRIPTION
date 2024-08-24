@@ -2,7 +2,7 @@ Package: TMSig
 Type: Package
 Title: Tools for Molecular Signatures
 Version: 0.99.0
-Date: 2024-08-23
+Date: 2024-08-24
 Authors@R: 
     c(
       person(given = "Tyler", family = "Sagendorf", 
@@ -35,7 +35,6 @@ Imports:
     data.table,
     grDevices,
     grid,
-    lifecycle,
     Matrix,
     stats,
     utils

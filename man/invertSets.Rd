@@ -13,10 +13,8 @@ invertSets(x)
 A named list of sets.
 }
 \description{
-\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
-
-Invert a list of sets so that elements become set names and set names
-become elements.
+Invert a list of sets so that elements become set names and set
+names become elements.
 }
 \note{
 This function is essentially a more limited version of
