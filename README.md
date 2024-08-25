@@ -92,7 +92,7 @@ Below is an overview of some of the core functions.
   those from `cameraPR.matrix`, as a bubble heatmap with signatures as
   rows and contrasts as columns.
 
-<img src="figures/bubble_heatmap.png" alt="Example bubble heatmap." width="70%" height="70%" />
+<img src="figures/bubble_heatmap.png" alt="Example bubble heatmap." width="85%" height="85%" style="display: block; margin: auto;" />
 
 ## Examples
 
