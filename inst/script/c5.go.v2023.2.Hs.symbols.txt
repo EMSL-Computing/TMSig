@@ -1,0 +1,8 @@
+# c5.go.v2023.2.Hs.symbols.gmt.gz:
+
+The c5.go.v2023.2.Hs.symbols.gmt file was downloaded from v2023.2.Hs of the
+Molecular Signatures Database (MSigDB;
+https://data.broadinstitute.org/gsea-msigdb/msigdb/release/2023.2.Hs/).
+
+R.utils::gzip() was used to compress the file (code run in the console), though
+no other modifications were made.
