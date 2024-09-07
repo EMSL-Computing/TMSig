@@ -11,6 +11,8 @@
 #' @note Currently, there are no checks to ensure \code{incidence} is a valid
 #'   incidence matrix.
 #'
+#' @importFrom Matrix which
+#'
 #' @export incidenceToList
 #'
 #' @examples

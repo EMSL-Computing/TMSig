@@ -2,9 +2,15 @@
 % Please edit documentation in R/filterSets.R
 \name{filterSets}
 \alias{filterSets}
+\alias{filterSets,GeneSet,character,numeric,numeric-method}
+\alias{filterSets,GeneSetCollection,character,numeric,numeric-method}
 \title{Filter a Named List of Sets by Size}
 \usage{
-filterSets(x, background = NULL, min_size = 5L, max_size = Inf)
+filterSets(x, background = NULL, min_size = 5L, max_size = Inf, ...)
+
+\S4method{filterSets}{GeneSet,character,numeric,numeric}(x, background = NULL, min_size = 5L, max_size = Inf, ...)
+
+\S4method{filterSets}{GeneSetCollection,character,numeric,numeric}(x, background = NULL, min_size = 5L, max_size = Inf, ...)
 }
 \arguments{
 \item{x}{a named list of sets. Elements must be of type \code{"character"}.}
@@ -15,6 +21,8 @@ filtered to only those elements of \code{background}.}
 \item{min_size}{integer (\eqn{\geq 1}); the minimum allowable set size.}
 
 \item{max_size}{integer (\eqn{\geq 1}); the maximum allowable set size.}
+
+\item{...}{additional arguments are not currently used.}
 }
 \value{
 A named list of sets at most the same size as \code{x}.

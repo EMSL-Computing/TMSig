@@ -2,12 +2,20 @@
 % Please edit documentation in R/sparseIncidence.R
 \name{sparseIncidence}
 \alias{sparseIncidence}
+\alias{sparseIncidence,GeneSet-method}
+\alias{sparseIncidence,GeneSetCollection-method}
 \title{Construct a Sparse Incidence Matrix}
 \usage{
-sparseIncidence(x)
+sparseIncidence(x, ...)
+
+\S4method{sparseIncidence}{GeneSet}(x, ...)
+
+\S4method{sparseIncidence}{GeneSetCollection}(x, ...)
 }
 \arguments{
 \item{x}{a named list of sets. Elements must be of type \code{"character"}.}
+
+\item{...}{additional arguments are not currently used.}
 }
 \value{
 An object of class \code{\link[Matrix:dgCMatrix-class]{dgCMatrix}}
@@ -15,6 +23,13 @@ with unique set names as rows and unique elements as columns.
 }
 \description{
 Construct a sparse incidence matrix from a named list of sets.
+}
+\details{
+\code{sparseIncidence} differs from
+\code{\link[GSEABase:incidence]{GSEABase::incidence}} in that it returns a
+sparse matrix, rather than a dense matrix, so it is more memory efficient.
+It also removes missing elements, removes empty sets, and combines sets
+with duplicate names.
 }
 \section{Incidence Matrix}{
 

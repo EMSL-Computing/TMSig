@@ -3,6 +3,7 @@
 #' @description Construct a sparse incidence matrix from a named list of sets.
 #'
 #' @param x a named list of sets. Elements must be of type \code{"character"}.
+#' @param ... additional arguments are not currently used.
 #'
 #' @section Incidence Matrix:
 #'
@@ -10,6 +11,12 @@
 #'
 #'   \deqn{A_{ij} = \begin{cases} 1, & \text{if } \text{element } e_j \in
 #'   \text{set } s_i \\ 0, & \text{otherwise} \end{cases}}
+#'
+#' @details \code{sparseIncidence} differs from
+#'   \code{\link[GSEABase:incidence]{GSEABase::incidence}} in that it returns a
+#'   sparse matrix, rather than a dense matrix, so it is more memory efficient.
+#'   It also removes missing elements, removes empty sets, and combines sets
+#'   with duplicate names.
 #'
 #' @returns An object of class \code{\link[Matrix:dgCMatrix-class]{dgCMatrix}}
 #'   with unique set names as rows and unique elements as columns.
@@ -37,10 +44,8 @@
 #' apply(imat[, keep], 1, sum)
 #'
 #' @importFrom Matrix sparseMatrix
-#'
-#' @export
 
-sparseIncidence <- function(x) {
+sparseIncidence <- function(x, ...) {
     # Validate x, remove missing values, remove duplicate set-element pairs
     dt <- .prepare_sets(x)
     sets <- dt[["sets"]]
@@ -62,3 +67,49 @@ sparseIncidence <- function(x) {
 
     return(mat)
 }
+
+
+#' @importFrom methods setGeneric setMethod signature
+#'
+#' @export
+setGeneric(name = "sparseIncidence", def = sparseIncidence)
+
+
+#' @rdname sparseIncidence
+#'
+#' @importFrom GSEABase geneIds setName setIdentifier
+#'
+#' @export
+setMethod(f = "sparseIncidence",
+          signature = signature(x = "GeneSet"),
+          definition = function(x, ...) {
+              dots <- names(list(...))
+              if (length(dots))
+                  warning("Extra arguments disregarded: ", sQuote(dots))
+
+              y <- list(geneIds(x))
+              names(y) <- setName(x)
+
+              if (is.null(names(y)))
+                  names(y) <- setIdentifier(x)
+
+              sparseIncidence(x = y)
+          })
+
+
+#' @rdname sparseIncidence
+#'
+#' @importFrom GSEABase geneIds
+#'
+#' @export
+setMethod(f = "sparseIncidence",
+          signature = signature(x = "GeneSetCollection"),
+          definition = function(x, ...) {
+              dots <- names(list(...))
+              if (length(dots))
+                  warning("Extra arguments disregarded: ", sQuote(dots))
+
+              x <- geneIds(x)
+
+              sparseIncidence(x = x)
+          })

@@ -15,8 +15,6 @@
 #'
 #' @importFrom data.table :=
 #'
-#' @export filterSets
-#'
 #' @examples
 #' x <- list("A" = c("a", "b", "c"),
 #'           "B" = c("a", "a", "d", "e", NA), # duplicates and NA
@@ -29,7 +27,11 @@
 #' # Limit scope of sets before filtering
 #' filterSets(x, min_size = 2L, background = c("a", "c", "e", "z"))
 
-filterSets <- function(x, background = NULL, min_size = 5L, max_size = Inf) {
+filterSets <- function(x,
+                       background = NULL,
+                       min_size = 5L,
+                       max_size = Inf,
+                       ...) {
     if (!is.vector(min_size, mode = "numeric") || length(min_size) != 1L)
         stop("`min_size` must be a single integer.")
 
@@ -65,3 +67,64 @@ filterSets <- function(x, background = NULL, min_size = 5L, max_size = Inf) {
     return(x)
 }
 
+
+#' @importFrom methods setGeneric setMethod signature
+#'
+#' @export
+setGeneric(name = "filterSets", def = filterSets)
+
+
+#' @rdname filterSets
+#'
+#' @importFrom GSEABase geneIds setName setIdentifier
+#'
+#' @export
+setMethod(f = "filterSets",
+          signature = signature(x = "GeneSet",
+                                background = "character",
+                                min_size = "numeric",
+                                max_size = "numeric"),
+          definition = function(x,
+                                background = NULL,
+                                min_size = 5L,
+                                max_size = Inf,
+                                ...) {
+              dots <- names(list(...))
+              if (length(dots))
+                  warning("Extra arguments disregarded: ", sQuote(dots))
+
+              y <- list(geneIds(x))
+              names(y) <- setName(x)
+
+              if (is.null(names(y)))
+                  names(y) <- setIdentifier(x)
+
+              filterSets(x = y, background = background,
+                         min_size = min_size, max_size = max_size)
+          })
+
+
+#' @rdname filterSets
+#'
+#' @importFrom GSEABase geneIds
+#'
+#' @export
+setMethod(f = "filterSets",
+          signature = signature(x = "GeneSetCollection",
+                                background = "character",
+                                min_size = "numeric",
+                                max_size = "numeric"),
+          definition = function(x,
+                                background = NULL,
+                                min_size = 5L,
+                                max_size = Inf,
+                                ...) {
+              dots <- names(list(...))
+              if (length(dots))
+                  warning("Extra arguments disregarded: ", sQuote(dots))
+
+              x <- geneIds(x)
+
+              filterSets(x = x, background = background,
+                         min_size = min_size, max_size = max_size)
+          })

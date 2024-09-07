@@ -10,8 +10,6 @@
 #'
 #' @returns A named list of sets.
 #'
-#' @export invertSets
-#'
 #' @examples
 #' x <- list("A" = c("a", "b", "c"),
 #'           "B" = c("c", "d"),
@@ -28,8 +26,54 @@
 #' yc <- lapply(y, paste, collapse = ", ")
 #' invertSets(yc)
 
-invertSets <- function(x) {
+invertSets <- function(x, ...) {
     dt <- .prepare_sets(x)
 
     split(x = dt[["sets"]], f = dt[["elements"]])
 }
+
+
+#' @importFrom methods setGeneric setMethod signature
+#'
+#' @export
+setGeneric(name = "invertSets", def = invertSets)
+
+
+#' @rdname invertSets
+#'
+#' @importFrom GSEABase geneIds setName setIdentifier
+#'
+#' @export
+setMethod(f = "invertSets",
+          signature = signature(x = "GeneSet"),
+          definition = function(x, ...) {
+              dots <- names(list(...))
+              if (length(dots))
+                  warning("Extra arguments disregarded: ", sQuote(dots))
+
+              y <- list(geneIds(x))
+              names(y) <- setName(x)
+
+              if (is.null(names(y)))
+                  names(y) <- setIdentifier(x)
+
+              invertSets(x = y)
+          })
+
+
+#' @rdname invertSets
+#'
+#' @importFrom GSEABase geneIds
+#'
+#' @export
+setMethod(f = "invertSets",
+          signature = signature(x = "GeneSetCollection"),
+          definition = function(x, ...) {
+              dots <- names(list(...))
+              if (length(dots))
+                  warning("Extra arguments disregarded: ", sQuote(dots))
+
+              x <- geneIds(x)
+
+              invertSets(x = x)
+          })

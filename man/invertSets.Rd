@@ -2,12 +2,20 @@
 % Please edit documentation in R/invertSets.R
 \name{invertSets}
 \alias{invertSets}
+\alias{invertSets,GeneSet-method}
+\alias{invertSets,GeneSetCollection-method}
 \title{Invert a List of Sets, Transposing Sets and Elements}
 \usage{
-invertSets(x)
+invertSets(x, ...)
+
+\S4method{invertSets}{GeneSet}(x, ...)
+
+\S4method{invertSets}{GeneSetCollection}(x, ...)
 }
 \arguments{
 \item{x}{a named list of sets. Elements must be of type \code{"character"}.}
+
+\item{...}{additional arguments are not currently used.}
 }
 \value{
 A named list of sets.
