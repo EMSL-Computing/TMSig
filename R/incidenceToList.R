@@ -1,10 +1,10 @@
 #' @title Convert Incidence Matrix to a Named List of Sets
 #'
 #' @description Converts an incidence matrix to a named list of sets. The
-#' inverse of \code{\link{incidence}}.
+#'   inverse of \code{\link{sparseIncidence}}.
 #'
 #' @param incidence incidence matrix with set names as rows and elements as
-#'   columns. Usually, the output of \code{\link{incidence}}.
+#'   columns. For instance, the output of \code{\link{sparseIncidence}}.
 #'
 #' @returns a named list of sets with the same length as \code{nrow(incidence)}.
 #'
@@ -19,7 +19,7 @@
 #'           "C" = c("x", "y", "z", "z"), # duplicates
 #'           "D" = c("a", NA)) # missing values
 #'
-#' (imat <- incidence(x)) # incidence matrix
+#' (imat <- sparseIncidence(x)) # incidence matrix
 #'
 #' incidenceToList(incidence = imat)
 

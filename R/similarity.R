@@ -3,7 +3,7 @@
 #' @description Construct a sparse matrix of similarity coefficients for each
 #'   pair of sets in a list.
 #'
-#' @inheritParams incidence
+#' @inheritParams sparseIncidence
 #' @param type character; the type of similarity measure to use. Either
 #'   \code{"jaccard"}, \code{"overlap"}, or \code{"otsuka"}. May be abbreviated.
 #'
@@ -71,7 +71,7 @@
 #'   coefficients of faunal similarity. \emph{Journal of Paleontology, 53}(4),
 #'   1029–1034. \url{http://www.jstor.org/stable/1304126}
 #'
-#' @seealso \code{\link{incidence}}, \code{\link{clusterSets}}
+#' @seealso \code{\link{sparseIncidence}}, \code{\link{clusterSets}}
 #'
 #' @importFrom Matrix tril diag which
 #'
@@ -92,7 +92,7 @@
 similarity <- function(x, type = c("jaccard", "overlap", "otsuka")) {
     type <- match.arg(type, choices = c("jaccard", "overlap", "otsuka"))
 
-    incidence_mat <- incidence(x) # sparse incidence matrix
+    incidence_mat <- sparseIncidence(x) # sparse incidence matrix
 
     if (nrow(incidence_mat) < 2L)
         stop("`x` must contain 2 or more sets.")

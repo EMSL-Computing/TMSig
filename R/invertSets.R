@@ -3,7 +3,7 @@
 #' @description Invert a list of sets so that elements become set names and set
 #'   names become elements.
 #'
-#' @inheritParams incidence
+#' @inheritParams sparseIncidence
 #'
 #' @note This function is essentially a more limited version of
 #'   \code{purrr::transpose_list}.

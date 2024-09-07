@@ -3,7 +3,7 @@
 #' @description Remove missing values, remove duplicate set-element pairs, and
 #'   create a \code{data.table}.
 #'
-#' @inheritParams incidence
+#' @inheritParams sparseIncidence
 #' @inheritParams filterSets
 #'
 #' @returns A \code{data.table} with columns \code{sets} and \code{elements}.

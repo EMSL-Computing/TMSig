@@ -8,14 +8,14 @@ incidenceToList(incidence)
 }
 \arguments{
 \item{incidence}{incidence matrix with set names as rows and elements as
-columns. Usually, the output of \code{\link{incidence}}.}
+columns. For instance, the output of \code{\link{sparseIncidence}}.}
 }
 \value{
 a named list of sets with the same length as \code{nrow(incidence)}.
 }
 \description{
 Converts an incidence matrix to a named list of sets. The
-inverse of \code{\link{incidence}}.
+inverse of \code{\link{sparseIncidence}}.
 }
 \note{
 Currently, there are no checks to ensure \code{incidence} is a valid
@@ -27,7 +27,7 @@ x <- list("A" = c("a", "b", "c"),
           "C" = c("x", "y", "z", "z"), # duplicates
           "D" = c("a", NA)) # missing values
 
-(imat <- incidence(x)) # incidence matrix
+(imat <- sparseIncidence(x)) # incidence matrix
 
 incidenceToList(incidence = imat)
 }

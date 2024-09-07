@@ -52,8 +52,8 @@ Below is an overview of some of the core functions.
 
 - `readGMT`: create a named list of sets from a GMT file.
 
-- `incidence`: compute a sparse incidence matrix with unique sets as
-  rows and unique elements as columns. A value of 1 indicates that a
+- `sparseIncidence`: compute a sparse incidence matrix with unique sets
+  as rows and unique elements as columns. A value of 1 indicates that a
   particular element is a member of that set, while a value of 0
   indicates that it is not.
 
@@ -135,7 +135,7 @@ x
 ```
 
 ``` r
-(imat <- incidence(x)) # incidence matrix
+(imat <- sparseIncidence(x)) # incidence matrix
 #> 7 x 9 sparse Matrix of class "dgCMatrix"
 #>      a b c d e x y z f
 #> Set1 1 1 1 1 1 . . . .

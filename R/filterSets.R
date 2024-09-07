@@ -5,7 +5,7 @@
 #'   are optionally restricted to elements of \code{background} before filtering
 #'   by size.
 #'
-#' @inheritParams incidence
+#' @inheritParams sparseIncidence
 #' @param background character; optional character vector. \code{x} will be
 #'   filtered to only those elements of \code{background}.
 #' @param min_size integer (\eqn{\geq 1}); the minimum allowable set size.

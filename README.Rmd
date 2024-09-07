@@ -59,7 +59,7 @@ Below is an overview of some of the core functions.
 
 - `readGMT`: create a named list of sets from a GMT file.
 
-- `incidence`: compute a sparse incidence matrix with unique sets as rows and unique elements as columns. A value of 1 indicates that a particular element is a member of that set, while a value of 0 indicates that it is not.
+- `sparseIncidence`: compute a sparse incidence matrix with unique sets as rows and unique elements as columns. A value of 1 indicates that a particular element is a member of that set, while a value of 0 indicates that it is not.
 
 - `similarity`: compute the matrix of pairwise Jaccard, overlap, or Ōtsuka similarity coefficients for all pairs of sets $A$ and $B$, where
     - Jaccard(A, B) = $\frac{|A \cap B|}{|A \cup B|}$
@@ -107,7 +107,7 @@ x
 ```
 
 ```{r}
-(imat <- incidence(x)) # incidence matrix
+(imat <- sparseIncidence(x)) # incidence matrix
 
 tcrossprod(imat) # pairwise intersection and set sizes
 

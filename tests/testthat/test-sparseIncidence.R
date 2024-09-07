@@ -2,27 +2,27 @@ test_that("x must be a named list of character vectors", {
     err <- "`x` must be a named list of character vectors."
 
     expect_error(
-        incidence(list(c("a", "b"))), # no names
+        sparseIncidence(list(c("a", "b"))), # no names
         err
     )
 
     expect_error(
-        incidence(1), # not a list
+        sparseIncidence(1), # not a list
         err
     )
 
     expect_error(
-        incidence(list("A" = 1)), # elements are not strings
+        sparseIncidence(list("A" = 1)), # elements are not strings
         err
     )
 })
 
 
-test_that("incidence works for a single set", {
+test_that("sparseIncidence works for a single set", {
     x <- list("A" = letters[1:5])
 
     expect_no_error(
-        out <- incidence(x)
+        out <- sparseIncidence(x)
     )
 
     expect_identical(
@@ -37,7 +37,7 @@ test_that("duplicates are handled properly", {
     x <- list("A" = c("a", "b"),
               "B" = letters[rep(3, 10)])
 
-    out <- incidence(x)
+    out <- sparseIncidence(x)
 
     expect_true(all(attr(out, "x") == 1))
 })
@@ -47,7 +47,7 @@ test_that("missing values are discarded", {
     x <- list("A" = c("a", "b"),
               "B" = c("b", NA))
 
-    out <- incidence(x)
+    out <- sparseIncidence(x)
 
     expect_identical(colnames(out), c("a", "b"))
 })
@@ -57,7 +57,7 @@ test_that("all values cannot be missing", {
     x <- list("A" = rep(NA_character_, 2))
 
     expect_error(
-        incidence(x),
+        sparseIncidence(x),
         "All sets in `x` are empty or only contain missing values."
     )
 })
@@ -69,7 +69,7 @@ test_that("duplicate list names combine those unique elements", {
               "B" = c("b", "c"))
 
     expect_no_error(
-        out <- incidence(x)
+        out <- sparseIncidence(x)
     )
 
     expect_identical(

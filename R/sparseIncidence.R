@@ -1,13 +1,15 @@
-#' @title Construct Sparse Incidence Matrix from List of Sets
+#' @title Construct a Sparse Incidence Matrix
 #'
-#' @description Given a named list of sets, construct a sparse incidence matrix.
+#' @description Construct a sparse incidence matrix from a named list of sets.
 #'
 #' @param x a named list of sets. Elements must be of type \code{"character"}.
 #'
-#' @details The incidence matrix, \eqn{B}, is defined such that
+#' @section Incidence Matrix:
 #'
-#' \deqn{B_{ij} = \begin{cases} 1, & \text{if } \text{element } e_j \in
-#' \text{set } s_i \\ 0, & \text{otherwise} \end{cases}}
+#'   An incidence matrix, \eqn{A}, is defined such that
+#'
+#'   \deqn{A_{ij} = \begin{cases} 1, & \text{if } \text{element } e_j \in
+#'   \text{set } s_i \\ 0, & \text{otherwise} \end{cases}}
 #'
 #' @returns An object of class \code{\link[Matrix:dgCMatrix-class]{dgCMatrix}}
 #'   with unique set names as rows and unique elements as columns.
@@ -15,17 +17,14 @@
 #' @seealso \code{\link{incidenceToList}}, \code{\link{similarity}},
 #'   \code{\link[Matrix]{sparseMatrix}}
 #'
-#' @importFrom Matrix sparseMatrix
-#'
-#' @export incidence
-#'
 #' @examples
-#' x <- list("A" = c("a", "b", "c"),
+#' x <- list("A" = c("a", "b"),
+#'           "A" = c("c"), # duplicate sets
 #'           "B" = c("c", "d"),
 #'           "C" = c("x", "y", "z", "z"), # duplicates
 #'           "D" = c("a", NA)) # missing values
 #'
-#' (imat <- incidence(x))
+#' (imat <- sparseIncidence(x))
 #'
 #' # Sizes of sets and their pairwise intersections
 #' tcrossprod(imat)
@@ -36,8 +35,12 @@
 #' # Count number of elements unique to each set
 #' keep <- apply(imat, 2, sum) == 1
 #' apply(imat[, keep], 1, sum)
+#'
+#' @importFrom Matrix sparseMatrix
+#'
+#' @export
 
-incidence <- function(x) {
+sparseIncidence <- function(x) {
     # Validate x, remove missing values, remove duplicate set-element pairs
     dt <- .prepare_sets(x)
     sets <- dt[["sets"]]
@@ -59,4 +62,3 @@ incidence <- function(x) {
 
     return(mat)
 }
-

@@ -21,7 +21,7 @@
 possibly with \code{\link[base]{NA}}s) with genes/molecules as row names
 and one or more contrasts or coefficients as column names.}
 
-\item{index}{a named list of sets to test. Passed to \code{\link{incidence}}.
+\item{index}{a named list of sets to test. Passed to \code{\link{sparseIncidence}}.
 \code{index} must be a list of character vectors, not the result of
 \code{\link[limma]{ids2indices}}, so it is more restrictive than what
 \code{\link[limma]{cameraPR.default}} allows.}

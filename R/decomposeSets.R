@@ -6,7 +6,7 @@
 #'   section in \code{\link{invertSets}} for a method to decompose an entire
 #'   list of sets.
 #'
-#' @inheritParams incidence
+#' @inheritParams sparseIncidence
 #' @param overlap integer; only pairs of sets with at least \code{overlap}
 #'   elements in common will be decomposed.
 #' @param AND character; string used to denote the intersection of two sets.
@@ -81,7 +81,7 @@ decomposeSets <- function(x,
 
     x <- filterSets(x, min_size = overlap)
 
-    incidence <- incidence(x)
+    incidence <- sparseIncidence(x)
     elements <- colnames(incidence)
 
     # Sparse lower triangular matrix of intersection sizes

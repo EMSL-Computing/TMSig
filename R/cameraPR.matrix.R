@@ -12,7 +12,7 @@
 #' @param statistic a matrix of statistics (e.g., moderated t-statistics;
 #'   possibly with \code{\link[base]{NA}}s) with genes/molecules as row names
 #'   and one or more contrasts or coefficients as column names.
-#' @param index a named list of sets to test. Passed to \code{\link{incidence}}.
+#' @param index a named list of sets to test. Passed to \code{\link{sparseIncidence}}.
 #'   \code{index} must be a list of character vectors, not the result of
 #'   \code{\link[limma]{ids2indices}}, so it is more restrictive than what
 #'   \code{\link[limma]{cameraPR.default}} allows.
@@ -177,7 +177,7 @@ cameraPR.matrix <- function(statistic,
                         min_size = min.size,
                         max_size = length(background) - 1L)
 
-    imat <- incidence(index) # sparse incidence matrix
+    imat <- sparseIncidence(index) # sparse incidence matrix
     sets <- rownames(imat)
     elements <- colnames(imat)
 

@@ -148,7 +148,7 @@ functions in TMSig, including `similarity`, `clusterSets`, `decomposeSets`,
 and `cameraPR.matrix`.
 
 ```{r incidence-matrix}
-imat <- incidence(x = geneSetsFilt)
+imat <- sparseIncidence(x = geneSetsFilt)
 dim(imat) # 1015 sets, 1914 genes
 
 imat[seq_len(8L), seq_len(5L)] # first 8 sets, first 5 genes

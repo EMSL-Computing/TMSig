@@ -99,5 +99,5 @@ coefficients of faunal similarity. \emph{Journal of Paleontology, 53}(4),
 1029–1034. \url{http://www.jstor.org/stable/1304126}
 }
 \seealso{
-\code{\link{incidence}}, \code{\link{clusterSets}}
+\code{\link{sparseIncidence}}, \code{\link{clusterSets}}
 }

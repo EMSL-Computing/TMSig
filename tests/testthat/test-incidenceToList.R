@@ -5,7 +5,7 @@ x <- list("A" = 1:3,
           "A" = 4)
 x <- lapply(x, as.character)
 
-incidence <- incidence(x)
+incidence <- sparseIncidence(x)
 
 
 test_that("set order does not change", {
