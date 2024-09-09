@@ -1,7 +1,8 @@
-# TMSig DEV (2024-09-06)
+# TMSig DEV (2024-09-07)
 
 **SIGNIFICANT USER-VISIBLE CHANGES**
 
+- Convert functions `sparseIncidence`, `filterSets`, and `invertSets` to S4 generics and add methods for objects of class `GSEABase::GeneSet` and `GSEABase::GeneSetCollection`.
 - Rename functions to adhere to Bioconductor style: `cluster_sets` to `clusterSets`, `decompose_sets` to `decomposeSets`, `filter_sets` to `filterSets`, `gmt_to_list` to `readGMT`, `incidence` to `sparseIncidence`, `incidence_to_list` to `incidenceToList`, `invert_sets` to `invertSets`, `range_extend` to `extendRangeNum`, `camera_color_fun` to `cameraColorFun`, `gsea_color_fun` to `gseaColorFun`.
 - `enrichmap()`: heatmap rectangle fill and border color can now be changed via the `heatmap_args` parameter. 
 - `enrichmap()`: color legend title can now be changed via `heatmap_args = list(name = "new title")` instead of `heatmap_args = list(heatmap_legend_param = list(title = "new title"))`. 
