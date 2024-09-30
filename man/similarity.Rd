@@ -27,18 +27,18 @@ If \eqn{A} and \eqn{B} are sets, we define the Jaccard similarity
 coefficient \eqn{J} as the size of their intersection divided by the size
 of their union (Jaccard, 1912):
 
-\deqn{J(A, B) = \frac{|A \cap B|}{|A \cup B|}}
+\deqn{\text{J}(A, B) = \frac{|A \cap B|}{|A \cup B|}}
 
 The overlap coefficient is defined as the size of the intersection divided
 by the size of the smaller set (Simpson, 1943, 1947, 1960; Fallaw 1979):
 
-\deqn{Overlap(A, B) = \frac{|A \cap B|}{min(|A|, |B|)}}
+\deqn{\text{Overlap}(A, B) = \frac{|A \cap B|}{min(|A|, |B|)}}
 
 The Ōtsuka coefficient is defined as the size of the intersection divided
 by the geometric mean of the set sizes (Ōtsuka, 1936), which is equivalent
 to the cosine similarity of two bit vectors:
 
-\deqn{Ōtsuka(A, B) = \frac{|A \cap B|}{\sqrt{|A| \times |B|}}}
+\deqn{\text{Ōtsuka}(A, B) = \frac{|A \cap B|}{\sqrt{|A| \times |B|}}}
 
 The Jaccard and Ōtsuka coefficients can identify aliased sets (sets which
 contain the same elements, but have different names), while the overlap
@@ -48,7 +48,8 @@ are not easily distinguished without also having the matrix of Jaccard (or
 
 Notice the relationship between the similarity coefficients:
 
-\deqn{0 \leq J(A, B) \leq Ōtsuka(A, B) \leq Overlap(A, B) \leq 1}
+\deqn{0 \leq \text{J}(A, B) \leq \text{Ōtsuka}(A, B) \leq
+  \text{Overlap}(A, B) \leq 1}
 }
 
 \section{Optimization}{
