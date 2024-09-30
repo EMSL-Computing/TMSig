@@ -474,10 +474,6 @@ inference of multiple contrasts or coefficients.
 # CAMERA-PR (matrix method)
 res <- cameraPR(statistic = modz, 
                 index = geneSetsFilt)
-
-# Add z-score column to results (used for bubble heatmaps later)
-res$ZScore <- with(res, zscoreT(x = TwoSampleT, df = df))
-
 head(res)
 ```
 

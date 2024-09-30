@@ -143,8 +143,11 @@ test_that("parametric results are correct", {
         Direction = c(rep("Down", 3), "Up"),
         TwoSampleT = c(-0.38944590, -0.24192298, -1.11542975, 0.04874584),
         df = c(5898L, 5797L, 5998L, 5998L),
+        ZScore = NA_real_,
         PValue = NA_real_
     )
+
+    expected$ZScore <- zscoreT(expected$TwoSampleT, expected$df)
 
     expected$PValue[1:3] <- 2 * pt(expected$TwoSampleT[1:3],
                                    df = expected$df[1:3])

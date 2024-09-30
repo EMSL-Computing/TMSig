@@ -15,7 +15,7 @@
 #'   Default is "GeneSet".
 #' @param statistic_column character; the name of a column in \code{x}
 #'   containing the statistic for each combination of contrast and molecular
-#'   signature. Determines the heatmap body colors.
+#'   signature. Determines the heatmap body colors. Default is "ZScore".
 #' @param contrast_column character; the name of a column in \code{x} containing
 #'   contrasts that will be used as columns for the heatmap. Entries of
 #'   \code{x[[rownames_colum]]} must be uniquely defined for each contrast
@@ -131,7 +131,7 @@
 enrichmap <- function(x,
                       n_top = 15L,
                       set_column = "GeneSet",
-                      statistic_column = "TwoSampleT",
+                      statistic_column = "ZScore",
                       contrast_column = "Contrast",
                       padj_column = "FDR",
                       padj_legend_title = padj_column,

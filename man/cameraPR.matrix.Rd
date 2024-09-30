@@ -21,10 +21,10 @@
 possibly with \code{\link[base]{NA}}s) with genes/molecules as row names
 and one or more contrasts or coefficients as column names.}
 
-\item{index}{a named list of sets to test. Passed to \code{\link{sparseIncidence}}.
-\code{index} must be a list of character vectors, not the result of
-\code{\link[limma]{ids2indices}}, so it is more restrictive than what
-\code{\link[limma]{cameraPR.default}} allows.}
+\item{index}{a named list of sets to test. Passed to
+\code{\link{sparseIncidence}}. \code{index} must be a list of character
+vectors, not the result of \code{\link[limma]{ids2indices}}, so it is more
+restrictive than what \code{\link[limma]{cameraPR.default}} allows.}
 
 \item{use.ranks}{logical; whether to perform a parametric test (\code{FALSE};
 default) or a rank-based test (\code{TRUE}).}
@@ -70,6 +70,7 @@ A \code{data.frame} with the following columns:
 \item{df}{integer; degrees of freedom (only included if
 \code{use.ranks=FALSE}). Two less than the number of non-missing values in
 each column of the \code{statistic} matrix.}
+\item{ZScore}{numeric; the z-score equivalent of \code{TwoSampleT}.}
 \item{PValue}{numeric; one- or two-sided (if
 \code{alternative="two.sided"}) p-value.}
 \item{FDR}{numeric; Benjamini and Hochberg FDR adjusted p-value.}

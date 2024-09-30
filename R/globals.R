@@ -22,5 +22,6 @@ utils::globalVariables(
       "criteria",
       "Down",
       "TwoSampleT",
-      "Up")
+      "Up",
+      "ZScore")
 )

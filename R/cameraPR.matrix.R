@@ -12,10 +12,10 @@
 #' @param statistic a matrix of statistics (e.g., moderated t-statistics;
 #'   possibly with \code{\link[base]{NA}}s) with genes/molecules as row names
 #'   and one or more contrasts or coefficients as column names.
-#' @param index a named list of sets to test. Passed to \code{\link{sparseIncidence}}.
-#'   \code{index} must be a list of character vectors, not the result of
-#'   \code{\link[limma]{ids2indices}}, so it is more restrictive than what
-#'   \code{\link[limma]{cameraPR.default}} allows.
+#' @param index a named list of sets to test. Passed to
+#'   \code{\link{sparseIncidence}}. \code{index} must be a list of character
+#'   vectors, not the result of \code{\link[limma]{ids2indices}}, so it is more
+#'   restrictive than what \code{\link[limma]{cameraPR.default}} allows.
 #' @param use.ranks logical; whether to perform a parametric test (\code{FALSE};
 #'   default) or a rank-based test (\code{TRUE}).
 #' @param inter.gene.cor numeric; the inter-gene correlation within tested sets.
@@ -53,6 +53,7 @@
 #'   \item{df}{integer; degrees of freedom (only included if
 #'   \code{use.ranks=FALSE}). Two less than the number of non-missing values in
 #'   each column of the \code{statistic} matrix.}
+#'   \item{ZScore}{numeric; the z-score equivalent of \code{TwoSampleT}.}
 #'   \item{PValue}{numeric; one- or two-sided (if
 #'   \code{alternative="two.sided"}) p-value.}
 #'   \item{FDR}{numeric; Benjamini and Hochberg FDR adjusted p-value.}
@@ -85,7 +86,7 @@
 #'
 #' @importFrom data.table frank data.table `:=` rbindlist setcolorder setorderv
 #'   setDF
-#' @importFrom limma cameraPR
+#' @importFrom limma cameraPR zscoreT
 #' @importFrom stats p.adjust pt var
 #'
 #' @export cameraPR.matrix
@@ -304,15 +305,15 @@ cameraPR.matrix <- function(statistic,
             GeneSet = sets,
             NGenes = m[, contrast_i],
             Direction = Direction[, contrast_i],
-            PValue = PValue[, contrast_i],
             stringsAsFactors = FALSE
         )
 
         if (!use.ranks) {
             tab_i[, `:=`(TwoSampleT = TwoSampleT[, contrast_i],
                          df = df[, contrast_i])]
-            setcolorder(tab_i, c("TwoSampleT", "df"), before = "PValue")
+            tab_i[, ZScore := zscoreT(TwoSampleT, df)]
         }
+        tab_i[, PValue := PValue[, contrast_i]]
 
         return(tab_i)
     })
