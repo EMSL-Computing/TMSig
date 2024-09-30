@@ -9,9 +9,9 @@
 #'   While the language is gene-centric, any \emph{a priori} groups of molecules
 #'   may be tested.
 #'
-#' @param statistic a matrix of statistics (e.g., moderated t-statistics;
-#'   possibly with \code{\link[base]{NA}}s) with genes/molecules as row names
-#'   and one or more contrasts or coefficients as column names.
+#' @param statistic a matrix of statistics (moderated z-statistics preferred)
+#'   with genes/molecules as row names and one or more contrasts or coefficients
+#'   as column names. Missing values are allowed.
 #' @param index a named list of sets to test. Passed to
 #'   \code{\link{sparseIncidence}}. \code{index} must be a list of character
 #'   vectors, not the result of \code{\link[limma]{ids2indices}}, so it is more
@@ -25,8 +25,7 @@
 #'   p-value? Default is \code{TRUE}.
 #' @param alternative character; the alternative hypothesis. Must be one of
 #'   "\code{two.sided}" (default), "\code{greater}", or "\code{less}". May be
-#'   abbreviated. A warning will be issued if anything other than
-#'   "\code{two.sided}" is specified when \code{use.ranks=FALSE}.
+#'   abbreviated.
 #' @param adjust.globally logical; whether p-values from different contrasts
 #'   should be adjusted together. It is recommended to set this to \code{TRUE}
 #'   when testing a set of closely related contrasts. See Section 13.3 of the
@@ -67,7 +66,8 @@
 #'   the moderated t-statistics are converted to z-statistics with
 #'   \code{\link[limma]{zscoreT}} and used for the analysis.
 #'
-#'   If \code{use.ranks=TRUE}, a modified Wilcoxon rank sum test will be used.
+#'   If \code{use.ranks=TRUE}, a modified Wilcoxon-Mann-Whitney rank sum test
+#'   will be used.
 #'
 #' @references Wu, D., and Smyth, G. K. (2012). Camera: a competitive gene set
 #'   test accounting for inter-gene correlation. \emph{Nucleic Acids Research}
@@ -79,7 +79,10 @@
 #'   980-987. doi:\href{https://doi.org/10.1093/bioinformatics/btm051
 #'   }{10.1093/bioinformatics/btm051}.
 #'
-#' @author Di Wu, Gordon Smyth, and Tyler Sagendorf
+#' @author CAMERA-PR was developed by Di Wu and Gordon Smyth (2012). With
+#'   permission, Tyler Sagendorf modified their original code to create the
+#'   matrix method. If using \code{cameraPR.matrix}, please cite the original
+#'   paper, as well as the TMSig R package.
 #'
 #' @seealso \code{\link[limma]{cameraPR}},
 #'   \code{\link[limma]{rankSumTestWithCorrelation}}

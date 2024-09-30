@@ -17,9 +17,9 @@
 )
 }
 \arguments{
-\item{statistic}{a matrix of statistics (e.g., moderated t-statistics;
-possibly with \code{\link[base]{NA}}s) with genes/molecules as row names
-and one or more contrasts or coefficients as column names.}
+\item{statistic}{a matrix of statistics (moderated z-statistics preferred)
+with genes/molecules as row names and one or more contrasts or coefficients
+as column names. Missing values are allowed.}
 
 \item{index}{a named list of sets to test. Passed to
 \code{\link{sparseIncidence}}. \code{index} must be a list of character
@@ -38,8 +38,7 @@ p-value? Default is \code{TRUE}.}
 
 \item{alternative}{character; the alternative hypothesis. Must be one of
 "\code{two.sided}" (default), "\code{greater}", or "\code{less}". May be
-abbreviated. A warning will be issued if anything other than
-"\code{two.sided}" is specified when \code{use.ranks=FALSE}.}
+abbreviated.}
 
 \item{adjust.globally}{logical; whether p-values from different contrasts
 should be adjusted together. It is recommended to set this to \code{TRUE}
@@ -95,7 +94,8 @@ approximately Normally distributed. In \code{\link[limma]{camera.default}},
 the moderated t-statistics are converted to z-statistics with
 \code{\link[limma]{zscoreT}} and used for the analysis.
 
-If \code{use.ranks=TRUE}, a modified Wilcoxon rank sum test will be used.
+If \code{use.ranks=TRUE}, a modified Wilcoxon-Mann-Whitney rank sum test
+will be used.
 }
 
 \examples{
@@ -159,5 +159,8 @@ terms of gene sets: methodological issues. \emph{Bioinformatics} 23,
 \code{\link[limma]{rankSumTestWithCorrelation}}
 }
 \author{
-Di Wu, Gordon Smyth, and Tyler Sagendorf
+CAMERA-PR was developed by Di Wu and Gordon Smyth (2012). With
+permission, Tyler Sagendorf modified their original code to create the
+matrix method. If using \code{cameraPR.matrix}, please cite the original
+paper, as well as the TMSig R package.
 }
