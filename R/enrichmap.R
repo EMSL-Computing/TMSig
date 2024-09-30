@@ -80,11 +80,8 @@
 #'   diameter; this is to better visualize patterns across contrasts. Bubbles
 #'   can also be scaled so that largest \eqn{-log_{10}} adjusted p-value by
 #'   column (\code{scale_by="column"}) or in the entire heatmap
-#'   (\code{scale_by="max"}) has the maximum diameter. If the adjusted p-value
-#'   is below \code{padj_cutoff}, the bubble diameter will be no smaller than
-#'   \code{0.2 * cell_size}. If the adjusted p-value is greater than or equal to
-#'   \code{padj_cutoff}, there is no limit on how small the diameter can be, so
-#'   it may seem as if the bubbles have disappeared, leaving a blank cell.
+#'   (\code{scale_by="max"}) has the maximum diameter. The bubble diameters will
+#'   be no smaller than \code{0.2 * cell_size}.
 #'
 #' @importFrom circlize colorRamp2
 #' @importFrom ComplexHeatmap Heatmap Legend draw max_text_width

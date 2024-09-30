@@ -196,11 +196,9 @@
     }
 
     # Limits on bubble diameters
-    r_min <- 0.20 # only applies to significant adjusted p-values
-    r_max <- 0.95 # upper limit because a black border is added to the bubbles
-    dmat <- ifelse(padj_mat < padj_cutoff,
-                   dmat * (r_max - r_min) + r_min,
-                   dmat * r_max)
+    r_min <- 0.20
+    r_max <- 0.95
+    dmat <- dmat * (r_max - r_min) + r_min
 
     # Draw bubbles
     grid.circle(
