@@ -1,8 +1,8 @@
 Package: TMSig
 Type: Package
 Title: Tools for Molecular Signatures
-Version: 0.99.1
-Date: 2024-09-30
+Version: 0.99.2
+Date: 2024-10-17
 Authors@R: 
     c(
       person(given = "Tyler", family = "Sagendorf", 
@@ -25,7 +25,8 @@ Encoding: UTF-8
 RoxygenNote: 7.3.2
 Roxygen: list(markdown = TRUE)
 VignetteBuilder: knitr
-biocViews: Clustering, GeneSetEnrichment, GraphAndNetwork, Pathways, Visualization
+biocViews: 
+    Clustering, GeneSetEnrichment, GraphAndNetwork, Pathways, Visualization
 Depends:
     R (>= 4.4.0),
     limma

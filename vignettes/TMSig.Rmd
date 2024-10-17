@@ -42,7 +42,7 @@ options(width = 80)
 knitr::opts_chunk$set(collapse = TRUE,
                       message = FALSE,
                       comment = "#>",
-                      dpi = 400)
+                      dpi = 250)
 
 suppressPackageStartupMessages({
     library(TMSig)
@@ -86,7 +86,7 @@ filt <- filterSets(x = geneSets,
 length(filt) # 7096 gene sets remain (down from 10461)
 ```
 
-Normally, **the background is the genes quantified in a particular
+Normally, **the background is the set of genes quantified in a particular
 experiment**. For the purposes of this example, the top 2000 most common genes
 will be selected to serve as the background. This ensures the gene sets will
 maintain some degree of overlap for later steps.
@@ -295,7 +295,12 @@ disjoint parts:
 2. The elements unique to $B$: $B \setminus A$ ("B minus A")
 3. The elements common to both $A$ and $B$: $A \cap B$ ("A and B")
 
-```{r venn-diagram, echo=FALSE, out.height="80%", out.width="80%", fig.cap="Decomposition of sets."}
+```{r venn-diagram-chunk-opts, include=FALSE}
+h <- w <- "80%"
+cap <- "Decomposition of sets."
+```
+
+```{r venn-diagram, echo=FALSE, out.height=h, out.width=w, fig.cap=cap}
 knitr::include_graphics("images/Venn_Diagram.png")
 ```
 
@@ -514,7 +519,12 @@ maximum diameter, and all other bubbles will be scaled relative to it based on
 their -log$_{10}$ adjusted p-values. See 
 `help(topic = "enrichmap", package = "TMSig")` for more details.
 
-```{r DA-bubble-heatmap, out.height="70%", out.width="70%", dpi=400, fig.cap="Bubble heatmap of differential expression analysis results."}
+```{r DA-heatmap-chunk-opts, include=FALSE}
+h <- w <- "70%"
+cap <- "Bubble heatmap of differential expression analysis results."
+```
+
+```{r DA-bubble-heatmap, out.height=h, out.width=w, fig.cap=cap}
 # Differential analysis bubble heatmap
 enrichmap(x = resDA, 
           scale_by = "max",
@@ -539,7 +549,12 @@ enrichmap(x = resDA,
 Now, a bubble heatmap will be generated to visualize the CAMERA-PR gene set
 analysis results. The top 20 gene sets will be shown.
 
-```{r CAMERA-bubble-heatmap, dpi=400, fig.cap="Bubble heatmap of CAMERA-PR results."}
+```{r camera-heatmap-chunk-opts, include=FALSE}
+h <- w <- "100%"
+cap <- "Bubble heatmap of CAMERA-PR results."
+```
+
+```{r CAMERA-bubble-heatmap, out.height=h, out.width=w, fig.cap=cap}
 # CAMERA-PR bubble heatmap
 enrichmap(x = res, 
           scale_by = "row", # default
