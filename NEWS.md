@@ -1,3 +1,9 @@
+# TMSig 0.99.3 (2024-10-17)
+
+**MINOR CHANGES**
+- Addressed 'Consider shorter lines' NOTE from BiocCheck.
+
+
 # TMSig 0.99.2 (2024-10-17)
 
 **MINOR CHANGES**
